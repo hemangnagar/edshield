@@ -1,0 +1,21 @@
+# COPPA profile for services used by children under 13.
+# COPPA (16 CFR 312.2) treats persistent identifiers (usernames, screen
+# names, device IDs), contact information and geolocation as personal
+# information. This profile is recall-first: lower confidence thresholds,
+# usernames and IDs always removed, and no surrogate generation for
+# contact fields (a fake email is still an email a child might use).
+name: coppa
+description: Recall-first removal of children's personal information from chat, transcripts and submissions before any model call.
+default_method: mask
+min_confidence: 0.35
+allow_method_override: true
+labels:
+  NAME_STUDENT: {enabled: true, mask: "[CHILD]", min_confidence: 0.3}
+  EMAIL: {enabled: true, method: mask}
+  USERNAME: {enabled: true, method: mask, min_confidence: 0.3}
+  ID_NUM: {enabled: true, min_confidence: 0.5}
+  PHONE_NUM: {enabled: true, method: mask}
+  URL_PERSONAL: {enabled: true, method: mask}
+  STREET_ADDRESS: {enabled: true, method: mask}
+  SSN: {enabled: true, method: mask}
+  DATE: {enabled: true, method: shift_dates}

@@ -1,0 +1,23 @@
+# FERPA de-identification profile.
+# FERPA (34 CFR 99.31(b)) permits release of education records only after
+# removal of all personally identifiable information, including information
+# that "alone or in combination" would let a reasonable person in the school
+# community identify the student. This profile therefore acts on every
+# direct identifier and on dates. Using this profile does not, by itself,
+# establish FERPA compliance; a reasonable-determination review is still
+# the institution's responsibility.
+name: ferpa
+description: Remove all direct identifiers from student writing and records before release or before sending to a third-party model.
+default_method: mask
+min_confidence: 0.5
+allow_method_override: true
+labels:
+  NAME_STUDENT: {enabled: true, mask: "[STUDENT]", min_confidence: 0.4}
+  EMAIL: {enabled: true}
+  USERNAME: {enabled: true}
+  ID_NUM: {enabled: true, min_confidence: 0.6}
+  PHONE_NUM: {enabled: true}
+  URL_PERSONAL: {enabled: true}
+  STREET_ADDRESS: {enabled: true}
+  SSN: {enabled: true, method: mask}
+  DATE: {enabled: true, method: shift_dates}

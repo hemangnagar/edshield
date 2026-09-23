@@ -1,0 +1,19 @@
+# Research-release profile: readable surrogates instead of masks so that
+# learning-science analyses (essay scoring, discourse tagging) keep natural
+# text. Same value -> same surrogate within a document. Dates are shifted by
+# a per-document offset so intervals are preserved.
+name: research
+description: Surrogate replacement that keeps text natural for educational-data-mining releases.
+default_method: replace
+min_confidence: 0.5
+allow_method_override: true
+labels:
+  NAME_STUDENT: {enabled: true}
+  EMAIL: {enabled: true}
+  USERNAME: {enabled: true}
+  ID_NUM: {enabled: true}
+  PHONE_NUM: {enabled: true}
+  URL_PERSONAL: {enabled: true}
+  STREET_ADDRESS: {enabled: true}
+  SSN: {enabled: true, method: mask}
+  DATE: {enabled: true, method: shift_dates}

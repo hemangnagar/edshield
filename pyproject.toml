@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "edshield"
+version = "0.1.0"
+description = "Local-first student-privacy layer for AI in education: PII detection and FERPA/COPPA de-identification that runs on-device."
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.10"
+authors = [{name = "Hemang Nagar", email = "hi@hemangnagar.dev"}]
+keywords = ["education", "FERPA", "COPPA", "PII", "de-identification", "NER", "on-device", "edtech"]
+classifiers = [
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Topic :: Education",
+  "Topic :: Security",
+]
+dependencies = ["pyyaml>=6", "faker>=20"]
+
+[project.optional-dependencies]
+hf = ["transformers>=4.40", "torch>=2.1"]
+onnx = ["onnxruntime>=1.17", "optimum>=1.19"]
+service = ["fastapi>=0.110", "uvicorn>=0.29"]
+train = ["transformers>=4.40", "torch>=2.1", "datasets>=2.18", "accelerate>=0.28", "seqeval>=1.2"]
+dev = ["pytest>=8", "ruff>=0.4"]
+
+[project.scripts]
+edshield = "edshield.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/hemangnagar/edshield"
+
+[tool.setuptools.packages.find]
+include = ["edshield*"]
+
+[tool.setuptools.package-data]
+edshield = ["policies/*.yaml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

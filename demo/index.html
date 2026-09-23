@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>edshield demo: student writing, redacted on this device</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f7f8fa;
+    --sheet: #ffffff;
+    --ink: #17203a;
+    --ink-soft: #5b6478;
+    --line: #d9dde6;
+    --mark: #ffe45c;
+    --mark-deep: #e8c62a;
+    --ok: #1e7f4f;
+    --warn: #b23a2a;
+    --font: "Atkinson Hyperlegible", "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font); font-size: 17px; line-height: 1.5; }
+  header { max-width: 1180px; margin: 0 auto; padding: 40px 24px 16px; }
+  header h1 { font-size: 30px; line-height: 1.15; margin: 0 0 8px; font-weight: 700; letter-spacing: -0.01em; }
+  header p { margin: 0; color: var(--ink-soft); max-width: 62ch; }
+  .controls { max-width: 1180px; margin: 0 auto; padding: 8px 24px 20px; display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; }
+  .controls label { display: inline-flex; align-items: center; gap: 8px; color: var(--ink-soft); font-size: 15px; }
+  select, button { font: inherit; font-size: 15px; border: 1px solid var(--line); background: var(--sheet); color: var(--ink); border-radius: 6px; padding: 6px 10px; }
+  button.primary { background: var(--ink); color: #fff; border-color: var(--ink); padding: 8px 18px; cursor: pointer; }
+  button.primary:hover { background: #24304f; }
+  button:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--mark); outline-offset: 2px; }
+  .pages { max-width: 1180px; margin: 0 auto; padding: 0 24px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .sheet { background: var(--sheet); border: 1px solid var(--line); border-radius: 4px; padding: 26px 28px 22px; min-height: 380px; position: relative; box-shadow: 0 1px 0 rgba(23,32,58,.06); }
+  .sheet h2 { font-size: 15px; font-weight: 700; margin: 0 0 12px; color: var(--ink-soft); }
+  textarea { width: 100%; min-height: 330px; border: 0; resize: vertical; font: inherit; line-height: 1.6; color: var(--ink); background: transparent; padding: 0; }
+  #out { white-space: pre-wrap; line-height: 1.6; min-height: 330px; }
+  mark { background: none; color: var(--ink); position: relative; z-index: 0; padding: 0 3px; border-radius: 2px; }
+  mark::before { content: ""; position: absolute; inset: 2px -2px 1px -2px; background: var(--mark); transform: skew(-4deg) rotate(-0.4deg); z-index: -1; border-radius: 3px; }
+  mark.new::before { animation: sweep 320ms ease-out both; transform-origin: left center; }
+  @keyframes sweep { from { transform: scaleX(0) skew(-4deg); } to { transform: scaleX(1) skew(-4deg); } }
+  @media (prefers-reduced-motion: reduce) { mark.new::before { animation: none; } }
+  mark small { font-size: 11px; color: var(--ink-soft); margin-left: 3px; vertical-align: 1px; }
+  .strip { max-width: 1180px; margin: 0 auto; padding: 0 24px 32px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .stat { border-top: 2px solid var(--ink); padding-top: 10px; }
+  .stat b { display: block; font-size: 28px; line-height: 1.1; font-weight: 700; }
+  .stat span { color: var(--ink-soft); font-size: 14px; }
+  .stat.ok b { color: var(--ok); }
+  details { max-width: 1180px; margin: 0 auto 48px; padding: 0 24px; color: var(--ink-soft); font-size: 15px; }
+  pre { background: var(--sheet); border: 1px solid var(--line); border-radius: 4px; padding: 14px 16px; overflow-x: auto; font-family: var(--mono); font-size: 13px; line-height: 1.5; color: var(--ink); }
+  .note { margin: 18px 0 0; padding-top: 12px; border-top: 1px dashed var(--line); color: var(--ink-soft); font-size: 14px; }
+  #status { font-size: 14px; color: var(--ink-soft); }
+  #status.warn { color: var(--warn); }
+  .empty { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; color: var(--ink-soft); padding: 40px; }
+  @media (max-width: 860px) { .pages { grid-template-columns: 1fr; } .strip { grid-template-columns: repeat(2, 1fr); } header { padding-top: 24px; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Student writing, redacted before it leaves this device</h1>
+  <p>Paste an essay, a tutoring transcript or a chat message. edshield finds the student's personal details and removes them locally. The text on the right is all an AI tutor or a cloud model would ever see.</p>
+</header>
+
+<div class="controls">
+  <label>Sample <select id="sample">
+    <option value="essay">Reflection essay</option>
+    <option value="transcript">Tutoring transcript</option>
+    <option value="chat">Chatbot message</option>
+  </select></label>
+  <label>Policy <select id="policy">
+    <option value="coppa">COPPA (under 13, recall-first)</option>
+    <option value="ferpa" selected>FERPA (education records)</option>
+    <option value="research">Research release (surrogates)</option>
+  </select></label>
+  <label>Detector <select id="engine">
+    <option value="rules" selected>Rules only (no model)</option>
+    <option value="model">Rules + on-device model</option>
+  </select></label>
+  <button class="primary" id="run">Redact</button>
+  <span id="status">Ready. Nothing has been sent anywhere.</span>
+</div>
+
+<div class="pages">
+  <section class="sheet">
+    <h2>What the student wrote</h2>
+    <textarea id="in" spellcheck="false" aria-label="Student text"></textarea>
+  </section>
+  <section class="sheet">
+    <h2>What leaves the device</h2>
+    <div id="out"></div>
+    <p id="note" class="note" hidden>Rules catch names the student introduces ("my name is…", a signature). A friend's name mentioned in passing, like a classmate in this essay, needs the on-device model. Switch the detector to see the difference.</p>
+    <div class="empty" id="empty">Press Redact to see the safe copy.</div>
+  </section>
+</div>
+
+<div class="strip">
+  <div class="stat"><b id="n-ent">0</b><span>identifiers found</span></div>
+  <div class="stat"><b id="n-chars">0</b><span>characters removed</span></div>
+  <div class="stat"><b id="n-ms">0 ms</b><span>time on this device</span></div>
+  <div class="stat ok"><b id="n-bytes">0 bytes</b><span>of student text sent over the network</span></div>
+</div>
+
+<details>
+  <summary>Entities as JSON (what the Python API returns)</summary>
+  <pre id="json">{}</pre>
+</details>
+
+<script type="module">
+// ---------- Samples (all synthetic) ----------
+const SAMPLES = {
+essay: `My name is Priya Raman and I'm in 8th grade at Rachel Carson Middle School. For this project I chose to look at how much food our cafeteria throws away every week.
+
+First, I gathered information by interviewing the kitchen staff and by posting a survey on my class page at priyawrites.wordpress.com. My friend Daniel Okafor helped me count trays for three days. We found that about a third of the fruit goes straight into the trash.
+
+If anyone wants the spreadsheet, you can email me at priya.raman08@gmail.com or text 703-555-0142. My student ID is 4471882 if the office needs it. We live at 1420 Maple Ridge Ct, Vienna, VA 22182, so I can drop off a copy too.
+
+Overall this taught me that listening to people matters more than having a fancy idea. Priya`,
+transcript: `Tutor: Good afternoon! What are we working on today?
+Student: Hi, this is Marcus. We have a quiz on similar triangles Friday.
+Tutor: Great. Let's start with problem 3. What do you think it's asking?
+Student: I think we need to find the missing side using the ratio. I got 42 but my brother Jordan said that's wrong.
+Tutor: Let's slow down. What's the scale factor between the two triangles?
+Student: Oh, it's 1.5. So 28 times 1.5 is 42. It IS right!
+Tutor: Nice work. For next time, can you send me the worksheet?
+Student: Sure, my email is marcus.t2012@gmail.com and my Discord is @marcus_hoops. Mom said you can also call her at (571) 555-0188. My birthday is 03/14/2012 so I'll be 15 soon.
+Tutor: Perfect. Try problems 4 through 8 before Thursday.`,
+chat: `hey can u help me with my essay?? its due tmrw. im Aiden Ruiz btw, my teacher Ms. Patel said to use the rubric. my login for the school portal is aruiz2013 if u need to see the assignment, id number S20130447. dont tell my mom i waited till the last minute lol`
+};
+
+// ---------- Rule detectors (JS port of edshield/rules.py) ----------
+const SUFFIX = "street|st|avenue|ave|road|rd|boulevard|blvd|lane|ln|drive|dr|court|ct|circle|cir|way|place|pl|terrace|ter|parkway|pkwy|highway|hwy|trail|trl|square|sq|mission|flats|forges|port|ridge|run|pass|crossing|loop|point|park|manor|estates|heights|hollow|meadows|springs|valley|village|mills|plaza|station|trace|view|walk|cove|creek|falls|glen|grove|harbor|isle|junction|lake|landing|light|lodge|mount|orchard|path|pike|prairie|rapids|rest|shoals|shore|summit|track|tunnel|turnpike|vista|wells";
+const R = {
+  EMAIL: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g,
+  SSN: /(?<!\d)(?!000|666|9\d\d)\d{3}[- ](?!00)\d{2}[- ](?!0000)\d{4}(?!\d)/g,
+  PHONE_NUM: /(?<![\w.])(?:\+?1[\s.-]?)?(?:\(\d{3}\)|\d{3})[\s.-]?\d{3}[\s.-]?\d{4}(?!\w)(?!\.\d)|(?<![\w.])\+\d{1,3}[\s.-]?\d{2,4}(?:[\s.-]?\d{2,4}){2,3}(?!\w)(?!\.\d)/g,
+  URL: /\b(?:https?:\/\/|www\.)[^\s<>"']+|\b[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:com|net|org|io|me|edu|co|dev|app|info)(?:\/[^\s<>"']*)?/gi,
+  USERNAME: /(?<![\w@])@([A-Za-z0-9_.]{3,30})\b|\b(?:username|user name|handle|login|user id|userid|screen name|gamertag|discord|instagram|insta|snap|snapchat|tiktok|twitter|github|roblox|xbox|psn)(?![.\/])\s*(?:is|:|=|-)\s*@?([A-Za-z0-9_][A-Za-z0-9_.]{2,29})\b|\b(?:username|user name|handle|login|user id|userid|screen name|gamertag|discord|instagram|insta|snap|snapchat|tiktok|twitter|github|roblox|xbox|psn)\b[^.\n@]{0,40}?\b(?:is|:)\s*@?([A-Za-z0-9_][A-Za-z0-9_.]{2,29})\b|\b(?:username|user name|handle|login|user id|userid|screen name|gamertag|discord|instagram|insta|snap|snapchat|tiktok|twitter|github|roblox|xbox|psn)(?![.\/])\s+@?([A-Za-z]*[0-9_.][A-Za-z0-9_.]*)\b/gi,
+  ID_CUE: /\b(?:student\s*(?:id|number|no\.?|#)|id\s*(?:number|no\.?|#)?|osis|sid|lunch\s*(?:number|#)|badge|library\s*card|account\s*(?:number|no\.?|#)|roll\s*(?:number|no\.?))\s*(?:is|:|=|-|#)?\s*([A-Z0-9][A-Z0-9-]{4,24})\b/gi,
+  ID_BARE: /(?<![\w-])(?=[A-Z0-9-]{7,24}(?![\w-]))(?=[A-Z-]*\d)[A-Z0-9-]{7,24}(?![\w-])/g,
+  STREET_ADDRESS: new RegExp(`\\b\\d{1,6}\\s+(?:[A-Z][a-zA-Z0-9]*\\.?\\s+){0,4}(?:${SUFFIX})\\.?(?:\\s*,?\\s*(?:apt|apartment|unit|suite|ste|#)\\.?\\s*\\w+)?(?:\\s*,?\\s*[A-Z][a-zA-Z]+(?:\\s[A-Z][a-zA-Z]+)?\\s*,?\\s*[A-Z]{2}\\s*\\d{5}(?:-\\d{4})?)?`, "gi"),
+  DATE: /\b(?:0?[1-9]|1[0-2])[\/.-](?:0?[1-9]|[12]\d|3[01])[\/.-](?:19|20)\d{2}\b|\b(?:19|20)\d{2}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])\b|\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\.?\s+\d{1,2}(?:st|nd|rd|th)?,?\s+(?:19|20)\d{2}\b/gi,
+  NAME_STRONG: /\b(?:my name is|my name's|i am|i'm|im|this is|it's|its|name:|sincerely,?|thanks,?|thank you,?|regards,?|love,?|yours,?)\s+([A-Za-z][a-z'’-]+(?:\s+(?:[A-Za-z][a-z'’-]+|[A-Za-z]\.?)){0,2})/gi,
+  NAME_WEAK: /\b(?:written by|by|from|interviewed|with|and)\s+([A-Za-z][a-z'’-]+(?:\s+(?:[A-Za-z][a-z'’-]+|[A-Za-z]\.?)){1,2})/gi,
+};
+const STOP = new Set(["Hi","Hello","Hey","Oh","Thanks","Yeah","Well","Um","Hmm","Wait","Ms","Mr","Mrs","Dr","Miss","Mx","Tutor","Student","Teacher","Okay","Ok","Yes","No","Just","Still","Only","All","My","Your","Our","Their","Good","The","This","That","What","When","Where","Why","How","Which","Who","In","On","At","For","From","With","About","Going","Not","Very","Really","Also","Then","Now","Here","There","So","But","And","Or","A","An","It","We","They","He","She","You","I","Sure","Sorry","Middle","School"]);
+const ALLOW = ["wikipedia.org","khanacademy.org","google.com","youtube.com","youtu.be","britannica.com","nasa.gov",".gov","nytimes.com","bbc.com","coursera.org","edx.org","doi.org","jstor.org","arxiv.org","quizlet.com","desmos.com","stackoverflow.com"];
+const HINT = ["linkedin.com/in/","facebook.com/","instagram.com/","twitter.com/","x.com/","tiktok.com/@","github.com/","youtube.com/@","medium.com/@","wordpress.com","blogspot.com","wixsite.com","carrd.co","about.me","linktr.ee"];
+
+function trim(text, s, e) { while (e > s && ".,;:)]}'\"".includes(text[e-1])) e--; return [s, e]; }
+function push(out, label, text, s, e, conf, source="rules") { [s, e] = trim(text, s, e); if (e > s) out.push({label, text: text.slice(s, e), start: s, end: e, confidence: conf, source}); }
+
+function detectRules(text) {
+  const out = [];
+  for (const m of text.matchAll(R.EMAIL)) push(out, "EMAIL", text, m.index, m.index + m[0].length, 0.99);
+  for (const m of text.matchAll(R.SSN)) push(out, "SSN", text, m.index, m.index + m[0].length, 0.97);
+  for (const m of text.matchAll(R.PHONE_NUM)) { const d = m[0].replace(/\D/g, ""); if (d.length >= 10 && d.length <= 15) push(out, "PHONE_NUM", text, m.index, m.index + m[0].length, 0.95); }
+  for (const m of text.matchAll(R.URL)) {
+    if (text[m.index - 1] === "@") continue;
+    const u = m[0].toLowerCase();
+    const personal = HINT.some(h => u.includes(h)) || !ALLOW.some(a => u.includes(a));
+    if (personal) push(out, "URL_PERSONAL", text, m.index, m.index + m[0].length, 0.9);
+  }
+  for (const m of text.matchAll(R.USERNAME)) { const g = [1,2,3,4].find(i => m[i]); if (!g) continue; const s = m.index + m[0].lastIndexOf(m[g]); push(out, "USERNAME", text, s, s + m[g].length, 0.9); }
+  for (const m of text.matchAll(R.ID_CUE)) { const s = m.index + m[0].lastIndexOf(m[1]); push(out, "ID_NUM", text, s, s + m[1].length, 0.92); }
+  for (const m of text.matchAll(R.ID_BARE)) { const d = m[0].replace(/\D/g, ""); push(out, "ID_NUM", text, m.index, m.index + m[0].length, d.length >= 7 ? 0.75 : 0.6); }
+  for (const m of text.matchAll(R.STREET_ADDRESS)) push(out, "STREET_ADDRESS", text, m.index, m.index + m[0].length, 0.85);
+  for (const m of text.matchAll(R.DATE)) push(out, "DATE", text, m.index, m.index + m[0].length, 0.8);
+  for (const [re, minTok] of [[R.NAME_STRONG, 1], [R.NAME_WEAK, 2]]) for (const m of text.matchAll(re)) {
+    // keep the leading run of capitalised tokens (the i flag is only for the cue)
+    const toks = m[1].split(/\s+/); let keep = [];
+    for (const t of toks) { if (/^[A-Z]/.test(t)) keep.push(t); else break; }
+    if (keep.length < minTok || STOP.has(keep[0])) continue;
+    const name = keep.join(" "); const s = m.index + m[0].indexOf(m[1]); push(out, "NAME_STUDENT", text, s, s + name.length, 0.7);
+  }
+  return out;
+}
+
+function propagateNames(text, ents) {
+  const names = ents.filter(e => e.label === "NAME_STUDENT");
+  if (!names.length) return ents;
+  const seen = new Set(ents.map(e => `${e.start}:${e.end}`));
+  const needles = new Map();
+  for (const e of names) {
+    needles.set(e.text.trim(), e.confidence);
+    for (let tok of e.text.split(/\s+/)) { tok = tok.replace(/\.$/, ""); if (tok.length >= 3 && /^[A-Z]/.test(tok) && !STOP.has(tok)) needles.set(tok, e.confidence * 0.9); }
+  }
+  const out = [...ents];
+  for (const [needle, conf] of [...needles].sort((a, b) => b[0].length - a[0].length)) {
+    const re = new RegExp(`(?<![\\w'’])${needle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\w'’])`, "g");
+    for (const m of text.matchAll(re)) {
+      const key = `${m.index}:${m.index + needle.length}`;
+      if (seen.has(key)) continue;
+      if (ents.some(k => k.label !== "NAME_STUDENT" && k.start <= m.index && m.index + needle.length <= k.end)) continue;
+      out.push({label: "NAME_STUDENT", text: needle, start: m.index, end: m.index + needle.length, confidence: conf, source: "propagated"});
+      seen.add(key);
+    }
+  }
+  return out;
+}
+
+function resolve(ents) {
+  const ordered = [...ents].sort((a, b) => (b.confidence - a.confidence) || ((b.end - b.start) - (a.end - a.start)) || ((a.source === "model" ? 0 : 1) - (b.source === "model" ? 0 : 1)) || (a.start - b.start));
+  const kept = [];
+  for (const e of ordered) if (!kept.some(k => e.start < k.end && k.start < e.end)) kept.push(e);
+  return kept.sort((a, b) => a.start - b.start);
+}
+
+// ---------- Policies (mirror of edshield/policies/*.yaml) ----------
+const POLICY = {
+  ferpa:    { min: 0.5,  labels: { NAME_STUDENT: {mask: "[STUDENT]", min: 0.4}, EMAIL: {}, USERNAME: {}, ID_NUM: {min: 0.6}, PHONE_NUM: {}, URL_PERSONAL: {}, STREET_ADDRESS: {}, SSN: {method: "mask"}, DATE: {method: "shift"} } },
+  coppa:    { min: 0.35, labels: { NAME_STUDENT: {mask: "[CHILD]", min: 0.3}, EMAIL: {method: "mask"}, USERNAME: {method: "mask", min: 0.3}, ID_NUM: {min: 0.5}, PHONE_NUM: {method: "mask"}, URL_PERSONAL: {method: "mask"}, STREET_ADDRESS: {method: "mask"}, SSN: {method: "mask"}, DATE: {method: "shift"} } },
+  research: { min: 0.5,  method: "replace", labels: { NAME_STUDENT: {}, EMAIL: {}, USERNAME: {}, ID_NUM: {}, PHONE_NUM: {}, URL_PERSONAL: {}, STREET_ADDRESS: {}, SSN: {method: "mask"}, DATE: {method: "shift"} } },
+};
+const FIRST = ["Avery","Jordan","Riley","Sam","Taylor","Morgan","Casey","Quinn","Rowan","Elliot"], LAST = ["Nguyen","Patel","Garcia","Okoro","Kim","Rossi","Haddad","Lindqvist","Mensah","Sato"];
+function surrogate(e, memo) {
+  const key = e.label + "::" + e.text.toLowerCase();
+  if (memo.has(key)) return memo.get(key);
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  let v;
+  switch (e.label) {
+    case "NAME_STUDENT": v = e.text.trim().includes(" ") ? `${pick(FIRST)} ${pick(LAST)}` : pick(FIRST); break;
+    case "EMAIL": v = `${pick(FIRST).toLowerCase()}${Math.floor(Math.random()*90+10)}@example.com`; break;
+    case "USERNAME": v = `${pick(FIRST).toLowerCase()}_${Math.floor(Math.random()*900+100)}`; break;
+    case "ID_NUM": v = String(Math.floor(Math.random()*9e6+1e6)); break;
+    case "PHONE_NUM": v = `555-${Math.floor(Math.random()*900+100)}-${Math.floor(Math.random()*9000+1000)}`; break;
+    case "URL_PERSONAL": v = `https://example.com/${pick(FIRST).toLowerCase()}`; break;
+    case "STREET_ADDRESS": v = `${Math.floor(Math.random()*9000+100)} ${pick(LAST)} St`; break;
+    default: v = `[${e.label}]`;
+  }
+  memo.set(key, v); return v;
+}
+function shiftDate(s, days) {
+  const m = s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);
+  if (!m) return "[DATE]";
+  const d = new Date(+m[3], +m[1]-1, +m[2]); d.setDate(d.getDate() + days);
+  const p = n => String(n).padStart(2, "0");
+  return `${p(d.getMonth()+1)}/${p(d.getDate())}/${d.getFullYear()}`;
+}
+
+function deidentify(text, ents, policyName) {
+  const pol = POLICY[policyName], memo = new Map(), shift = 137;
+  const acted = ents.filter(e => { const c = pol.labels[e.label]; return c && e.confidence >= (c.min ?? pol.min); });
+  let out = "", cursor = 0; const html = [];
+  for (const e of acted) {
+    const c = pol.labels[e.label];
+    const method = c.method || pol.method || "mask";
+    let rep;
+    if (method === "mask") rep = c.mask || `[${e.label}]`;
+    else if (method === "replace") rep = surrogate(e, memo);
+    else if (method === "shift") rep = shiftDate(e.text, shift);
+    out += text.slice(cursor, e.start) + rep;
+    html.push(esc(text.slice(cursor, e.start)), `<mark class="new" title="${e.label} · ${e.source} · ${e.confidence.toFixed(2)}">${esc(rep)}<small>${e.label.toLowerCase().replace("_", " ")}</small></mark>`);
+    cursor = e.end;
+  }
+  out += text.slice(cursor); html.push(esc(text.slice(cursor)));
+  return { text: out, html: html.join(""), acted };
+}
+const esc = s => s.replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+
+// ---------- Optional on-device model (Transformers.js) ----------
+let pipe = null;
+async function loadModel() {
+  status("Loading model from ./models on this machine…");
+  const { pipeline, env } = await import("https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.2");
+  env.allowRemoteModels = false; env.allowLocalModels = true; env.localModelPath = "./models/";
+  pipe = await pipeline("token-classification", "piilo-deberta-v3-small-onnx", { dtype: "q8" });
+}
+async function detectModel(text) {
+  if (!pipe) await loadModel();
+  const res = await pipe(text, { aggregation_strategy: "simple", ignore_labels: ["O"] });
+  const ents = [];
+  let cursor = 0;
+  for (const r of res) {
+    const word = r.word.replace(/^▁/, "").trim(); if (!word) continue;
+    const i = text.indexOf(word, cursor); if (i < 0) continue;
+    ents.push({label: r.entity_group ?? r.entity.replace(/^[BI]-/, ""), text: word, start: i, end: i + word.length, confidence: r.score, source: "model"});
+    cursor = i + word.length;
+  }
+  // merge adjacent same-label spans
+  const merged = [];
+  for (const e of ents) { const p = merged[merged.length-1]; if (p && p.label === e.label && /^[\s\-.'’_]?$/.test(text.slice(p.end, e.start))) { p.end = e.end; p.text = text.slice(p.start, p.end); p.confidence = Math.min(p.confidence, e.confidence); } else merged.push(e); }
+  return merged;
+}
+
+// ---------- UI ----------
+const $ = id => document.getElementById(id);
+const status = (msg, warn=false) => { $("status").textContent = msg; $("status").className = warn ? "warn" : ""; };
+$("in").value = SAMPLES.essay;
+$("sample").addEventListener("change", e => { $("in").value = SAMPLES[e.target.value]; $("out").innerHTML = ""; $("empty").style.display = "grid"; });
+
+$("run").addEventListener("click", async () => {
+  const text = $("in").value, t0 = performance.now();
+  let ents = detectRules(text);
+  if ($("engine").value === "model") {
+    try { ents = ents.concat(await detectModel(text)); }
+    catch (err) {
+      status("No model found at demo/models/piilo-deberta-v3-small-onnx. Run training/export_onnx.py, or switch to Rules only. Showing rules-only result.", true);
+    }
+  }
+  ents = resolve(propagateNames(text, ents));
+  const r = deidentify(text, ents, $("policy").value);
+  const ms = Math.round(performance.now() - t0);
+  $("out").innerHTML = r.html; $("empty").style.display = "none";
+  $("note").hidden = !($("engine").value === "rules" || !pipe);
+  $("n-ent").textContent = r.acted.length;
+  $("n-chars").textContent = r.acted.reduce((n, e) => n + (e.end - e.start), 0);
+  $("n-ms").textContent = `${ms} ms`;
+  $("json").textContent = JSON.stringify({ policy: $("policy").value, entities: ents.map(({label, text, start, end, confidence, source}) => ({label, text, start, end, confidence: +confidence.toFixed(2), source})) }, null, 2);
+  if (!$("status").classList.contains("warn")) status(`Done in ${ms} ms on this device with ${$("engine").value === "model" && pipe ? "rules + model" : "rules only"}. Nothing was sent anywhere.`);
+});
+</script>
+</body>
+</html>
