@@ -87,12 +87,31 @@ def test_deferred_rule_cannot_crowd_out_a_kept_rule(monkeypatch):
     assert got(text) == {("URL_PERSONAL", "priya2012.wordpress.com", "rules")}
 
 
-def test_falls_back_to_rules_when_model_unavailable(monkeypatch):
+def test_default_model_missing_falls_back_to_rules_with_a_warning(monkeypatch):
     broken_model(monkeypatch)
+    monkeypatch.delenv("EDSHIELD_MODEL", raising=False)
     text = "My name is Priya Raman, student ID 4471882."
-    r = edshield.analyze_text(text, model_name="stub")
+    with pytest.warns(RuntimeWarning, match="rules only"):
+        r = edshield.analyze_text(text)
     assert r.model_name == "rules"
     assert {(e.label, e.text) for e in r.entities} == {("NAME_STUDENT", "Priya Raman"), ("ID_NUM", "4471882")}
+
+
+def test_requested_model_that_fails_raises(monkeypatch):
+    broken_model(monkeypatch)
+    with pytest.raises(edshield.ModelUnavailableError, match="no weights on disk"):
+        edshield.analyze_text("My name is Priya Raman.", model_name="stub")
+    with pytest.raises(edshield.ModelUnavailableError):
+        edshield.deidentify("My name is Priya Raman.", model_name="stub")
+    monkeypatch.setenv("EDSHIELD_MODEL", "from_env")
+    with pytest.raises(edshield.ModelUnavailableError):
+        edshield.analyze_text("My name is Priya Raman.")
+
+
+def test_rules_mode_never_touches_the_model(monkeypatch, recwarn):
+    broken_model(monkeypatch)
+    r = edshield.analyze_text("My name is Priya Raman.", model_name="rules")
+    assert r.model_name == "rules" and len(recwarn) == 0
 
 
 def test_model_name_reported_even_when_model_finds_nothing(monkeypatch):

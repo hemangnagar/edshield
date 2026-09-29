@@ -33,6 +33,10 @@ The design follows [OpenMed](https://github.com/maziyarpanahi/openmed): small fi
 
 When a model is loaded, the rules for NAME_STUDENT, ID_NUM and STREET_ADDRESS are switched off: they are recall-oriented fallbacks that over-flag ordinary essay text. Without a model the rules cover every label. `analyze_text(..., model_authority=())` runs both layers on everything.
 
+**Loading a model.** Models load from disk only: a directory you pass, the `local_path` in `models.jsonl`, or the Hugging Face cache. Nothing is downloaded unless you set `EDSHIELD_ALLOW_DOWNLOAD=1`. If you name a model (`model_name=...` or `EDSHIELD_MODEL`) and it cannot be loaded, edshield raises `ModelUnavailableError` rather than quietly doing less. If you name none and the default is not installed, the rules run alone and a `RuntimeWarning` says so; pass `model_name="rules"` to choose that on purpose.
+
+**Recall-first decoding.** `analyze_text(..., o_threshold=0.99)` marks a token as an entity whenever P(O) < 0.99 instead of taking the most likely class. It is off by default: on held-out PIILO essays it lowered precision from 0.69 to 0.57 with recall already at 1.00.
+
 Label schema is the seven types of the [PIILO corpus](https://the-learning-agency-lab.com/learning-exchange/piilo-dataset/) (The Learning Agency Lab, CC BY 4.0), so models trained on it drop straight in.
 
 ## Install
