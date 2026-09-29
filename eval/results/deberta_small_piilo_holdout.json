@@ -1,22 +1,22 @@
 {
-  "model": "C:\\edshield\\models\\piilo-deberta-v3-small",
+  "model": "C:/edshield/models/piilo-deberta-v3-small",
   "docs": 280,
   "overall": {
     "tp": 141,
-    "fp": 65,
+    "fp": 61,
     "fn": 0,
-    "precision": 0.6845,
+    "precision": 0.698,
     "recall": 1.0,
-    "f5": 0.9826
+    "f5": 0.9836
   },
   "per_label": {
     "NAME_STUDENT": {
       "tp": 113,
-      "fp": 44,
+      "fp": 47,
       "fn": 0,
-      "precision": 0.7197,
+      "precision": 0.7063,
       "recall": 1.0,
-      "f5": 0.9852
+      "f5": 0.9843
     },
     "EMAIL": {
       "tp": 5,
@@ -36,11 +36,11 @@
     },
     "ID_NUM": {
       "tp": 6,
-      "fp": 3,
+      "fp": 2,
       "fn": 0,
-      "precision": 0.6667,
+      "precision": 0.75,
       "recall": 1.0,
-      "f5": 0.9811
+      "f5": 0.9873
     },
     "PHONE_NUM": {
       "tp": 1,
@@ -52,11 +52,11 @@
     },
     "URL_PERSONAL": {
       "tp": 15,
-      "fp": 17,
+      "fp": 11,
       "fn": 0,
-      "precision": 0.4688,
+      "precision": 0.5769,
       "recall": 1.0,
-      "f5": 0.9582
+      "f5": 0.9726
     },
     "STREET_ADDRESS": {
       "tp": 1,

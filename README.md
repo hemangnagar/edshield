@@ -65,7 +65,27 @@ Three synthetic samples (essay, tutoring transcript, chatbot message), three pol
 
 ## Benchmarks
 
-Rules-only detector on 500 synthetic tutoring transcripts and essays (`eval/synthetic_bench.py --n 500 --seed 1`):
+All numbers are span-level from `eval/evaluate.py`; F5 weights recall 5:1, as the PIILO competition did.
+
+**Real student essays.** 280 PIILO documents held out from training of `piilo-deberta-v3-small`:
+
+| Detector | Precision | Recall | F5 | Missed entities |
+|---|---|---|---|---|
+| Rules only | 0.614 | 0.305 | 0.311 | 98 of 141 |
+| Rules + model | 0.698 | 1.000 | 0.984 | 0 of 141 |
+
+| Rules + model, by label | Precision | Recall | n |
+|---|---|---|---|
+| NAME_STUDENT | 0.706 | 1.000 | 113 |
+| URL_PERSONAL | 0.577 | 1.000 | 15 |
+| ID_NUM | 0.750 | 1.000 | 6 |
+| EMAIL | 1.000 | 1.000 | 5 |
+| PHONE_NUM | 1.000 | 1.000 | 1 |
+| STREET_ADDRESS | 0.500 | 1.000 | 1 |
+
+The held-out set is small: the rare labels have a handful of examples each, so their rows say little. Most name false positives are real names of people who are not students (cited authors, lecturers), which PIILO does not label.
+
+**Synthetic transcripts and essays.** Rules only, 500 documents (`eval/synthetic_bench.py --n 500 --seed 1`). The generator's sentences use the same cues the rules look for, so read this as a regression check, not as expected accuracy on real text:
 
 | Label | Precision | Recall | F5 |
 |---|---|---|---|
@@ -73,12 +93,12 @@ Rules-only detector on 500 synthetic tutoring transcripts and essays (`eval/synt
 | PHONE_NUM | 1.000 | 1.000 | 1.000 |
 | USERNAME | 1.000 | 1.000 | 1.000 |
 | URL_PERSONAL | 1.000 | 1.000 | 1.000 |
-| ID_NUM | 0.962 | 1.000 | 0.999 |
-| STREET_ADDRESS | 0.774 | 0.973 | 0.963 |
+| ID_NUM | 0.926 | 1.000 | 0.997 |
+| STREET_ADDRESS | 1.000 | 0.945 | 0.947 |
 | NAME_STUDENT | 1.000 | 0.761 | 0.768 |
-| **overall** | **0.965** | **0.906** | **0.908** |
+| **overall** | **0.994** | **0.903** | **0.906** |
 
-Names are the gap, and the reason the model layer exists: rules only catch names the writer introduces, so a friend mentioned in passing is missed. PIILO results for the first fine-tuned models will be published here as they land (see `eval/evaluate.py`; F5 is the competition metric, weighting recall 5:1).
+Names are the gap, and the reason the model layer exists: rules only catch names the writer introduces, so a friend mentioned in passing is missed.
 
 ## Train a model
 

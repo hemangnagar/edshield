@@ -158,6 +158,8 @@ def main():
         warmup_steps=int(0.1 * a.epochs * len(train_ds) / a.bs),
         eval_strategy="epoch",
         save_strategy="epoch",
+        save_only_model=True,  # no optimizer state: a checkpoint is ~0.6 GB instead of ~1.7 GB
+        save_total_limit=1,    # the best checkpoint is always kept as well
         load_best_model_at_end=True,
         metric_for_best_model="f5",
         fp16=a.fp16,
