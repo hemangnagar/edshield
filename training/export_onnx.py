@@ -9,10 +9,12 @@ Requires `pip install 'edshield[hf,onnx]'`. Output layout:
 which is what `@huggingface/transformers` expects when given a local path.
 
 The INT8 model uses dynamic quantization with no CPU-specific instructions,
-so the same file runs on a Chromebook, an ARM laptop and a desktop. After
-export the script runs both files against the PyTorch model and prints how
-closely they agree; quantization changes the numbers, so check the agreement
-before shipping the small file.
+so the same file runs on a Chromebook, an ARM laptop and a desktop. The first
+encoder layers stay at full precision (--keep-layers, default 2): quantizing
+them is what cost recall on the held-out essays, and keeping them adds about
+33 MB. After export the script runs both files against the PyTorch model and
+prints how closely they agree; quantization changes the numbers, so measure
+the small file with eval/evaluate_onnx.py before shipping it.
 """
 from __future__ import annotations
 
@@ -30,9 +32,12 @@ def main():
     ap.add_argument("--model", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--opset", type=int, default=17)
+    ap.add_argument("--keep-layers", type=int, default=2,
+                    help="leave this many of the first encoder layers at full precision in the INT8 file")
     a = ap.parse_args()
 
     import numpy as np
+    import onnx
     import onnxruntime as ort
     import torch
     from onnxruntime.quantization import QuantType, quantize_dynamic
@@ -65,7 +70,10 @@ def main():
         dynamo=False,
     )
     int8 = onnx_dir / "model_quantized.onnx"
-    quantize_dynamic(str(fp32), str(int8), weight_type=QuantType.QUInt8)
+    kept = tuple(f"/layer.{i}/" for i in range(a.keep_layers))
+    exclude = [n.name for n in onnx.load(str(fp32), load_external_data=False).graph.node
+               if n.op_type == "MatMul" and any(k in n.name for k in kept)]
+    quantize_dynamic(str(fp32), str(int8), weight_type=QuantType.QUInt8, nodes_to_exclude=exclude)
 
     # Agreement with PyTorch, on the sample and on a longer input than was traced.
     print(f"exported to {out}")
