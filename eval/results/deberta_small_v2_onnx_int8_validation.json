@@ -1,0 +1,127 @@
+{
+  "model": "onnx",
+  "docs": 680,
+  "overall": {
+    "tp": 157,
+    "fp": 70,
+    "fn": 8,
+    "precision": 0.6916,
+    "recall": 0.9515,
+    "f5": 0.938
+  },
+  "per_label": {
+    "NAME_STUDENT": {
+      "tp": 137,
+      "fp": 55,
+      "fn": 6,
+      "precision": 0.7135,
+      "recall": 0.958,
+      "f5": 0.9456
+    },
+    "EMAIL": {
+      "tp": 4,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f5": 1.0
+    },
+    "USERNAME": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 2,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f5": 0.0
+    },
+    "ID_NUM": {
+      "tp": 7,
+      "fp": 3,
+      "fn": 0,
+      "precision": 0.7,
+      "recall": 1.0,
+      "f5": 0.9838
+    },
+    "PHONE_NUM": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f5": 0.0
+    },
+    "URL_PERSONAL": {
+      "tp": 8,
+      "fp": 12,
+      "fn": 0,
+      "precision": 0.4,
+      "recall": 1.0,
+      "f5": 0.9455
+    },
+    "STREET_ADDRESS": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f5": 1.0
+    }
+  },
+  "identifiers": 165,
+  "exposed": 7,
+  "exposed_by_label": {
+    "NAME_STUDENT": 6,
+    "USERNAME": 1
+  },
+  "removed_under_any_label": 0.9576,
+  "leaks": [
+    {
+      "document": 7779,
+      "label": "NAME_STUDENT",
+      "text": "Leroy",
+      "exposed": true
+    },
+    {
+      "document": 7779,
+      "label": "NAME_STUDENT",
+      "text": "Sullivan Leroy",
+      "exposed": true
+    },
+    {
+      "document": 7779,
+      "label": "NAME_STUDENT",
+      "text": "Leroy",
+      "exposed": true
+    },
+    {
+      "document": 7779,
+      "label": "NAME_STUDENT",
+      "text": "Sullivan Leroy",
+      "exposed": true
+    },
+    {
+      "document": 7779,
+      "label": "NAME_STUDENT",
+      "text": "Sullivan Leroy",
+      "exposed": true
+    },
+    {
+      "document": 4462,
+      "label": "USERNAME",
+      "text": "fdixon",
+      "exposed": false
+    },
+    {
+      "document": 4462,
+      "label": "USERNAME",
+      "text": "fdixon",
+      "exposed": true
+    },
+    {
+      "document": 4717,
+      "label": "NAME_STUDENT",
+      "text": "Qais",
+      "exposed": true
+    }
+  ]
+}

@@ -19,6 +19,7 @@ All figures are from `eval/evaluate.py`; the reports are in `eval/results/`. "Go
 | Test set | What it is | Detector | Identifiers | Got through |
 |---|---|---|---|---|
 | PIILO held-out | 680 real essays by adult online learners, never used in training | Rules + model | 165 | 0 |
+| PIILO held-out | same | Rules + INT8 model (the browser demo's) | 165 | 7 |
 | PIILO held-out | same | Rules only | 165 | 101 |
 | K-12 synthetic, cued | 400 synthetic documents, identifiers worded the way the rules expect | Rules + model | 1,445 | 0 |
 | K-12 synthetic, hard | 400 synthetic documents, identifiers the way children type them | Rules + model | 1,433 | 319 (22%) |
@@ -30,6 +31,7 @@ Read these with four cautions:
 2. **The cued set is a regression check.** A perfect score there means the rules match their own examples.
 3. **The hard set is the honest baseline.** On child-style text, about one identifier in five gets through with the model, and about three in four without it.
 4. **The PIILO set is small.** 143 of its 165 identifiers are names; most other types have fewer than ten examples.
+5. **The small browser model is less accurate than the full one.** Quantizing to INT8 cuts the file from 566 MB to 172 MB and costs recall: 7 identifiers in 3 of the 680 documents got through, where the full model missed none. Use the full model where it matters, and quote the INT8 figure for anything that runs in the browser.
 
 Precision on the PIILO held-out set is 0.642: 92 flags out of 257 were not labelled as identifiers by the dataset. Reading all of them (`eval/results/false_alarms_validation.json`, recorded before three fixes that removed 22) showed that most are names of people other than the essay's author, which PIILO does not label but which a privacy tool should remove.
 

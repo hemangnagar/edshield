@@ -75,6 +75,7 @@ All numbers are span-level from `eval/evaluate.py`; F5 weights recall 5:1, as th
 |---|---|---|---|---|
 | Rules only | 0.538 | 0.388 | 0.392 | 101 of 165 |
 | Rules + model | 0.642 | 1.000 | 0.979 | 0 of 165 |
+| Rules + INT8 model (browser) | 0.692 | 0.952 | 0.938 | 8 of 165 |
 
 | Rules + model, by label | Precision | Recall | n |
 |---|---|---|---|
