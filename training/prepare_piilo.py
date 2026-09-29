@@ -46,6 +46,13 @@ def is_positive(doc) -> bool:
     return any(l != "O" for l in doc["labels"])
 
 
+def renumber(extra, docs):
+    """Give the extra documents ids above every real one. Synthetic files
+    number from 0, which collides with the corpus's own document ids."""
+    start = max((d["document"] for d in docs), default=-1) + 1
+    return [{**d, "document": start + i} for i, d in enumerate(extra)]
+
+
 def split(docs, extra=(), neg_ratio: float = 0.3, val_frac: float = 0.1, seed: int = 42):
     """Return (train, validation).
 
@@ -79,7 +86,7 @@ def main():
     from datasets import Dataset, DatasetDict  # noqa: WPS433
 
     docs = load(Path(a.input))
-    extra = [d for path in a.extra for d in load(Path(path))]
+    extra = renumber([d for path in a.extra for d in load(Path(path))], docs)
     train, val = split(docs, extra, neg_ratio=a.neg_ratio, val_frac=a.val_frac, seed=a.seed)
 
     def to_rows(ds):

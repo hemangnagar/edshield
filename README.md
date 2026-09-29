@@ -136,7 +136,8 @@ training/         prepare_piilo.py, train.py, export_onnx.py
 eval/             evaluate.py (F5 + leak count), synthetic_bench.py, results/
 demo/             single-file browser demo; drop exported models in demo/models/
 tests/            pytest
-ci/               GitHub Actions workflow; move to .github/workflows/ci.yml to enable
+docs/             COVERAGE.md: what is detected, how well, and what can be claimed
+.github/          GitHub Actions workflow: tests and the rules benchmark on every push
 models.jsonl      model manifest
 ```
 

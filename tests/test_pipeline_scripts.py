@@ -52,6 +52,15 @@ def test_no_document_is_in_both_splits_and_every_positive_is_used():
     assert positives <= ids(train) | ids(val)
 
 
+def test_extra_documents_get_ids_above_the_real_ones():
+    out = prepare.renumber(SYNTH, REAL)
+    ids = [d["document"] for d in out]
+    assert ids == list(range(300, 400))
+    assert not set(ids) & {d["document"] for d in REAL}
+    assert SYNTH[0]["document"] == 0  # input untouched
+    assert prepare.renumber(SYNTH[:2], [])[0]["document"] == 0
+
+
 def test_split_is_reproducible_and_leaves_input_alone():
     before = [d["document"] for d in REAL]
     a = prepare.split(REAL, SYNTH, seed=1)

@@ -93,6 +93,78 @@ def demo_rules_js() -> str:
     return m.group()
 
 
+def demo_section(title: str) -> str:
+    html = DEMO.read_text(encoding="utf-8")
+    m = re.search(r"// -+ " + re.escape(title) + r".*?(?=// -+ )", html, re.S)
+    assert m, f"section {title!r} not found in demo/index.html"
+    return m.group()
+
+
+# (text, [(token piece, label, score), ...]) as the browser model reports them: one entry
+# per token, in order, with no positions. "▁" marks a token that starts a word.
+MODEL_CASES = [
+    # a short piece that also occurs earlier in another word ("p" in "project")
+    ("For this project email me at priya.raman08@gmail.com today",
+     [("▁For", "O", .99), ("▁this", "O", .99), ("▁project", "O", .99), ("▁email", "O", .99),
+      ("▁me", "O", .99), ("▁at", "O", .99), ("▁p", "B-EMAIL", .98), ("riya", "I-EMAIL", .99),
+      (".", "I-EMAIL", .99), ("raman", "I-EMAIL", .99), ("08", "I-EMAIL", .99), ("@", "I-EMAIL", .99),
+      ("gmail", "I-EMAIL", .99), (".", "I-EMAIL", .99), ("com", "I-EMAIL", .99), ("▁today", "O", .99)]),
+    # a username in pieces, each of which also occurs inside an earlier word
+    ("my teacher said use the rubric. my login is aruiz2013 ok",
+     [("▁my", "O", .99), ("▁teacher", "O", .99), ("▁said", "O", .99), ("▁use", "O", .99),
+      ("▁the", "O", .99), ("▁rubric", "O", .99), (".", "O", .99), ("▁my", "O", .99),
+      ("▁login", "O", .99), ("▁is", "O", .99), ("▁a", "B-USERNAME", .99), ("ru", "B-USERNAME", .99),
+      ("iz2013", "B-USERNAME", .99), ("▁ok", "O", .99)]),
+    # word pieces, two adjacent words, and a name only partly tagged
+    ("I met Priyanka Ramanathan and Daniel today",
+     [("▁I", "O", .99), ("▁met", "O", .99), ("▁Pri", "B-NAME_STUDENT", .97), ("yanka", "B-NAME_STUDENT", .95),
+      ("▁Raman", "I-NAME_STUDENT", .96), ("athan", "O", .60), ("▁and", "O", .99),
+      ("▁Daniel", "B-NAME_STUDENT", .99), ("▁today", "O", .99)]),
+    # below the threshold, a one-letter name, and a piece of a URL inside brackets
+    ("By C. see (https://coursera.org/share/b24116a7) and Hood",
+     [("▁By", "O", .99), ("▁C", "B-NAME_STUDENT", .98), (".", "O", .99), ("▁see", "O", .99),
+      ("▁(", "O", .99), ("https", "O", .9), ("://", "O", .9), ("coursera", "B-URL_PERSONAL", .66),
+      (".", "O", .9), ("org", "O", .9), ("/", "O", .9), ("share", "O", .9), ("/", "O", .9), ("b24116a7", "B-ID_NUM", .56),
+      (")", "O", .99), ("▁and", "O", .99), ("▁Hood", "B-NAME_STUDENT", .45)]),
+]
+
+
+def python_decode(text, pieces):
+    from edshield import ner
+    labels = ["O"] + sorted({l for _, l, _ in pieces if l != "O"})
+    id2label = dict(enumerate(labels))
+    offsets, probs, cursor = [], [], 0
+    for piece, label, score in pieces:
+        piece = piece.lstrip("▁")
+        start = text.index(piece, cursor)
+        assert text[cursor:start].strip() == "", "test pieces must follow each other in the text"
+        cursor = start + len(piece)
+        p = [0.0] * len(labels)
+        p[labels.index(label)] = score
+        p[1 if label == "O" else 0] += 1 - score
+        offsets.append((start, cursor))
+        probs.append(p)
+    return [[e.label, e.text, e.start, e.end] for e in ner.decode(text, offsets, probs, id2label)]
+
+
+def test_demo_model_decoding_agrees_with_python():
+    harness = """
+const cases = JSON.parse(require("fs").readFileSync(0, "utf8"));
+console.log(JSON.stringify(cases.map(([text, pieces]) =>
+  decodeTokens(text, alignTokens(text, pieces.map(([word, entity, score]) => ({word, entity, score}))))
+    .map(e => [e.label, e.text, e.start, e.end]))));
+"""
+    code = 'const NAME_LABELS = ["NAME_STUDENT","NAME_RELATED"];\n' + demo_section("Model decoding") + harness
+    proc = subprocess.run([NODE, "-e", code], input=json.dumps(MODEL_CASES), capture_output=True,
+                          text=True, encoding="utf-8", timeout=60)
+    assert proc.returncode == 0, proc.stderr
+    got = json.loads(proc.stdout)
+    assert got[0] == [["EMAIL", "priya.raman08@gmail.com", 29, 52]]
+    assert got[1] == [["USERNAME", "aruiz2013", 44, 53]]
+    for (text, pieces), js in zip(MODEL_CASES, got):
+        assert js == python_decode(text, pieces), f"demo and Python disagree on: {text!r}"
+
+
 def test_demo_rules_agree_with_python():
     proc = subprocess.run(
         [NODE, "-e", demo_rules_js() + HARNESS],
