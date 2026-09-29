@@ -24,7 +24,7 @@ hf = ["transformers>=4.40", "torch>=2.1"]
 onnx = ["onnxruntime>=1.17", "optimum>=1.19"]
 service = ["fastapi>=0.110", "uvicorn>=0.29"]
 train = ["transformers>=4.40", "torch>=2.1", "datasets>=2.18", "accelerate>=0.28", "seqeval>=1.2"]
-dev = ["pytest>=8", "ruff>=0.4"]
+dev = ["pytest>=8", "ruff>=0.4", "fastapi>=0.110", "httpx>=0.27"]
 
 [project.scripts]
 edshield = "edshield.cli:main"
