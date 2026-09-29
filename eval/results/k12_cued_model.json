@@ -1,0 +1,1357 @@
+{
+  "model": "C:/edshield/models/piilo-deberta-v3-small-v2",
+  "docs": 400,
+  "overall": {
+    "tp": 1218,
+    "fp": 245,
+    "fn": 227,
+    "precision": 0.8325,
+    "recall": 0.8429,
+    "f5": 0.8425
+  },
+  "per_label": {
+    "NAME_STUDENT": {
+      "tp": 149,
+      "fp": 168,
+      "fn": 0,
+      "precision": 0.47,
+      "recall": 1.0,
+      "f5": 0.9584
+    },
+    "EMAIL": {
+      "tp": 127,
+      "fp": 12,
+      "fn": 0,
+      "precision": 0.9137,
+      "recall": 1.0,
+      "f5": 0.9964
+    },
+    "USERNAME": {
+      "tp": 114,
+      "fp": 4,
+      "fn": 0,
+      "precision": 0.9661,
+      "recall": 1.0,
+      "f5": 0.9987
+    },
+    "ID_NUM": {
+      "tp": 60,
+      "fp": 9,
+      "fn": 0,
+      "precision": 0.8696,
+      "recall": 1.0,
+      "f5": 0.9943
+    },
+    "PHONE_NUM": {
+      "tp": 79,
+      "fp": 21,
+      "fn": 0,
+      "precision": 0.79,
+      "recall": 1.0,
+      "f5": 0.9899
+    },
+    "URL_PERSONAL": {
+      "tp": 45,
+      "fp": 0,
+      "fn": 12,
+      "precision": 1.0,
+      "recall": 0.7895,
+      "f5": 0.7959
+    },
+    "STREET_ADDRESS": {
+      "tp": 32,
+      "fp": 30,
+      "fn": 0,
+      "precision": 0.5161,
+      "recall": 1.0,
+      "f5": 0.9652
+    },
+    "SSN": {
+      "tp": 33,
+      "fp": 0,
+      "fn": 13,
+      "precision": 1.0,
+      "recall": 0.7174,
+      "f5": 0.7253
+    },
+    "DATE": {
+      "tp": 60,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f5": 1.0
+    },
+    "NAME_RELATED": {
+      "tp": 55,
+      "fp": 1,
+      "fn": 165,
+      "precision": 0.9821,
+      "recall": 0.25,
+      "f5": 0.2574
+    },
+    "SCHOOL": {
+      "tp": 80,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1.0,
+      "recall": 0.9877,
+      "f5": 0.9881
+    },
+    "LOCATION": {
+      "tp": 68,
+      "fp": 0,
+      "fn": 20,
+      "precision": 1.0,
+      "recall": 0.7727,
+      "f5": 0.7795
+    },
+    "AGE": {
+      "tp": 140,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f5": 1.0
+    },
+    "IP_ADDRESS": {
+      "tp": 43,
+      "fp": 0,
+      "fn": 7,
+      "precision": 1.0,
+      "recall": 0.86,
+      "f5": 0.8647
+    },
+    "DEVICE_ID": {
+      "tp": 88,
+      "fp": 0,
+      "fn": 8,
+      "precision": 1.0,
+      "recall": 0.9167,
+      "f5": 0.9196
+    },
+    "GEO": {
+      "tp": 45,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1.0,
+      "recall": 0.9783,
+      "f5": 0.9791
+    }
+  },
+  "identifiers": 1445,
+  "exposed": 0,
+  "exposed_by_label": {
+    "NAME_RELATED": 0,
+    "URL_PERSONAL": 0,
+    "LOCATION": 0,
+    "IP_ADDRESS": 0,
+    "DEVICE_ID": 0,
+    "SSN": 0,
+    "GEO": 0,
+    "SCHOOL": 0
+  },
+  "removed_under_any_label": 1.0,
+  "leaks": [
+    {
+      "document": 5,
+      "label": "NAME_RELATED",
+      "text": "Denise",
+      "exposed": false
+    },
+    {
+      "document": 8,
+      "label": "NAME_RELATED",
+      "text": "Larry Todd",
+      "exposed": false
+    },
+    {
+      "document": 10,
+      "label": "NAME_RELATED",
+      "text": "Jordan",
+      "exposed": false
+    },
+    {
+      "document": 11,
+      "label": "URL_PERSONAL",
+      "text": "karencodes.blogspot.com",
+      "exposed": false
+    },
+    {
+      "document": 11,
+      "label": "LOCATION",
+      "text": "Port Justin, TX",
+      "exposed": false
+    },
+    {
+      "document": 14,
+      "label": "NAME_RELATED",
+      "text": "Robert",
+      "exposed": false
+    },
+    {
+      "document": 15,
+      "label": "NAME_RELATED",
+      "text": "Victoria Stewart",
+      "exposed": false
+    },
+    {
+      "document": 15,
+      "label": "LOCATION",
+      "text": "New Davidport",
+      "exposed": false
+    },
+    {
+      "document": 18,
+      "label": "NAME_RELATED",
+      "text": "Jeffrey",
+      "exposed": false
+    },
+    {
+      "document": 21,
+      "label": "NAME_RELATED",
+      "text": "Anthony Jones",
+      "exposed": false
+    },
+    {
+      "document": 27,
+      "label": "NAME_RELATED",
+      "text": "Elizabeth",
+      "exposed": false
+    },
+    {
+      "document": 30,
+      "label": "URL_PERSONAL",
+      "text": "suzannedraws.blogspot.com",
+      "exposed": false
+    },
+    {
+      "document": 31,
+      "label": "LOCATION",
+      "text": "Georgefort, NC",
+      "exposed": false
+    },
+    {
+      "document": 32,
+      "label": "NAME_RELATED",
+      "text": "James",
+      "exposed": false
+    },
+    {
+      "document": 40,
+      "label": "NAME_RELATED",
+      "text": "Seth Carr",
+      "exposed": false
+    },
+    {
+      "document": 40,
+      "label": "NAME_RELATED",
+      "text": "Seth Carr",
+      "exposed": false
+    },
+    {
+      "document": 41,
+      "label": "NAME_RELATED",
+      "text": "Sarah",
+      "exposed": false
+    },
+    {
+      "document": 42,
+      "label": "NAME_RELATED",
+      "text": "Donna",
+      "exposed": false
+    },
+    {
+      "document": 44,
+      "label": "NAME_RELATED",
+      "text": "Anthony",
+      "exposed": false
+    },
+    {
+      "document": 45,
+      "label": "LOCATION",
+      "text": "East Jamesfurt",
+      "exposed": false
+    },
+    {
+      "document": 46,
+      "label": "NAME_RELATED",
+      "text": "Grace",
+      "exposed": false
+    },
+    {
+      "document": 53,
+      "label": "IP_ADDRESS",
+      "text": "147.114.179.52",
+      "exposed": false
+    },
+    {
+      "document": 54,
+      "label": "LOCATION",
+      "text": "West Paul, VA",
+      "exposed": false
+    },
+    {
+      "document": 54,
+      "label": "NAME_RELATED",
+      "text": "Troy",
+      "exposed": false
+    },
+    {
+      "document": 56,
+      "label": "NAME_RELATED",
+      "text": "Elizabeth Lee",
+      "exposed": false
+    },
+    {
+      "document": 57,
+      "label": "NAME_RELATED",
+      "text": "Tyler",
+      "exposed": false
+    },
+    {
+      "document": 60,
+      "label": "URL_PERSONAL",
+      "text": "benjaminwrites.blogspot.com",
+      "exposed": false
+    },
+    {
+      "document": 61,
+      "label": "LOCATION",
+      "text": "West Laurenhaven, CA",
+      "exposed": false
+    },
+    {
+      "document": 65,
+      "label": "NAME_RELATED",
+      "text": "Sharon",
+      "exposed": false
+    },
+    {
+      "document": 68,
+      "label": "NAME_RELATED",
+      "text": "Edward",
+      "exposed": false
+    },
+    {
+      "document": 69,
+      "label": "DEVICE_ID",
+      "text": "91549d76-3212-4c71-90d1-c871efeb7bd7",
+      "exposed": false
+    },
+    {
+      "document": 69,
+      "label": "NAME_RELATED",
+      "text": "Marie",
+      "exposed": false
+    },
+    {
+      "document": 70,
+      "label": "NAME_RELATED",
+      "text": "Kevin",
+      "exposed": false
+    },
+    {
+      "document": 72,
+      "label": "LOCATION",
+      "text": "South Jonathanmouth, GA",
+      "exposed": false
+    },
+    {
+      "document": 74,
+      "label": "NAME_RELATED",
+      "text": "Jill",
+      "exposed": false
+    },
+    {
+      "document": 77,
+      "label": "NAME_RELATED",
+      "text": "Lori",
+      "exposed": false
+    },
+    {
+      "document": 77,
+      "label": "NAME_RELATED",
+      "text": "Lori",
+      "exposed": false
+    },
+    {
+      "document": 77,
+      "label": "NAME_RELATED",
+      "text": "Lori",
+      "exposed": false
+    },
+    {
+      "document": 78,
+      "label": "NAME_RELATED",
+      "text": "Lori",
+      "exposed": false
+    },
+    {
+      "document": 83,
+      "label": "IP_ADDRESS",
+      "text": "104.89.91.189",
+      "exposed": false
+    },
+    {
+      "document": 84,
+      "label": "NAME_RELATED",
+      "text": "Kevin",
+      "exposed": false
+    },
+    {
+      "document": 84,
+      "label": "NAME_RELATED",
+      "text": "Kevin",
+      "exposed": false
+    },
+    {
+      "document": 85,
+      "label": "NAME_RELATED",
+      "text": "Michelle",
+      "exposed": false
+    },
+    {
+      "document": 85,
+      "label": "SSN",
+      "text": "203-34-3643",
+      "exposed": false
+    },
+    {
+      "document": 86,
+      "label": "NAME_RELATED",
+      "text": "Jeffrey",
+      "exposed": false
+    },
+    {
+      "document": 88,
+      "label": "NAME_RELATED",
+      "text": "Bennett",
+      "exposed": false
+    },
+    {
+      "document": 91,
+      "label": "URL_PERSONAL",
+      "text": "timothycodes.wordpress.com",
+      "exposed": false
+    },
+    {
+      "document": 91,
+      "label": "NAME_RELATED",
+      "text": "Valerie Kelley",
+      "exposed": false
+    },
+    {
+      "document": 92,
+      "label": "SSN",
+      "text": "291-95-1430",
+      "exposed": false
+    },
+    {
+      "document": 92,
+      "label": "IP_ADDRESS",
+      "text": "11.102.154.224",
+      "exposed": false
+    },
+    {
+      "document": 96,
+      "label": "NAME_RELATED",
+      "text": "Carlos Wilkerson",
+      "exposed": false
+    },
+    {
+      "document": 99,
+      "label": "NAME_RELATED",
+      "text": "Evan",
+      "exposed": false
+    },
+    {
+      "document": 101,
+      "label": "NAME_RELATED",
+      "text": "Kevin",
+      "exposed": false
+    },
+    {
+      "document": 101,
+      "label": "NAME_RELATED",
+      "text": "Manuel Gentry",
+      "exposed": false
+    },
+    {
+      "document": 102,
+      "label": "NAME_RELATED",
+      "text": "Larry",
+      "exposed": false
+    },
+    {
+      "document": 103,
+      "label": "GEO",
+      "text": "25.8597, -111.8800",
+      "exposed": false
+    },
+    {
+      "document": 105,
+      "label": "NAME_RELATED",
+      "text": "Anita",
+      "exposed": false
+    },
+    {
+      "document": 106,
+      "label": "NAME_RELATED",
+      "text": "Kara",
+      "exposed": false
+    },
+    {
+      "document": 112,
+      "label": "LOCATION",
+      "text": "North Larry",
+      "exposed": false
+    },
+    {
+      "document": 114,
+      "label": "NAME_RELATED",
+      "text": "Jessica",
+      "exposed": false
+    },
+    {
+      "document": 114,
+      "label": "LOCATION",
+      "text": "West Zacharyton",
+      "exposed": false
+    },
+    {
+      "document": 115,
+      "label": "NAME_RELATED",
+      "text": "Nathan Ferguson",
+      "exposed": false
+    },
+    {
+      "document": 116,
+      "label": "NAME_RELATED",
+      "text": "Tyrone Elliott",
+      "exposed": false
+    },
+    {
+      "document": 117,
+      "label": "LOCATION",
+      "text": "Lake Josemouth, CO",
+      "exposed": false
+    },
+    {
+      "document": 118,
+      "label": "NAME_RELATED",
+      "text": "Ashley",
+      "exposed": false
+    },
+    {
+      "document": 119,
+      "label": "NAME_RELATED",
+      "text": "Joy Jones",
+      "exposed": false
+    },
+    {
+      "document": 123,
+      "label": "NAME_RELATED",
+      "text": "Kevin",
+      "exposed": false
+    },
+    {
+      "document": 124,
+      "label": "NAME_RELATED",
+      "text": "Katherine",
+      "exposed": false
+    },
+    {
+      "document": 125,
+      "label": "SSN",
+      "text": "301-78-9125",
+      "exposed": false
+    },
+    {
+      "document": 126,
+      "label": "URL_PERSONAL",
+      "text": "alisonwrites.blogspot.com",
+      "exposed": false
+    },
+    {
+      "document": 127,
+      "label": "NAME_RELATED",
+      "text": "Michael",
+      "exposed": false
+    },
+    {
+      "document": 127,
+      "label": "NAME_RELATED",
+      "text": "Michael",
+      "exposed": false
+    },
+    {
+      "document": 131,
+      "label": "NAME_RELATED",
+      "text": "David",
+      "exposed": false
+    },
+    {
+      "document": 131,
+      "label": "DEVICE_ID",
+      "text": "25635e55-907b-4040-ab6a-addea14572d6",
+      "exposed": false
+    },
+    {
+      "document": 134,
+      "label": "NAME_RELATED",
+      "text": "Jennifer",
+      "exposed": false
+    },
+    {
+      "document": 134,
+      "label": "NAME_RELATED",
+      "text": "Amy Foster",
+      "exposed": false
+    },
+    {
+      "document": 135,
+      "label": "NAME_RELATED",
+      "text": "Cindy",
+      "exposed": false
+    },
+    {
+      "document": 136,
+      "label": "NAME_RELATED",
+      "text": "Todd",
+      "exposed": false
+    },
+    {
+      "document": 138,
+      "label": "NAME_RELATED",
+      "text": "Moon",
+      "exposed": false
+    },
+    {
+      "document": 144,
+      "label": "NAME_RELATED",
+      "text": "George",
+      "exposed": false
+    },
+    {
+      "document": 147,
+      "label": "NAME_RELATED",
+      "text": "Scott",
+      "exposed": false
+    },
+    {
+      "document": 148,
+      "label": "NAME_RELATED",
+      "text": "Andrew",
+      "exposed": false
+    },
+    {
+      "document": 149,
+      "label": "NAME_RELATED",
+      "text": "Nathaniel Gutierrez",
+      "exposed": false
+    },
+    {
+      "document": 151,
+      "label": "NAME_RELATED",
+      "text": "Hannah",
+      "exposed": false
+    },
+    {
+      "document": 151,
+      "label": "NAME_RELATED",
+      "text": "Hannah",
+      "exposed": false
+    },
+    {
+      "document": 153,
+      "label": "SSN",
+      "text": "379-06-7599",
+      "exposed": false
+    },
+    {
+      "document": 154,
+      "label": "NAME_RELATED",
+      "text": "Garner",
+      "exposed": false
+    },
+    {
+      "document": 155,
+      "label": "DEVICE_ID",
+      "text": "27f7f80e-3dcc-48aa-8358-ac2dc8f1a365",
+      "exposed": false
+    },
+    {
+      "document": 156,
+      "label": "NAME_RELATED",
+      "text": "Chelsea",
+      "exposed": false
+    },
+    {
+      "document": 157,
+      "label": "NAME_RELATED",
+      "text": "Nelson",
+      "exposed": false
+    },
+    {
+      "document": 157,
+      "label": "NAME_RELATED",
+      "text": "Nelson",
+      "exposed": false
+    },
+    {
+      "document": 158,
+      "label": "URL_PERSONAL",
+      "text": "sandracodes.wordpress.com",
+      "exposed": false
+    },
+    {
+      "document": 158,
+      "label": "NAME_RELATED",
+      "text": "Christine Hodges",
+      "exposed": false
+    },
+    {
+      "document": 160,
+      "label": "NAME_RELATED",
+      "text": "Lori Carrillo",
+      "exposed": false
+    },
+    {
+      "document": 160,
+      "label": "URL_PERSONAL",
+      "text": "kellycodes.blogspot.com",
+      "exposed": false
+    },
+    {
+      "document": 161,
+      "label": "NAME_RELATED",
+      "text": "Nicolas",
+      "exposed": false
+    },
+    {
+      "document": 162,
+      "label": "LOCATION",
+      "text": "East Patricia, OH",
+      "exposed": false
+    },
+    {
+      "document": 163,
+      "label": "NAME_RELATED",
+      "text": "Cynthia",
+      "exposed": false
+    },
+    {
+      "document": 163,
+      "label": "SSN",
+      "text": "304-71-4544",
+      "exposed": false
+    },
+    {
+      "document": 164,
+      "label": "NAME_RELATED",
+      "text": "Karen",
+      "exposed": false
+    },
+    {
+      "document": 170,
+      "label": "DEVICE_ID",
+      "text": "2c54d519-c981-4f2a-aea8-0e67ebba7083",
+      "exposed": false
+    },
+    {
+      "document": 170,
+      "label": "NAME_RELATED",
+      "text": "Sarah",
+      "exposed": false
+    },
+    {
+      "document": 171,
+      "label": "NAME_RELATED",
+      "text": "Olivia",
+      "exposed": false
+    },
+    {
+      "document": 171,
+      "label": "SSN",
+      "text": "279-65-3805",
+      "exposed": false
+    },
+    {
+      "document": 171,
+      "label": "NAME_RELATED",
+      "text": "Olivia",
+      "exposed": false
+    },
+    {
+      "document": 172,
+      "label": "DEVICE_ID",
+      "text": "c8ca5018-4262-4d61-99e4-8ad46102447b",
+      "exposed": false
+    },
+    {
+      "document": 174,
+      "label": "NAME_RELATED",
+      "text": "Heather",
+      "exposed": false
+    },
+    {
+      "document": 179,
+      "label": "NAME_RELATED",
+      "text": "Brian",
+      "exposed": false
+    },
+    {
+      "document": 181,
+      "label": "IP_ADDRESS",
+      "text": "195.243.160.5",
+      "exposed": false
+    },
+    {
+      "document": 182,
+      "label": "URL_PERSONAL",
+      "text": "williamdraws.blogspot.com",
+      "exposed": false
+    },
+    {
+      "document": 183,
+      "label": "NAME_RELATED",
+      "text": "Angela",
+      "exposed": false
+    },
+    {
+      "document": 184,
+      "label": "IP_ADDRESS",
+      "text": "164.138.170.99",
+      "exposed": false
+    },
+    {
+      "document": 185,
+      "label": "NAME_RELATED",
+      "text": "Christina Li",
+      "exposed": false
+    },
+    {
+      "document": 187,
+      "label": "URL_PERSONAL",
+      "text": "alishadraws.blogspot.com",
+      "exposed": false
+    },
+    {
+      "document": 189,
+      "label": "NAME_RELATED",
+      "text": "George",
+      "exposed": false
+    },
+    {
+      "document": 191,
+      "label": "DEVICE_ID",
+      "text": "38472fb0-5fe4-4a70-8cbb-97255300532b",
+      "exposed": false
+    },
+    {
+      "document": 192,
+      "label": "NAME_RELATED",
+      "text": "Mark",
+      "exposed": false
+    },
+    {
+      "document": 193,
+      "label": "NAME_RELATED",
+      "text": "Shane",
+      "exposed": false
+    },
+    {
+      "document": 194,
+      "label": "NAME_RELATED",
+      "text": "Bryant",
+      "exposed": false
+    },
+    {
+      "document": 195,
+      "label": "NAME_RELATED",
+      "text": "Charles Peck",
+      "exposed": false
+    },
+    {
+      "document": 198,
+      "label": "NAME_RELATED",
+      "text": "Rangel",
+      "exposed": false
+    },
+    {
+      "document": 199,
+      "label": "NAME_RELATED",
+      "text": "Brittany",
+      "exposed": false
+    },
+    {
+      "document": 201,
+      "label": "NAME_RELATED",
+      "text": "Chase",
+      "exposed": false
+    },
+    {
+      "document": 201,
+      "label": "URL_PERSONAL",
+      "text": "christinewrites.blogspot.com",
+      "exposed": false
+    },
+    {
+      "document": 201,
+      "label": "NAME_RELATED",
+      "text": "Chase",
+      "exposed": false
+    },
+    {
+      "document": 202,
+      "label": "NAME_RELATED",
+      "text": "Derrick",
+      "exposed": false
+    },
+    {
+      "document": 205,
+      "label": "LOCATION",
+      "text": "Justinhaven",
+      "exposed": false
+    },
+    {
+      "document": 207,
+      "label": "NAME_RELATED",
+      "text": "Martin",
+      "exposed": false
+    },
+    {
+      "document": 208,
+      "label": "NAME_RELATED",
+      "text": "Allen",
+      "exposed": false
+    },
+    {
+      "document": 210,
+      "label": "NAME_RELATED",
+      "text": "Diane",
+      "exposed": false
+    },
+    {
+      "document": 210,
+      "label": "NAME_RELATED",
+      "text": "Diane",
+      "exposed": false
+    },
+    {
+      "document": 215,
+      "label": "NAME_RELATED",
+      "text": "Cheryl",
+      "exposed": false
+    },
+    {
+      "document": 217,
+      "label": "NAME_RELATED",
+      "text": "Patrick Nelson",
+      "exposed": false
+    },
+    {
+      "document": 217,
+      "label": "NAME_RELATED",
+      "text": "Patrick Nelson",
+      "exposed": false
+    },
+    {
+      "document": 218,
+      "label": "NAME_RELATED",
+      "text": "Joseph",
+      "exposed": false
+    },
+    {
+      "document": 223,
+      "label": "NAME_RELATED",
+      "text": "James Hudson",
+      "exposed": false
+    },
+    {
+      "document": 225,
+      "label": "NAME_RELATED",
+      "text": "Norman Weber",
+      "exposed": false
+    },
+    {
+      "document": 228,
+      "label": "LOCATION",
+      "text": "Amandamouth, VA",
+      "exposed": false
+    },
+    {
+      "document": 229,
+      "label": "NAME_RELATED",
+      "text": "Megan",
+      "exposed": false
+    },
+    {
+      "document": 231,
+      "label": "NAME_RELATED",
+      "text": "Foster",
+      "exposed": false
+    },
+    {
+      "document": 232,
+      "label": "NAME_RELATED",
+      "text": "Michael",
+      "exposed": false
+    },
+    {
+      "document": 234,
+      "label": "NAME_RELATED",
+      "text": "Edward Green",
+      "exposed": false
+    },
+    {
+      "document": 234,
+      "label": "NAME_RELATED",
+      "text": "Edward Green",
+      "exposed": false
+    },
+    {
+      "document": 235,
+      "label": "NAME_RELATED",
+      "text": "Steven Martinez",
+      "exposed": false
+    },
+    {
+      "document": 237,
+      "label": "NAME_RELATED",
+      "text": "Jennifer",
+      "exposed": false
+    },
+    {
+      "document": 241,
+      "label": "NAME_RELATED",
+      "text": "Daniel",
+      "exposed": false
+    },
+    {
+      "document": 243,
+      "label": "NAME_RELATED",
+      "text": "Lisa",
+      "exposed": false
+    },
+    {
+      "document": 244,
+      "label": "NAME_RELATED",
+      "text": "Rachel",
+      "exposed": false
+    },
+    {
+      "document": 246,
+      "label": "NAME_RELATED",
+      "text": "Kimberly",
+      "exposed": false
+    },
+    {
+      "document": 248,
+      "label": "NAME_RELATED",
+      "text": "Lee",
+      "exposed": false
+    },
+    {
+      "document": 249,
+      "label": "DEVICE_ID",
+      "text": "03f87dd5-a47f-4571-ae38-38c8204aab1a",
+      "exposed": false
+    },
+    {
+      "document": 253,
+      "label": "NAME_RELATED",
+      "text": "Laura",
+      "exposed": false
+    },
+    {
+      "document": 256,
+      "label": "DEVICE_ID",
+      "text": "c135ca3f-a9ed-4263-b8d4-00b7cb926a5b",
+      "exposed": false
+    },
+    {
+      "document": 257,
+      "label": "NAME_RELATED",
+      "text": "Diana",
+      "exposed": false
+    },
+    {
+      "document": 259,
+      "label": "NAME_RELATED",
+      "text": "Jade Berry",
+      "exposed": false
+    },
+    {
+      "document": 262,
+      "label": "SSN",
+      "text": "368-36-5817",
+      "exposed": false
+    },
+    {
+      "document": 263,
+      "label": "SSN",
+      "text": "481-89-8150",
+      "exposed": false
+    },
+    {
+      "document": 266,
+      "label": "NAME_RELATED",
+      "text": "Daniel",
+      "exposed": false
+    },
+    {
+      "document": 266,
+      "label": "LOCATION",
+      "text": "New Ronaldbury, TX",
+      "exposed": false
+    },
+    {
+      "document": 270,
+      "label": "IP_ADDRESS",
+      "text": "216.147.177.195",
+      "exposed": false
+    },
+    {
+      "document": 270,
+      "label": "NAME_RELATED",
+      "text": "Shari",
+      "exposed": false
+    },
+    {
+      "document": 270,
+      "label": "NAME_RELATED",
+      "text": "Shari",
+      "exposed": false
+    },
+    {
+      "document": 274,
+      "label": "NAME_RELATED",
+      "text": "Margaret Schneider",
+      "exposed": false
+    },
+    {
+      "document": 275,
+      "label": "SSN",
+      "text": "296-33-8883",
+      "exposed": false
+    },
+    {
+      "document": 280,
+      "label": "NAME_RELATED",
+      "text": "Jonathan Adkins",
+      "exposed": false
+    },
+    {
+      "document": 280,
+      "label": "NAME_RELATED",
+      "text": "Cesar",
+      "exposed": false
+    },
+    {
+      "document": 282,
+      "label": "NAME_RELATED",
+      "text": "Jennifer",
+      "exposed": false
+    },
+    {
+      "document": 285,
+      "label": "NAME_RELATED",
+      "text": "Scott",
+      "exposed": false
+    },
+    {
+      "document": 286,
+      "label": "NAME_RELATED",
+      "text": "David",
+      "exposed": false
+    },
+    {
+      "document": 289,
+      "label": "NAME_RELATED",
+      "text": "Suzanne",
+      "exposed": false
+    },
+    {
+      "document": 290,
+      "label": "NAME_RELATED",
+      "text": "Alexander",
+      "exposed": false
+    },
+    {
+      "document": 290,
+      "label": "NAME_RELATED",
+      "text": "Chelsea Warren",
+      "exposed": false
+    },
+    {
+      "document": 290,
+      "label": "NAME_RELATED",
+      "text": "Chelsea Warren",
+      "exposed": false
+    },
+    {
+      "document": 291,
+      "label": "NAME_RELATED",
+      "text": "Graham",
+      "exposed": false
+    },
+    {
+      "document": 295,
+      "label": "LOCATION",
+      "text": "West Chelsea",
+      "exposed": false
+    },
+    {
+      "document": 296,
+      "label": "SCHOOL",
+      "text": "Oliver Elementary",
+      "exposed": false
+    },
+    {
+      "document": 298,
+      "label": "NAME_RELATED",
+      "text": "Patricia",
+      "exposed": false
+    },
+    {
+      "document": 299,
+      "label": "SSN",
+      "text": "244-60-8928",
+      "exposed": false
+    },
+    {
+      "document": 302,
+      "label": "NAME_RELATED",
+      "text": "Raymond",
+      "exposed": false
+    },
+    {
+      "document": 304,
+      "label": "NAME_RELATED",
+      "text": "Erin",
+      "exposed": false
+    },
+    {
+      "document": 308,
+      "label": "NAME_RELATED",
+      "text": "Nathan",
+      "exposed": false
+    },
+    {
+      "document": 312,
+      "label": "LOCATION",
+      "text": "North Dianachester",
+      "exposed": false
+    },
+    {
+      "document": 313,
+      "label": "NAME_RELATED",
+      "text": "Melissa Ramsey",
+      "exposed": false
+    },
+    {
+      "document": 313,
+      "label": "NAME_RELATED",
+      "text": "Paul",
+      "exposed": false
+    },
+    {
+      "document": 313,
+      "label": "NAME_RELATED",
+      "text": "Paul",
+      "exposed": false
+    },
+    {
+      "document": 318,
+      "label": "NAME_RELATED",
+      "text": "Candice",
+      "exposed": false
+    },
+    {
+      "document": 324,
+      "label": "LOCATION",
+      "text": "New Kellybury",
+      "exposed": false
+    },
+    {
+      "document": 325,
+      "label": "NAME_RELATED",
+      "text": "Sharon",
+      "exposed": false
+    },
+    {
+      "document": 327,
+      "label": "NAME_RELATED",
+      "text": "Tiffany",
+      "exposed": false
+    },
+    {
+      "document": 328,
+      "label": "URL_PERSONAL",
+      "text": "monicawrites.blogspot.com",
+      "exposed": false
+    },
+    {
+      "document": 328,
+      "label": "LOCATION",
+      "text": "East Dustin",
+      "exposed": false
+    },
+    {
+      "document": 332,
+      "label": "NAME_RELATED",
+      "text": "Tara",
+      "exposed": false
+    },
+    {
+      "document": 335,
+      "label": "NAME_RELATED",
+      "text": "Collin Bean",
+      "exposed": false
+    },
+    {
+      "document": 336,
+      "label": "NAME_RELATED",
+      "text": "Park",
+      "exposed": false
+    },
+    {
+      "document": 337,
+      "label": "NAME_RELATED",
+      "text": "Melissa Lambert",
+      "exposed": false
+    },
+    {
+      "document": 338,
+      "label": "NAME_RELATED",
+      "text": "Jackson",
+      "exposed": false
+    },
+    {
+      "document": 338,
+      "label": "NAME_RELATED",
+      "text": "Jackson",
+      "exposed": false
+    },
+    {
+      "document": 340,
+      "label": "NAME_RELATED",
+      "text": "Amber",
+      "exposed": false
+    },
+    {
+      "document": 342,
+      "label": "NAME_RELATED",
+      "text": "Benjamin",
+      "exposed": false
+    },
+    {
+      "document": 342,
+      "label": "NAME_RELATED",
+      "text": "Christian Olson",
+      "exposed": false
+    }
+  ]
+}

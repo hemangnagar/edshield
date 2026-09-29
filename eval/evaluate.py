@@ -80,22 +80,30 @@ def main():
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--device", default="cpu")
     ap.add_argument("--o_threshold", type=float, default=None, help="entity whenever P(O) < this (default: argmax)")
+    ap.add_argument("--labels", choices=["piilo", "all"], default="piilo",
+                    help="score the seven PIILO labels, or every label edshield produces")
     ap.add_argument("--report", default=None, help="write JSON report here")
     a = ap.parse_args()
 
     docs = json.loads(Path(a.input).read_text(encoding="utf-8"))
     if a.limit:
         docs = docs[: a.limit]
+    labels = edshield.PIILO_LABELS if a.labels == "piilo" else edshield.ALL_LABELS
 
     tp = Counter(); fp = Counter(); fn = Counter()
     leaks = []
+    exposed = Counter()  # gold spans that no flag of any label touched: what would actually get through
     for d in docs:
         text, gold = rebuild(d)
+        gold = [g for g in gold if g[2] in labels]
         pred = edshield.analyze_text(text, model_name=a.model, device=a.device, o_threshold=a.o_threshold).entities
-        pred_spans = [(e.start, e.end, e.label) for e in pred if e.label in edshield.PIILO_LABELS]
+        pred_spans = [(e.start, e.end, e.label) for e in pred if e.label in labels]
         d_tp, d_fp, d_fn, missed = score(gold, pred_spans)
         tp += d_tp; fp += d_fp; fn += d_fn
-        leaks.extend({"document": d["document"], "label": gl, "text": text[gs:ge]} for gs, ge, gl in missed)
+        for gs, ge, gl in missed:
+            untouched = not any(e.start < ge and gs < e.end for e in pred)
+            exposed[gl] += untouched
+            leaks.append({"document": d["document"], "label": gl, "text": text[gs:ge], "exposed": untouched})
 
     def prf(label=None):
         t = tp[label] if label else sum(tp.values())
@@ -107,11 +115,19 @@ def main():
         f5 = (1 + b2) * prec * rec / (b2 * prec + rec) if prec + rec else 0.0
         return {"tp": t, "fp": p_, "fn": n, "precision": round(prec, 4), "recall": round(rec, 4), "f5": round(f5, 4)}
 
-    report = {"model": a.model, "docs": len(docs), "overall": prf(), "per_label": {l: prf(l) for l in edshield.PIILO_LABELS}, "leaks": leaks[:200]}
+    n_gold = sum(tp.values()) + sum(fn.values())
+    n_exposed = sum(exposed.values())
+    report = {"model": a.model, "docs": len(docs), "overall": prf(), "per_label": {l: prf(l) for l in labels},
+              "identifiers": n_gold, "exposed": n_exposed, "exposed_by_label": dict(exposed),
+              "removed_under_any_label": round(1 - n_exposed / n_gold, 4) if n_gold else None,
+              "leaks": leaks[:200]}
     print(f"model={a.model} docs={len(docs)}")
     print(f"overall  P={report['overall']['precision']:.3f} R={report['overall']['recall']:.3f} F5={report['overall']['f5']:.3f}  leaks={sum(fn.values())}")
+    # A name found but labelled as the wrong kind of name is still removed from the text.
+    print(f"exposed  {n_exposed} of {n_gold} identifiers were touched by no flag of any label")
     for l, m in report["per_label"].items():
-        print(f"  {l:15} P={m['precision']:.3f} R={m['recall']:.3f} F5={m['f5']:.3f} (n={m['tp']+m['fn']})")
+        if m["tp"] + m["fn"] + m["fp"]:
+            print(f"  {l:15} P={m['precision']:.3f} R={m['recall']:.3f} F5={m['f5']:.3f} (n={m['tp']+m['fn']}, exposed={exposed[l]})")
     if a.report:
         Path(a.report).parent.mkdir(parents=True, exist_ok=True)
         Path(a.report).write_text(json.dumps(report, indent=2))

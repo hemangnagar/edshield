@@ -1,0 +1,1358 @@
+{
+  "model": "C:/edshield/models/piilo-deberta-v3-small-v2",
+  "docs": 400,
+  "overall": {
+    "tp": 753,
+    "fp": 383,
+    "fn": 680,
+    "precision": 0.6629,
+    "recall": 0.5255,
+    "f5": 0.5297
+  },
+  "per_label": {
+    "NAME_STUDENT": {
+      "tp": 343,
+      "fp": 282,
+      "fn": 8,
+      "precision": 0.5488,
+      "recall": 0.9772,
+      "f5": 0.9487
+    },
+    "EMAIL": {
+      "tp": 90,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0.989,
+      "recall": 1.0,
+      "f5": 0.9996
+    },
+    "USERNAME": {
+      "tp": 68,
+      "fp": 14,
+      "fn": 4,
+      "precision": 0.8293,
+      "recall": 0.9444,
+      "f5": 0.9394
+    },
+    "ID_NUM": {
+      "tp": 57,
+      "fp": 78,
+      "fn": 0,
+      "precision": 0.4222,
+      "recall": 1.0,
+      "f5": 0.95
+    },
+    "PHONE_NUM": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 72,
+      "precision": 1.0,
+      "recall": 0.04,
+      "f5": 0.0415
+    },
+    "URL_PERSONAL": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f5": 0.0
+    },
+    "STREET_ADDRESS": {
+      "tp": 0,
+      "fp": 3,
+      "fn": 34,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f5": 0.0
+    },
+    "SSN": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f5": 0.0
+    },
+    "DATE": {
+      "tp": 31,
+      "fp": 0,
+      "fn": 40,
+      "precision": 1.0,
+      "recall": 0.4366,
+      "f5": 0.4463
+    },
+    "NAME_RELATED": {
+      "tp": 40,
+      "fp": 5,
+      "fn": 200,
+      "precision": 0.8889,
+      "recall": 0.1667,
+      "f5": 0.172
+    },
+    "SCHOOL": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 116,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f5": 0.0
+    },
+    "LOCATION": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 122,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f5": 0.0
+    },
+    "AGE": {
+      "tp": 121,
+      "fp": 0,
+      "fn": 84,
+      "precision": 1.0,
+      "recall": 0.5902,
+      "f5": 0.5997
+    },
+    "IP_ADDRESS": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f5": 0.0
+    },
+    "DEVICE_ID": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f5": 0.0
+    },
+    "GEO": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f5": 0.0
+    }
+  },
+  "identifiers": 1433,
+  "exposed": 319,
+  "exposed_by_label": {
+    "DATE": 38,
+    "STREET_ADDRESS": 34,
+    "LOCATION": 83,
+    "NAME_RELATED": 0,
+    "PHONE_NUM": 0,
+    "SCHOOL": 74,
+    "AGE": 82,
+    "NAME_STUDENT": 8,
+    "USERNAME": 0
+  },
+  "removed_under_any_label": 0.7774,
+  "leaks": [
+    {
+      "document": 0,
+      "label": "DATE",
+      "text": "16th of February",
+      "exposed": true
+    },
+    {
+      "document": 0,
+      "label": "STREET_ADDRESS",
+      "text": "Mayer Drive",
+      "exposed": true
+    },
+    {
+      "document": 1,
+      "label": "LOCATION",
+      "text": "woodtown",
+      "exposed": true
+    },
+    {
+      "document": 1,
+      "label": "NAME_RELATED",
+      "text": "taylor",
+      "exposed": false
+    },
+    {
+      "document": 2,
+      "label": "LOCATION",
+      "text": "West Kelly",
+      "exposed": true
+    },
+    {
+      "document": 4,
+      "label": "PHONE_NUM",
+      "text": "5710901610",
+      "exposed": false
+    },
+    {
+      "document": 6,
+      "label": "LOCATION",
+      "text": "East Kerry",
+      "exposed": true
+    },
+    {
+      "document": 6,
+      "label": "NAME_RELATED",
+      "text": "Amanda",
+      "exposed": false
+    },
+    {
+      "document": 7,
+      "label": "SCHOOL",
+      "text": "mosley middle school",
+      "exposed": true
+    },
+    {
+      "document": 7,
+      "label": "NAME_RELATED",
+      "text": "melinda",
+      "exposed": false
+    },
+    {
+      "document": 7,
+      "label": "LOCATION",
+      "text": "kennethport",
+      "exposed": true
+    },
+    {
+      "document": 7,
+      "label": "SCHOOL",
+      "text": "mosley middle school",
+      "exposed": true
+    },
+    {
+      "document": 8,
+      "label": "AGE",
+      "text": "11",
+      "exposed": true
+    },
+    {
+      "document": 8,
+      "label": "NAME_RELATED",
+      "text": "James",
+      "exposed": false
+    },
+    {
+      "document": 8,
+      "label": "STREET_ADDRESS",
+      "text": "Ross Drive",
+      "exposed": true
+    },
+    {
+      "document": 9,
+      "label": "LOCATION",
+      "text": "west alicia",
+      "exposed": false
+    },
+    {
+      "document": 9,
+      "label": "AGE",
+      "text": "7m",
+      "exposed": true
+    },
+    {
+      "document": 9,
+      "label": "AGE",
+      "text": "7m",
+      "exposed": true
+    },
+    {
+      "document": 11,
+      "label": "STREET_ADDRESS",
+      "text": "Johnson Drive",
+      "exposed": true
+    },
+    {
+      "document": 12,
+      "label": "LOCATION",
+      "text": "west amyside",
+      "exposed": false
+    },
+    {
+      "document": 12,
+      "label": "SCHOOL",
+      "text": "griffith high school",
+      "exposed": true
+    },
+    {
+      "document": 13,
+      "label": "AGE",
+      "text": "11m",
+      "exposed": true
+    },
+    {
+      "document": 13,
+      "label": "NAME_RELATED",
+      "text": "james",
+      "exposed": false
+    },
+    {
+      "document": 14,
+      "label": "SCHOOL",
+      "text": "wyatt elementary",
+      "exposed": true
+    },
+    {
+      "document": 14,
+      "label": "NAME_STUDENT",
+      "text": "jack",
+      "exposed": true
+    },
+    {
+      "document": 16,
+      "label": "DATE",
+      "text": "14th of May",
+      "exposed": true
+    },
+    {
+      "document": 16,
+      "label": "SCHOOL",
+      "text": "Reed",
+      "exposed": true
+    },
+    {
+      "document": 18,
+      "label": "SCHOOL",
+      "text": "vazquez elementary school",
+      "exposed": true
+    },
+    {
+      "document": 19,
+      "label": "NAME_RELATED",
+      "text": "Mckenzie",
+      "exposed": false
+    },
+    {
+      "document": 19,
+      "label": "NAME_RELATED",
+      "text": "Mckenzie",
+      "exposed": false
+    },
+    {
+      "document": 19,
+      "label": "PHONE_NUM",
+      "text": "5719080268",
+      "exposed": false
+    },
+    {
+      "document": 19,
+      "label": "PHONE_NUM",
+      "text": "5719080268",
+      "exposed": false
+    },
+    {
+      "document": 20,
+      "label": "SCHOOL",
+      "text": "Vance",
+      "exposed": false
+    },
+    {
+      "document": 20,
+      "label": "NAME_RELATED",
+      "text": "April",
+      "exposed": false
+    },
+    {
+      "document": 20,
+      "label": "PHONE_NUM",
+      "text": "5712631355",
+      "exposed": false
+    },
+    {
+      "document": 21,
+      "label": "SCHOOL",
+      "text": "Richards",
+      "exposed": true
+    },
+    {
+      "document": 22,
+      "label": "AGE",
+      "text": "16m",
+      "exposed": true
+    },
+    {
+      "document": 23,
+      "label": "NAME_RELATED",
+      "text": "Melissa",
+      "exposed": false
+    },
+    {
+      "document": 23,
+      "label": "PHONE_NUM",
+      "text": "5711396789",
+      "exposed": false
+    },
+    {
+      "document": 25,
+      "label": "SCHOOL",
+      "text": "Lynch",
+      "exposed": false
+    },
+    {
+      "document": 26,
+      "label": "NAME_RELATED",
+      "text": "Alexis",
+      "exposed": false
+    },
+    {
+      "document": 26,
+      "label": "LOCATION",
+      "text": "Jeffreytown",
+      "exposed": true
+    },
+    {
+      "document": 27,
+      "label": "PHONE_NUM",
+      "text": "5715549031",
+      "exposed": false
+    },
+    {
+      "document": 28,
+      "label": "LOCATION",
+      "text": "North Victoria",
+      "exposed": true
+    },
+    {
+      "document": 29,
+      "label": "NAME_RELATED",
+      "text": "Rebecca",
+      "exposed": false
+    },
+    {
+      "document": 30,
+      "label": "SCHOOL",
+      "text": "hernandez elementary school",
+      "exposed": true
+    },
+    {
+      "document": 31,
+      "label": "PHONE_NUM",
+      "text": "5714332230",
+      "exposed": false
+    },
+    {
+      "document": 31,
+      "label": "NAME_RELATED",
+      "text": "Pamela",
+      "exposed": false
+    },
+    {
+      "document": 32,
+      "label": "AGE",
+      "text": "14m",
+      "exposed": true
+    },
+    {
+      "document": 33,
+      "label": "LOCATION",
+      "text": "Samuelside",
+      "exposed": false
+    },
+    {
+      "document": 33,
+      "label": "PHONE_NUM",
+      "text": "5719072836",
+      "exposed": false
+    },
+    {
+      "document": 33,
+      "label": "LOCATION",
+      "text": "Samuelside",
+      "exposed": false
+    },
+    {
+      "document": 35,
+      "label": "STREET_ADDRESS",
+      "text": "Burke Street",
+      "exposed": true
+    },
+    {
+      "document": 35,
+      "label": "SCHOOL",
+      "text": "Hernandez",
+      "exposed": true
+    },
+    {
+      "document": 39,
+      "label": "SCHOOL",
+      "text": "Castro",
+      "exposed": true
+    },
+    {
+      "document": 39,
+      "label": "LOCATION",
+      "text": "Brendaburgh",
+      "exposed": false
+    },
+    {
+      "document": 39,
+      "label": "SCHOOL",
+      "text": "Castro",
+      "exposed": true
+    },
+    {
+      "document": 40,
+      "label": "NAME_RELATED",
+      "text": "Ryan",
+      "exposed": false
+    },
+    {
+      "document": 40,
+      "label": "SCHOOL",
+      "text": "Brown",
+      "exposed": true
+    },
+    {
+      "document": 40,
+      "label": "LOCATION",
+      "text": "New Michaelshire",
+      "exposed": true
+    },
+    {
+      "document": 41,
+      "label": "NAME_RELATED",
+      "text": "Sherri",
+      "exposed": false
+    },
+    {
+      "document": 42,
+      "label": "NAME_RELATED",
+      "text": "Brenda",
+      "exposed": false
+    },
+    {
+      "document": 42,
+      "label": "STREET_ADDRESS",
+      "text": "Robinson Drive",
+      "exposed": true
+    },
+    {
+      "document": 43,
+      "label": "AGE",
+      "text": "7",
+      "exposed": true
+    },
+    {
+      "document": 43,
+      "label": "NAME_RELATED",
+      "text": "Catherine",
+      "exposed": false
+    },
+    {
+      "document": 44,
+      "label": "NAME_RELATED",
+      "text": "Nicole",
+      "exposed": false
+    },
+    {
+      "document": 44,
+      "label": "STREET_ADDRESS",
+      "text": "Roberson Court",
+      "exposed": true
+    },
+    {
+      "document": 44,
+      "label": "LOCATION",
+      "text": "West Randy",
+      "exposed": true
+    },
+    {
+      "document": 45,
+      "label": "DATE",
+      "text": "11th of December",
+      "exposed": true
+    },
+    {
+      "document": 45,
+      "label": "NAME_RELATED",
+      "text": "Jordan",
+      "exposed": false
+    },
+    {
+      "document": 46,
+      "label": "NAME_RELATED",
+      "text": "Gregory",
+      "exposed": false
+    },
+    {
+      "document": 46,
+      "label": "NAME_RELATED",
+      "text": "Gregory",
+      "exposed": false
+    },
+    {
+      "document": 46,
+      "label": "SCHOOL",
+      "text": "Abbott",
+      "exposed": true
+    },
+    {
+      "document": 46,
+      "label": "AGE",
+      "text": "12",
+      "exposed": true
+    },
+    {
+      "document": 46,
+      "label": "DATE",
+      "text": "13th of February",
+      "exposed": true
+    },
+    {
+      "document": 46,
+      "label": "NAME_RELATED",
+      "text": "Gregory",
+      "exposed": false
+    },
+    {
+      "document": 47,
+      "label": "LOCATION",
+      "text": "bergside",
+      "exposed": true
+    },
+    {
+      "document": 47,
+      "label": "LOCATION",
+      "text": "bergside",
+      "exposed": true
+    },
+    {
+      "document": 48,
+      "label": "LOCATION",
+      "text": "new jamesbury",
+      "exposed": false
+    },
+    {
+      "document": 49,
+      "label": "PHONE_NUM",
+      "text": "5712602489",
+      "exposed": false
+    },
+    {
+      "document": 49,
+      "label": "SCHOOL",
+      "text": "curtis elementary",
+      "exposed": true
+    },
+    {
+      "document": 50,
+      "label": "PHONE_NUM",
+      "text": "5719328972",
+      "exposed": false
+    },
+    {
+      "document": 50,
+      "label": "SCHOOL",
+      "text": "riley elementary",
+      "exposed": true
+    },
+    {
+      "document": 51,
+      "label": "SCHOOL",
+      "text": "olson elementary",
+      "exposed": true
+    },
+    {
+      "document": 51,
+      "label": "AGE",
+      "text": "11m",
+      "exposed": true
+    },
+    {
+      "document": 51,
+      "label": "AGE",
+      "text": "11m",
+      "exposed": true
+    },
+    {
+      "document": 52,
+      "label": "SCHOOL",
+      "text": "Miranda",
+      "exposed": false
+    },
+    {
+      "document": 53,
+      "label": "AGE",
+      "text": "9",
+      "exposed": true
+    },
+    {
+      "document": 53,
+      "label": "NAME_RELATED",
+      "text": "Mathew",
+      "exposed": false
+    },
+    {
+      "document": 54,
+      "label": "NAME_RELATED",
+      "text": "Christopher",
+      "exposed": false
+    },
+    {
+      "document": 54,
+      "label": "STREET_ADDRESS",
+      "text": "Morgan Avenue",
+      "exposed": true
+    },
+    {
+      "document": 55,
+      "label": "SCHOOL",
+      "text": "Carter",
+      "exposed": false
+    },
+    {
+      "document": 57,
+      "label": "LOCATION",
+      "text": "Port Vernonborough",
+      "exposed": true
+    },
+    {
+      "document": 57,
+      "label": "NAME_RELATED",
+      "text": "Charles",
+      "exposed": false
+    },
+    {
+      "document": 57,
+      "label": "LOCATION",
+      "text": "Port Vernonborough",
+      "exposed": true
+    },
+    {
+      "document": 57,
+      "label": "LOCATION",
+      "text": "Port Vernonborough",
+      "exposed": true
+    },
+    {
+      "document": 58,
+      "label": "LOCATION",
+      "text": "Julieborough",
+      "exposed": true
+    },
+    {
+      "document": 59,
+      "label": "LOCATION",
+      "text": "Christopherhaven",
+      "exposed": true
+    },
+    {
+      "document": 59,
+      "label": "LOCATION",
+      "text": "Christopherhaven",
+      "exposed": true
+    },
+    {
+      "document": 59,
+      "label": "AGE",
+      "text": "7",
+      "exposed": true
+    },
+    {
+      "document": 59,
+      "label": "AGE",
+      "text": "7",
+      "exposed": true
+    },
+    {
+      "document": 59,
+      "label": "NAME_RELATED",
+      "text": "Debra",
+      "exposed": false
+    },
+    {
+      "document": 60,
+      "label": "DATE",
+      "text": "17th of September",
+      "exposed": true
+    },
+    {
+      "document": 60,
+      "label": "LOCATION",
+      "text": "North Lindafort",
+      "exposed": true
+    },
+    {
+      "document": 60,
+      "label": "NAME_RELATED",
+      "text": "Jeanette",
+      "exposed": false
+    },
+    {
+      "document": 61,
+      "label": "NAME_RELATED",
+      "text": "Samantha",
+      "exposed": false
+    },
+    {
+      "document": 61,
+      "label": "STREET_ADDRESS",
+      "text": "Murphy Lane",
+      "exposed": true
+    },
+    {
+      "document": 63,
+      "label": "AGE",
+      "text": "14m",
+      "exposed": true
+    },
+    {
+      "document": 65,
+      "label": "PHONE_NUM",
+      "text": "5716557240",
+      "exposed": false
+    },
+    {
+      "document": 66,
+      "label": "SCHOOL",
+      "text": "moore academy",
+      "exposed": true
+    },
+    {
+      "document": 66,
+      "label": "NAME_RELATED",
+      "text": "daniel",
+      "exposed": false
+    },
+    {
+      "document": 66,
+      "label": "LOCATION",
+      "text": "north stephen",
+      "exposed": false
+    },
+    {
+      "document": 67,
+      "label": "SCHOOL",
+      "text": "hardy elementary",
+      "exposed": true
+    },
+    {
+      "document": 68,
+      "label": "DATE",
+      "text": "5th of May",
+      "exposed": true
+    },
+    {
+      "document": 68,
+      "label": "STREET_ADDRESS",
+      "text": "Walter Court",
+      "exposed": true
+    },
+    {
+      "document": 68,
+      "label": "NAME_RELATED",
+      "text": "David",
+      "exposed": false
+    },
+    {
+      "document": 69,
+      "label": "DATE",
+      "text": "jan 12",
+      "exposed": false
+    },
+    {
+      "document": 69,
+      "label": "SCHOOL",
+      "text": "reese elementary school",
+      "exposed": true
+    },
+    {
+      "document": 69,
+      "label": "LOCATION",
+      "text": "carlton",
+      "exposed": false
+    },
+    {
+      "document": 70,
+      "label": "LOCATION",
+      "text": "teresastad",
+      "exposed": true
+    },
+    {
+      "document": 72,
+      "label": "LOCATION",
+      "text": "Andersonberg",
+      "exposed": true
+    },
+    {
+      "document": 72,
+      "label": "AGE",
+      "text": "12",
+      "exposed": true
+    },
+    {
+      "document": 72,
+      "label": "DATE",
+      "text": "15th of January",
+      "exposed": true
+    },
+    {
+      "document": 72,
+      "label": "NAME_RELATED",
+      "text": "Pamela",
+      "exposed": false
+    },
+    {
+      "document": 73,
+      "label": "LOCATION",
+      "text": "Davidstad",
+      "exposed": true
+    },
+    {
+      "document": 74,
+      "label": "AGE",
+      "text": "11",
+      "exposed": true
+    },
+    {
+      "document": 75,
+      "label": "SCHOOL",
+      "text": "Chapman",
+      "exposed": true
+    },
+    {
+      "document": 77,
+      "label": "PHONE_NUM",
+      "text": "5715142464",
+      "exposed": false
+    },
+    {
+      "document": 77,
+      "label": "NAME_RELATED",
+      "text": "george",
+      "exposed": false
+    },
+    {
+      "document": 78,
+      "label": "NAME_RELATED",
+      "text": "Justin",
+      "exposed": false
+    },
+    {
+      "document": 78,
+      "label": "DATE",
+      "text": "13th of April",
+      "exposed": true
+    },
+    {
+      "document": 78,
+      "label": "LOCATION",
+      "text": "Sandraside",
+      "exposed": true
+    },
+    {
+      "document": 79,
+      "label": "DATE",
+      "text": "22th of August",
+      "exposed": true
+    },
+    {
+      "document": 79,
+      "label": "NAME_RELATED",
+      "text": "Kimberly",
+      "exposed": false
+    },
+    {
+      "document": 79,
+      "label": "DATE",
+      "text": "22th of August",
+      "exposed": true
+    },
+    {
+      "document": 79,
+      "label": "STREET_ADDRESS",
+      "text": "Bishop Court",
+      "exposed": true
+    },
+    {
+      "document": 79,
+      "label": "SCHOOL",
+      "text": "Reed",
+      "exposed": true
+    },
+    {
+      "document": 82,
+      "label": "STREET_ADDRESS",
+      "text": "Frey Avenue",
+      "exposed": true
+    },
+    {
+      "document": 82,
+      "label": "AGE",
+      "text": "16",
+      "exposed": true
+    },
+    {
+      "document": 84,
+      "label": "STREET_ADDRESS",
+      "text": "Waller Court",
+      "exposed": true
+    },
+    {
+      "document": 84,
+      "label": "LOCATION",
+      "text": "Johnchester",
+      "exposed": true
+    },
+    {
+      "document": 84,
+      "label": "DATE",
+      "text": "10th of May",
+      "exposed": true
+    },
+    {
+      "document": 84,
+      "label": "STREET_ADDRESS",
+      "text": "Waller Court",
+      "exposed": true
+    },
+    {
+      "document": 84,
+      "label": "SCHOOL",
+      "text": "Barron",
+      "exposed": true
+    },
+    {
+      "document": 86,
+      "label": "SCHOOL",
+      "text": "White",
+      "exposed": true
+    },
+    {
+      "document": 87,
+      "label": "PHONE_NUM",
+      "text": "5716037557",
+      "exposed": false
+    },
+    {
+      "document": 87,
+      "label": "NAME_RELATED",
+      "text": "amanda",
+      "exposed": false
+    },
+    {
+      "document": 88,
+      "label": "AGE",
+      "text": "12",
+      "exposed": true
+    },
+    {
+      "document": 88,
+      "label": "DATE",
+      "text": "9th of October",
+      "exposed": true
+    },
+    {
+      "document": 88,
+      "label": "LOCATION",
+      "text": "Marieside",
+      "exposed": true
+    },
+    {
+      "document": 89,
+      "label": "DATE",
+      "text": "13th of December",
+      "exposed": true
+    },
+    {
+      "document": 90,
+      "label": "NAME_RELATED",
+      "text": "anna",
+      "exposed": false
+    },
+    {
+      "document": 90,
+      "label": "SCHOOL",
+      "text": "ross high school",
+      "exposed": true
+    },
+    {
+      "document": 92,
+      "label": "PHONE_NUM",
+      "text": "5711512290",
+      "exposed": false
+    },
+    {
+      "document": 92,
+      "label": "NAME_RELATED",
+      "text": "Kari",
+      "exposed": false
+    },
+    {
+      "document": 92,
+      "label": "SCHOOL",
+      "text": "Parks",
+      "exposed": true
+    },
+    {
+      "document": 92,
+      "label": "PHONE_NUM",
+      "text": "5711512290",
+      "exposed": false
+    },
+    {
+      "document": 93,
+      "label": "PHONE_NUM",
+      "text": "5712404351",
+      "exposed": false
+    },
+    {
+      "document": 93,
+      "label": "SCHOOL",
+      "text": "Moses",
+      "exposed": false
+    },
+    {
+      "document": 94,
+      "label": "NAME_RELATED",
+      "text": "Elizabeth",
+      "exposed": false
+    },
+    {
+      "document": 94,
+      "label": "LOCATION",
+      "text": "Joshuaport",
+      "exposed": true
+    },
+    {
+      "document": 94,
+      "label": "NAME_RELATED",
+      "text": "Duncan",
+      "exposed": false
+    },
+    {
+      "document": 95,
+      "label": "PHONE_NUM",
+      "text": "5716292386",
+      "exposed": false
+    },
+    {
+      "document": 95,
+      "label": "NAME_RELATED",
+      "text": "Daniel",
+      "exposed": false
+    },
+    {
+      "document": 96,
+      "label": "LOCATION",
+      "text": "West Leslie",
+      "exposed": false
+    },
+    {
+      "document": 96,
+      "label": "SCHOOL",
+      "text": "Fox",
+      "exposed": false
+    },
+    {
+      "document": 97,
+      "label": "DATE",
+      "text": "jan 3",
+      "exposed": false
+    },
+    {
+      "document": 97,
+      "label": "NAME_RELATED",
+      "text": "kurt",
+      "exposed": false
+    },
+    {
+      "document": 99,
+      "label": "LOCATION",
+      "text": "east reginaldmouth",
+      "exposed": true
+    },
+    {
+      "document": 100,
+      "label": "SCHOOL",
+      "text": "Ross",
+      "exposed": true
+    },
+    {
+      "document": 100,
+      "label": "SCHOOL",
+      "text": "Ross",
+      "exposed": true
+    },
+    {
+      "document": 100,
+      "label": "SCHOOL",
+      "text": "Ross",
+      "exposed": true
+    },
+    {
+      "document": 101,
+      "label": "LOCATION",
+      "text": "Patrickfurt",
+      "exposed": true
+    },
+    {
+      "document": 102,
+      "label": "PHONE_NUM",
+      "text": "5716085490",
+      "exposed": false
+    },
+    {
+      "document": 103,
+      "label": "PHONE_NUM",
+      "text": "5714872996",
+      "exposed": false
+    },
+    {
+      "document": 103,
+      "label": "NAME_RELATED",
+      "text": "Willie",
+      "exposed": false
+    },
+    {
+      "document": 103,
+      "label": "PHONE_NUM",
+      "text": "5714872996",
+      "exposed": false
+    },
+    {
+      "document": 104,
+      "label": "SCHOOL",
+      "text": "walton elementary",
+      "exposed": true
+    },
+    {
+      "document": 107,
+      "label": "DATE",
+      "text": "15th of March",
+      "exposed": true
+    },
+    {
+      "document": 108,
+      "label": "AGE",
+      "text": "9m",
+      "exposed": true
+    },
+    {
+      "document": 108,
+      "label": "PHONE_NUM",
+      "text": "5714008023",
+      "exposed": false
+    },
+    {
+      "document": 109,
+      "label": "SCHOOL",
+      "text": "Cobb",
+      "exposed": false
+    },
+    {
+      "document": 109,
+      "label": "NAME_RELATED",
+      "text": "Gary",
+      "exposed": false
+    },
+    {
+      "document": 110,
+      "label": "NAME_RELATED",
+      "text": "madison",
+      "exposed": false
+    },
+    {
+      "document": 111,
+      "label": "AGE",
+      "text": "12",
+      "exposed": true
+    },
+    {
+      "document": 111,
+      "label": "NAME_RELATED",
+      "text": "Ashley",
+      "exposed": false
+    },
+    {
+      "document": 111,
+      "label": "STREET_ADDRESS",
+      "text": "Lee Court",
+      "exposed": true
+    },
+    {
+      "document": 112,
+      "label": "NAME_RELATED",
+      "text": "Carl",
+      "exposed": false
+    },
+    {
+      "document": 112,
+      "label": "NAME_RELATED",
+      "text": "Derek",
+      "exposed": false
+    },
+    {
+      "document": 113,
+      "label": "NAME_RELATED",
+      "text": "Ashley",
+      "exposed": false
+    },
+    {
+      "document": 114,
+      "label": "NAME_RELATED",
+      "text": "Michael",
+      "exposed": false
+    },
+    {
+      "document": 114,
+      "label": "DATE",
+      "text": "10th of September",
+      "exposed": true
+    },
+    {
+      "document": 115,
+      "label": "PHONE_NUM",
+      "text": "5716432368",
+      "exposed": false
+    },
+    {
+      "document": 116,
+      "label": "PHONE_NUM",
+      "text": "5712393583",
+      "exposed": false
+    },
+    {
+      "document": 117,
+      "label": "NAME_RELATED",
+      "text": "Caitlin",
+      "exposed": false
+    },
+    {
+      "document": 117,
+      "label": "AGE",
+      "text": "12",
+      "exposed": true
+    },
+    {
+      "document": 117,
+      "label": "LOCATION",
+      "text": "Port Aaron",
+      "exposed": true
+    },
+    {
+      "document": 117,
+      "label": "AGE",
+      "text": "12",
+      "exposed": true
+    },
+    {
+      "document": 118,
+      "label": "NAME_RELATED",
+      "text": "Abigail",
+      "exposed": false
+    },
+    {
+      "document": 118,
+      "label": "SCHOOL",
+      "text": "Aguilar",
+      "exposed": false
+    }
+  ]
+}

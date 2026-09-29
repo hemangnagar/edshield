@@ -26,10 +26,12 @@ The design follows [OpenMed](https://github.com/maziyarpanahi/openmed): small fi
 | Layer | Covers | Needs a model? |
 |---|---|---|
 | Rules | EMAIL, PHONE_NUM, URL_PERSONAL, USERNAME, ID_NUM, STREET_ADDRESS, SSN, DATE, and names introduced with a cue ("my name is…", a signature) | No |
+| Rules, beyond PIILO | NAME_RELATED (family, friends, teachers), SCHOOL, LOCATION, AGE, IP_ADDRESS, DEVICE_ID, GEO | No |
 | Model | The authority for NAME_STUDENT, ID_NUM and STREET_ADDRESS, plus a second opinion on every other label | Yes (PIILO-trained encoder) |
 | Propagation | Once a name is found, every other mention of it in the document is caught | No |
 | Policies | `ferpa`, `coppa`, `research` decide which labels to act on, the confidence floor, and the method per label (mask, surrogate, hash, date-shift) | No |
 | Verifier | Refuses to return output if any acted-on value still appears verbatim | No |
+| Audit record | Policy, version, detector and counts for every document, with no student data in it | No |
 
 When a model is loaded, the rules for NAME_STUDENT, ID_NUM and STREET_ADDRESS are switched off: they are recall-oriented fallbacks that over-flag ordinary essay text. Without a model the rules cover every label. `analyze_text(..., model_authority=())` runs both layers on everything.
 
@@ -71,19 +73,29 @@ All numbers are span-level from `eval/evaluate.py`; F5 weights recall 5:1, as th
 
 | Detector | Precision | Recall | F5 | Missed entities |
 |---|---|---|---|---|
-| Rules only | 0.500 | 0.388 | 0.391 | 101 of 165 |
-| Rules + model | 0.589 | 1.000 | 0.974 | 0 of 165 |
+| Rules only | 0.538 | 0.388 | 0.392 | 101 of 165 |
+| Rules + model | 0.642 | 1.000 | 0.979 | 0 of 165 |
 
 | Rules + model, by label | Precision | Recall | n |
 |---|---|---|---|
-| NAME_STUDENT | 0.622 | 1.000 | 143 |
-| URL_PERSONAL | 0.258 | 1.000 | 8 |
-| ID_NUM | 0.636 | 1.000 | 7 |
+| NAME_STUDENT | 0.656 | 1.000 | 143 |
+| URL_PERSONAL | 0.381 | 1.000 | 8 |
+| ID_NUM | 0.700 | 1.000 | 7 |
 | EMAIL | 1.000 | 1.000 | 4 |
 | USERNAME | 1.000 | 1.000 | 2 |
 | STREET_ADDRESS | 0.500 | 1.000 | 1 |
 
-The rare labels have a handful of examples each, so their rows say little. Most name false positives are real names of people who are not students (cited authors, lecturers), which PIILO does not label; most URL false positives are cited articles. Reports are in `eval/results/`.
+The rare labels have a handful of examples each, so their rows say little. Most name false positives are names of people other than the essay's author (personas, lecturers, friends), which PIILO does not label but which a privacy tool should remove. Reports are in `eval/results/`.
+
+**Synthetic K-12 writing.** PIILO is adult writing, so `eval/k12_bench.py` generates short essays, tutoring transcripts and chat messages in children's registers, covering every label. "Got through" counts identifiers that no flag of any label touched.
+
+| Set | Detector | Identifiers | Got through |
+|---|---|---|---|
+| Cued: worded the way the rules expect | Rules + model | 1,445 | 0 |
+| Hard: the way children type | Rules + model | 1,433 | 319 (22%) |
+| Hard | Rules only | 1,433 | 1,100 (77%) |
+
+The hard set is the honest baseline. What gets through is mostly lowercase schools and towns, ages in chat shorthand, spoken dates and streets without a house number. [docs/COVERAGE.md](docs/COVERAGE.md) has the breakdown and maps each identifier type in FERPA and COPPA to what edshield does.
 
 **Synthetic transcripts and essays.** Rules only, 500 documents (`eval/synthetic_bench.py --n 500 --seed 1`). The generator's sentences use the same cues the rules look for, so read this as a regression check, not as expected accuracy on real text:
 

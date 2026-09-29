@@ -3,11 +3,11 @@
   "docs": 680,
   "overall": {
     "tp": 64,
-    "fp": 64,
+    "fp": 55,
     "fn": 101,
-    "precision": 0.5,
+    "precision": 0.5378,
     "recall": 0.3879,
-    "f5": 0.3913
+    "f5": 0.3921
   },
   "per_label": {
     "NAME_STUDENT": {
@@ -52,11 +52,11 @@
     },
     "URL_PERSONAL": {
       "tp": 8,
-      "fp": 19,
+      "fp": 10,
       "fn": 0,
-      "precision": 0.2963,
+      "precision": 0.4444,
       "recall": 1.0,
-      "f5": 0.9163
+      "f5": 0.9541
     },
     "STREET_ADDRESS": {
       "tp": 1,

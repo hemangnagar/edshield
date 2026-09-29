@@ -14,6 +14,7 @@ def load(rel):
 
 prepare = load("training/prepare_piilo.py")
 evaluate = load("eval/evaluate.py")
+k12 = load("eval/k12_bench.py")
 
 
 def doc(i, positive, source="real"):
@@ -87,6 +88,37 @@ def test_unmatched_spans():
     gold = [(0, 5, "EMAIL"), (20, 25, "EMAIL")]
     pred = [(0, 5, "EMAIL"), (40, 45, "EMAIL")]
     assert counts(gold, pred) == (1, 1, 1, [(20, 25, "EMAIL")])
+
+
+# --- synthetic K-12 set -------------------------------------------------------
+
+def test_k12_documents_are_well_formed_and_reproducible():
+    import edshield
+    for style in ("cued", "hard"):
+        docs = k12.generate(60, style, seed=3)
+        assert docs == k12.generate(60, style, seed=3)
+        assert docs != k12.generate(60, style, seed=4)
+        seen = set()
+        for d in docs:
+            assert len(d["tokens"]) == len(d["labels"]) == len(d["trailing_whitespace"])
+            assert "⟦" not in d["full_text"] and "⟧" not in d["full_text"]
+            text, spans = evaluate.rebuild(d)
+            for s, e, label in spans:
+                assert label in edshield.ALL_LABELS
+                assert text[s:e].strip() == text[s:e] and text[s:e]
+                seen.add(label)
+        assert {"NAME_STUDENT", "NAME_RELATED", "SCHOOL", "LOCATION", "AGE", "EMAIL", "PHONE_NUM"} <= seen
+
+
+def test_k12_marker_becomes_one_labelled_span():
+    d = k12.to_piilo(0, f"im {k12.m('NAME_STUDENT', 'aiden')} from {k12.m('LOCATION', 'Cedar Falls')}.", "chat", "hard")
+    text, spans = evaluate.rebuild(d)
+    assert [(text[s:e], l) for s, e, l in spans] == [("aiden", "NAME_STUDENT"), ("Cedar Falls", "LOCATION")]
+
+
+def test_k12_adjacent_identifiers_stay_separate():
+    d = k12.to_piilo(0, f"{k12.m('NAME_STUDENT', 'LORI')} {k12.m('NAME_STUDENT', 'RIVERS')} ok", "chat", "hard")
+    assert d["labels"] == ["B-NAME_STUDENT", "B-NAME_STUDENT", "O"]
 
 
 def test_rebuild_round_trips_text_and_spans():

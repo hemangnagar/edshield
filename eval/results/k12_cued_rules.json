@@ -1,0 +1,147 @@
+{
+  "model": "rules",
+  "docs": 400,
+  "overall": {
+    "tp": 1445,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f5": 1.0
+  },
+  "per_label": {
+    "NAME_STUDENT": {
+      "tp": 149,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f5": 1.0
+    },
+    "EMAIL": {
+      "tp": 127,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f5": 1.0
+    },
+    "USERNAME": {
+      "tp": 114,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f5": 1.0
+    },
+    "ID_NUM": {
+      "tp": 60,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f5": 1.0
+    },
+    "PHONE_NUM": {
+      "tp": 79,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f5": 1.0
+    },
+    "URL_PERSONAL": {
+      "tp": 57,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f5": 1.0
+    },
+    "STREET_ADDRESS": {
+      "tp": 32,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f5": 1.0
+    },
+    "SSN": {
+      "tp": 46,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f5": 1.0
+    },
+    "DATE": {
+      "tp": 60,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f5": 1.0
+    },
+    "NAME_RELATED": {
+      "tp": 220,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f5": 1.0
+    },
+    "SCHOOL": {
+      "tp": 81,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f5": 1.0
+    },
+    "LOCATION": {
+      "tp": 88,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f5": 1.0
+    },
+    "AGE": {
+      "tp": 140,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f5": 1.0
+    },
+    "IP_ADDRESS": {
+      "tp": 50,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f5": 1.0
+    },
+    "DEVICE_ID": {
+      "tp": 96,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f5": 1.0
+    },
+    "GEO": {
+      "tp": 46,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f5": 1.0
+    }
+  },
+  "identifiers": 1445,
+  "exposed": 0,
+  "exposed_by_label": {},
+  "removed_under_any_label": 1.0,
+  "leaks": []
+}
