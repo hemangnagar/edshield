@@ -1,0 +1,75 @@
+{
+  "model": "onnx",
+  "docs": 680,
+  "overall": {
+    "tp": 165,
+    "fp": 93,
+    "fn": 0,
+    "precision": 0.6395,
+    "recall": 1.0,
+    "f5": 0.9788
+  },
+  "per_label": {
+    "NAME_STUDENT": {
+      "tp": 143,
+      "fp": 75,
+      "fn": 0,
+      "precision": 0.656,
+      "recall": 1.0,
+      "f5": 0.9802
+    },
+    "EMAIL": {
+      "tp": 4,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f5": 1.0
+    },
+    "USERNAME": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f5": 1.0
+    },
+    "ID_NUM": {
+      "tp": 7,
+      "fp": 4,
+      "fn": 0,
+      "precision": 0.6364,
+      "recall": 1.0,
+      "f5": 0.9785
+    },
+    "PHONE_NUM": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f5": 0.0
+    },
+    "URL_PERSONAL": {
+      "tp": 8,
+      "fp": 13,
+      "fn": 0,
+      "precision": 0.381,
+      "recall": 1.0,
+      "f5": 0.9412
+    },
+    "STREET_ADDRESS": {
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0.5,
+      "recall": 1.0,
+      "f5": 0.963
+    }
+  },
+  "identifiers": 165,
+  "exposed": 0,
+  "exposed_by_label": {},
+  "removed_under_any_label": 1.0,
+  "leaks": []
+}

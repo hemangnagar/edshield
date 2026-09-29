@@ -75,7 +75,9 @@ All numbers are span-level from `eval/evaluate.py`; F5 weights recall 5:1, as th
 |---|---|---|---|---|
 | Rules only | 0.538 | 0.388 | 0.392 | 101 of 165 |
 | Rules + model | 0.642 | 1.000 | 0.979 | 0 of 165 |
-| Rules + INT8 model (browser) | 0.692 | 0.952 | 0.938 | 8 of 165 |
+| Rules + INT8 model (browser) | 0.639 | 1.000 | 0.979 | 0 of 165 |
+
+The browser file is 205 MB against 566 MB at full precision. It is measured with `eval/evaluate_onnx.py`. Quantizing every layer gives 172 MB but missed 8 of the 165 (precision 0.692, recall 0.952), so the export leaves the first two encoder layers at full precision. That setting was chosen on this same set, so the row is a little optimistic; on the synthetic K-12 hard set below, which played no part in the choice, the browser file lets 324 of 1,433 through against 319 for the full model.
 
 | Rules + model, by label | Precision | Recall | n |
 |---|---|---|---|
@@ -134,7 +136,7 @@ python training/export_onnx.py --model models/piilo-deberta-v3-small --out demo/
 ```
 edshield/         runtime: rules.py, ner.py, deid.py, policies/, cli.py, service.py
 training/         prepare_piilo.py, train.py, export_onnx.py
-eval/             evaluate.py (F5 + leak count), synthetic_bench.py, results/
+eval/             evaluate.py (F5 + leak count), evaluate_onnx.py, synthetic_bench.py, results/
 demo/             single-file browser demo; drop exported models in demo/models/
 tests/            pytest
 docs/             COVERAGE.md: what is detected, how well, and what can be claimed

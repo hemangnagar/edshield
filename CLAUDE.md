@@ -33,7 +33,7 @@ State saved 2026-09-29. Update the "Current state" and "Open decisions" sections
 | `edshield/policies/*.yaml` | `ferpa`, `coppa`, `research` |
 | `edshield/service.py`, `cli.py` | FastAPI service, command line |
 | `training/` | `prepare_piilo.py`, `train.py`, `export_onnx.py` |
-| `eval/` | `evaluate.py`, `synthetic_bench.py`, `k12_bench.py`, `results/` |
+| `eval/` | `evaluate.py`, `evaluate_onnx.py` (scores an exported file), `synthetic_bench.py`, `k12_bench.py`, `results/` |
 | `demo/index.html` | Single-file browser demo with a JS port of the rules and decoding |
 | `docs/COVERAGE.md` | FERPA and COPPA identifier types mapped to coverage, with results |
 | `models.jsonl` | Model manifest |
@@ -44,7 +44,7 @@ Files outside git, in the main checkout:
 |---|---|
 | `C:\edshield\models\piilo-deberta-v3-small-v2` | Current model, trained on the corrected split |
 | `C:\edshield\models\piilo-deberta-v3-small` | Original model; its validation numbers were inflated |
-| `C:\edshield\demo\models\piilo-deberta-v3-small-onnx` | ONNX export (fp32 566 MB, INT8 172 MB); the worktree links to it |
+| `C:\edshield\demo\models\piilo-deberta-v3-small-onnx` | ONNX export (fp32 566 MB, INT8 205 MB); the worktree links to it. `model_quantized.all-layers.bak` is the earlier 172 MB file |
 | `C:\edshield\data\piilo\train.json` | PIILO corpus, 6,807 documents |
 | `C:\edshield\data\piilo_hf_v2` | Current split: train 4,430, validation 680 real documents, plus `validation.json` |
 
@@ -58,6 +58,7 @@ Files outside git, in the main checkout:
 - **Model failure is loud.** A named model that cannot load raises `ModelUnavailableError`. With none named, rules run with a `RuntimeWarning`.
 - **No downloads** unless `EDSHIELD_ALLOW_DOWNLOAD=1`.
 - **`o_threshold`** works but is off by default: it lowered precision with no recall gain.
+- **Browser model.** The INT8 export leaves the first two encoder layers at full precision (`--keep-layers 2`). Quantizing them caused the misses; the embedding table quantizes without loss. The setting was chosen on the PIILO validation set.
 - **Validation** is real documents only, in their natural mix. Synthetic documents go to training only.
 
 ## Results
@@ -67,10 +68,12 @@ Span-level, from `eval/evaluate.py`. "Got through" means no flag of any label to
 | Test set | Detector | Precision | Recall | Got through |
 |---|---|---|---|---|
 | PIILO held-out, 680 essays | Rules + model | 0.642 | 1.000 | 0 of 165 |
-| PIILO held-out | Rules + INT8 model (browser) | 0.692 | 0.952 | 7 of 165 |
+| PIILO held-out | Rules + INT8 model (browser), 205 MB | 0.639 | 1.000 | 0 of 165 |
+| PIILO held-out | Rules + INT8 model, every layer quantized, 172 MB | 0.692 | 0.952 | 7 of 165 |
 | PIILO held-out | Rules only | 0.538 | 0.388 | 101 of 165 |
 | K-12 synthetic, cued | Rules + model | | | 0 of 1,445 |
 | K-12 synthetic, hard | Rules + model | | | 319 of 1,433 (22%) |
+| K-12 synthetic, hard | Rules + INT8 model (browser), 205 MB | | | 324 of 1,433 (23%) |
 | K-12 synthetic, hard | Rules only | | | 1,100 of 1,433 (77%) |
 
 Caveats: PIILO is adult writing. The K-12 sets are synthetic. The PIILO false-alarm fixes were chosen by reading false alarms on the same validation set.
@@ -79,8 +82,7 @@ Caveats: PIILO is adult writing. The K-12 sets are synthetic. The PIILO false-al
 
 1. Merge pull request 1.
 2. Retrain with child-style synthetic text, worded differently from the test set, to close the 22% gap on the hard set. About 42 minutes.
-3. Try gentler quantization for the browser model; the INT8 file misses 7 identifiers the full model catches.
-4. Publish to the Hugging Face Hub. On hold. Steps: account, `edshield` organisation, write token, `hf auth login`, `hf upload`, model card with CC BY 4.0 and attribution.
+3. Publish to the Hugging Face Hub. On hold. Steps: account, `edshield` organisation, write token, `hf auth login`, `hf upload`, model card with CC BY 4.0 and attribution.
 
 Known small issues: the model labels `priyawrites.wordpress.com` as `EMAIL` (still removed); "I'll be 15 soon" is not caught as an age.
 
@@ -106,6 +108,9 @@ C:\edshield\.venv\Scripts\python.exe -m pytest -q
 
 # held-out evaluation with the model, on the GPU
 python eval/evaluate.py --input C:/edshield/data/piilo_hf_v2/validation.json --model C:/edshield/models/piilo-deberta-v3-small-v2 --device cuda
+
+# held-out evaluation of the browser file, on the CPU (about 6 minutes)
+python eval/evaluate_onnx.py --onnx C:/edshield/demo/models/piilo-deberta-v3-small-onnx/onnx/model_quantized.onnx --input C:/edshield/data/piilo_hf_v2/validation.json
 
 # synthetic K-12 sets
 python eval/k12_bench.py --n 400 --style hard --seed 1 --out data/k12_hard.json
