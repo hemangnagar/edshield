@@ -3,7 +3,8 @@
 Everything here is optional. Models are loaded once and cached per process,
 and only from disk: the local path in models.jsonl, a directory you pass, or
 the Hugging Face cache. Nothing is downloaded unless EDSHIELD_ALLOW_DOWNLOAD=1
-is set or `allow_download=True` is passed.
+is set or `allow_download=True` is passed; then a model that is not on disk
+is fetched from the Hugging Face Hub by the `hf_id` in models.jsonl.
 """
 
 from __future__ import annotations
@@ -17,7 +18,7 @@ from typing import Dict, List, Optional, Sequence, Tuple
 from .types import Entity
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-MANIFEST = REPO_ROOT / "models.jsonl"
+MANIFEST = Path(__file__).resolve().parent / "models.jsonl"  # inside the package, so an installed copy has it
 
 # Short name -> Hugging Face repo id (or local path). Populated from models.jsonl.
 DEFAULT_MODEL = "piilo_deberta_small"
@@ -32,7 +33,7 @@ class ModelUnavailableError(RuntimeError):
 def load_manifest() -> dict:
     entries = {}
     if MANIFEST.exists():
-        for line in MANIFEST.read_text().splitlines():
+        for line in MANIFEST.read_text(encoding="utf-8").splitlines():
             line = line.strip()
             if not line or line.startswith("#"):
                 continue

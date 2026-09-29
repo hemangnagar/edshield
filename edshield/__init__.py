@@ -24,7 +24,7 @@ from .types import Entity, AnalysisResult, DeidResult, PIILO_LABELS, ALL_LABELS,
 from .rules import detect_rules, resolve_overlaps, propagate_names
 from .deid import apply_deidentification, check_no_leak, available_policies, load_policy
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __all__ = [
     "analyze_text",
     "extract_pii",

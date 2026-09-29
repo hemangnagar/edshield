@@ -1,6 +1,7 @@
 """Model layer without a model: windowing, decoding and loading are tested
 with the forward pass stubbed, so no torch or weights are needed."""
 import re
+from pathlib import Path
 
 import pytest
 
@@ -198,6 +199,14 @@ def test_a_failed_load_is_not_retried(monkeypatch):
         with pytest.raises(ner.ModelUnavailableError):
             ner._load_once("some/model", "cpu", False)
     assert attempts == ["some/model"]
+
+
+def test_the_default_model_resolves_to_the_hub_when_it_is_not_on_disk(monkeypatch, tmp_path):
+    assert ner.MANIFEST.parent == Path(ner.__file__).resolve().parent  # ships inside the package
+    monkeypatch.setattr(ner, "REPO_ROOT", tmp_path)  # an installed copy: no models/ folder beside it
+    monkeypatch.delenv("EDSHIELD_MODEL", raising=False)
+    assert ner.resolve_model_id(None) == "edshield/piilo-deberta-v3-small"
+    assert ner.resolve_model_id("piilo_deberta_small_onnx") == "edshield/piilo-deberta-v3-small-onnx"
 
 
 def test_resolve_model_id(tmp_path, monkeypatch):

@@ -26,7 +26,7 @@ All figures are from `eval/evaluate.py`; the reports are in `eval/results/`. "Go
 | K-12 synthetic, hard | same | Rules + INT8 model (the browser demo's) | 1,433 | 324 (23%) |
 | K-12 synthetic, hard | same | Rules only | 1,433 | 1,100 (77%) |
 
-Read these with four cautions:
+Read these with five cautions:
 
 1. **There is no measurement on real writing by children.** PIILO is adult writing. The K-12 sets are synthetic and were written by the same people who wrote the detector.
 2. **The cued set is a regression check.** A perfect score there means the rules match their own examples.

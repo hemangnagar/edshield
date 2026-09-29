@@ -1,0 +1,35 @@
+name: release
+# Builds the package and publishes it to PyPI when a version tag is pushed.
+# Uses PyPI trusted publishing: no token is stored in the repository.
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install build
+      - run: python -m build
+      # The base install must work without torch.
+      - run: |
+          python -m venv /tmp/clean
+          /tmp/clean/bin/pip install dist/*.whl
+          /tmp/clean/bin/python -c "import edshield, importlib.util as u; assert u.find_spec('torch') is None; print(edshield.deidentify('Hi, this is Marcus. Email marcus.t2012@gmail.com', policy='coppa', model_name='rules').deidentified_text)"
+          /tmp/clean/bin/edshield --help
+      - uses: actions/upload-artifact@v4
+        with: { name: dist, path: dist }
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: dist, path: dist }
+      - uses: pypa/gh-action-pypi-publish@release/v1

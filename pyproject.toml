@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "edshield"
-version = "0.1.0"
+version = "0.2.0"
 description = "Local-first student-privacy layer for AI in education: PII detection and FERPA/COPPA de-identification that runs on-device."
 readme = "README.md"
 license = {text = "Apache-2.0"}
@@ -37,7 +37,7 @@ Homepage = "https://github.com/hemangnagar/edshield"
 include = ["edshield*"]
 
 [tool.setuptools.package-data]
-edshield = ["policies/*.yaml"]
+edshield = ["policies/*.yaml", "models.jsonl"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

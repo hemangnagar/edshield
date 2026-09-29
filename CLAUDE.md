@@ -1,6 +1,6 @@
 # edshield
 
-Local-first student-privacy layer: detects and removes student PII from essays, tutoring transcripts and chat before text reaches any LLM. Public pet project (github.com/hemangnagar/edshield, Apache-2.0), modelled on OpenMed. Near-term goal: a working offline demo to show an edtech contact.
+Local-first student-privacy layer: detects and removes student PII from essays, tutoring transcripts and chat before text reaches any LLM. Public pet project (github.com/hemangnagar/edshield, Apache-2.0), modelled on OpenMed. Near-term goal: make the model tryable by anyone (Hub weights, hosted demo, PyPI release), then Hemang sends a note to an edtech contact.
 
 State saved 2026-09-29. Update the "Current state" and "Open decisions" sections when they change.
 
@@ -10,7 +10,7 @@ State saved 2026-09-29. Update the "Current state" and "Open decisions" sections
 - Never write "FERPA compliant" or "COPPA compliant" claims. `docs/COVERAGE.md` has the wording the evidence supports. Compliance belongs to the deploying organisation; the truthful route to a claim is third-party certification.
 - Recall matters more than precision. A change that causes a leak is worse than one that adds false alarms. Re-run the held-out evaluation after touching rules or decoding.
 - Python rules (`edshield/rules.py`) and the demo's JavaScript (`demo/index.html`) must stay in parity. `tests/test_demo_parity.py` enforces it and needs Node.
-- The demo must run offline apart from one CDN script tag.
+- The demo loads scripts from one CDN only. "Rules only" needs no network. The model comes from `demo/models/` when a copy is there, otherwise from the Hugging Face Hub. `tests/test_demo_offline.py` enforces the one-host rule.
 - Do not commit `data/piilo*`, `models/`, `demo/models/*` or `*.onnx` (gitignored).
 - Do not tune rules to `eval/k12_bench.py`'s hard set; that makes the test circular.
 - Verify before explaining a number. Report when long jobs finish.
@@ -20,7 +20,8 @@ State saved 2026-09-29. Update the "Current state" and "Open decisions" sections
 - Pull requests 1 and 2 were merged into `main` on 2026-09-29. `main` has everything through the browser model fix (merge commit `1079fcb`).
 - New work goes on branch `worktree-model-authority` and reaches `main` through a new pull request, which the user creates and merges on GitHub.
 - Worktree: `C:\edshield\.claude\worktrees\model-authority`. Main checkout: `C:\edshield`.
-- 183 tests pass locally. CI (`.github/workflows/ci.yml`) is green on Python 3.10 and 3.12.
+- Release 0.2.0 is prepared on the branch but nothing is published yet. Waiting on the user: a Hugging Face account, `edshield` organisation and write token; a PyPI account with a trusted publisher; GitHub Pages switched to "GitHub Actions". See "Open decisions".
+- 184 tests pass locally. CI (`.github/workflows/ci.yml`) is green on Python 3.10 and 3.12.
 - The main checkout still has staged changes (`data/synthetic.json`, `eval/results/deberta_small_piilo.json`, `training/train.py`). All three are now in the branch; discard them there before pulling `main`.
 
 ## What is where
@@ -33,11 +34,13 @@ State saved 2026-09-29. Update the "Current state" and "Open decisions" sections
 | `edshield/deid.py` | Masking, surrogates, date shift, leak verifier, audit record |
 | `edshield/policies/*.yaml` | `ferpa`, `coppa`, `research` |
 | `edshield/service.py`, `cli.py` | FastAPI service, command line |
-| `training/` | `prepare_piilo.py`, `train.py`, `export_onnx.py` |
+| `edshield/models.jsonl` | Model manifest, shipped inside the package |
+| `training/` | `prepare_piilo.py`, `train.py`, `export_onnx.py`, `publish_hub.py` (uploads to the Hub) |
+| `hub/` | Model cards for the two Hub repositories |
+| `.github/workflows/` | `ci.yml`, `pages.yml` (deploys `demo/`), `release.yml` (PyPI on a `v*` tag) |
 | `eval/` | `evaluate.py`, `evaluate_onnx.py` (scores an exported file), `synthetic_bench.py`, `k12_bench.py`, `results/` |
 | `demo/index.html` | Single-file browser demo with a JS port of the rules and decoding |
 | `docs/COVERAGE.md` | FERPA and COPPA identifier types mapped to coverage, with results |
-| `models.jsonl` | Model manifest |
 
 Files outside git, in the main checkout:
 
@@ -81,8 +84,30 @@ Caveats: PIILO is adult writing. The K-12 sets are synthetic. The PIILO false-al
 
 ## Open decisions
 
-1. Retrain with child-style synthetic text, worded differently from the test set, to close the 22% gap on the hard set. About 42 minutes. Afterwards re-export the browser file and score it with `eval/evaluate_onnx.py`.
-2. Publish to the Hugging Face Hub. On hold. Steps: account, `edshield` organisation, write token, `hf auth login`, `hf upload`, model card with CC BY 4.0 and attribution.
+The plan was given by the user on 2026-09-29. Phases 2 and 3 are instructions, not suggestions, but must not start before the conditions stated.
+
+**Phase 1, in progress.** Code, model cards, workflows and README are done on the branch. Remaining steps, in order:
+
+1. User merges the release pull request into `main`.
+2. User creates the Hugging Face account and `edshield` organisation, then runs `hf auth login` on the PC. Then `python training/publish_hub.py --root C:\edshield` uploads both repositories (about 1.3 GB).
+3. User sets GitHub Pages to "GitHub Actions" (Settings, Pages, Source). Then run the `pages` workflow. URL: `https://hemangnagar.github.io/edshield/`.
+4. Check the Pages demo with "Rules + on-device model" against Python output on the three samples.
+5. User adds a trusted publisher on PyPI (project `edshield`, owner `hemangnagar`, repository `edshield`, workflow `release.yml`, environment `pypi`). Then tag `v0.2.0` on `main` and push the tag; `release.yml` publishes.
+6. Report the Pages URL and Hub links, then stop. Hemang sends the note to the edtech contact.
+
+**Phase 2, only after that first conversation.**
+
+- OpenAI-compatible `/v1/chat/completions` passthrough in `service.py`: redact user turns under the chosen policy, forward to the configured provider, return the response and the audit record.
+- Retrain with child-style synthetic text, worded differently from the hard set (do not tune to it). About 42 minutes. Re-run the held-out evaluation; 0 of 165 must hold. Re-export the browser file and score it with `eval/evaluate_onnx.py`.
+- Gentler quantization is already done (see "Browser model" above).
+
+**Phase 3, verification harness.**
+
+- `edshield-leaktest <endpoint>`: score any HTTP redaction endpoint on the PIILO held-out set and the K-12 hard set, with the same JSON as `eval/evaluate.py`.
+- Run it on Presidio and one frontier LLM as baselines; publish the table in the README.
+- Publish the K-12 hard set as a standalone benchmark file with its seed.
+
+**Deferred:** browser extension, MLX/Swift, MCP server.
 
 Known small issues: the model labels `priyawrites.wordpress.com` as `EMAIL` (still removed); "I'll be 15 soon" is not caught as an age.
 
