@@ -17,10 +17,11 @@ State saved 2026-09-29. Update the "Current state" and "Open decisions" sections
 
 ## Current state
 
-- Branch `worktree-model-authority`, pushed, open as pull request 1. `main` is still at the v0.1.0 commit `cc30519`.
+- Pull request 1 was merged into `main` on 2026-09-29 (merge commit `eebae07`), up to the Google Fonts removal.
+- Branch `worktree-model-authority` is pushed and one change ahead of `main`: the browser model fix (`8cbc0c7`). It needs a second pull request.
 - Worktree: `C:\edshield\.claude\worktrees\model-authority`. Main checkout: `C:\edshield`.
 - 183 tests pass locally. CI (`.github/workflows/ci.yml`) is green on Python 3.10 and 3.12.
-- The main checkout still has staged changes (`data/synthetic.json`, `eval/results/deberta_small_piilo.json`, `training/train.py`). All three are now in the branch; discard them there before pulling the merged branch.
+- The main checkout still has staged changes (`data/synthetic.json`, `eval/results/deberta_small_piilo.json`, `training/train.py`). All three are now in the branch; discard them there before pulling `main`.
 
 ## What is where
 
@@ -80,7 +81,7 @@ Caveats: PIILO is adult writing. The K-12 sets are synthetic. The PIILO false-al
 
 ## Open decisions
 
-1. Merge pull request 1.
+1. Open and merge a pull request for the browser model fix: `https://github.com/hemangnagar/edshield/compare/main...worktree-model-authority?expand=1`.
 2. Retrain with child-style synthetic text, worded differently from the test set, to close the 22% gap on the hard set. About 42 minutes.
 3. Publish to the Hugging Face Hub. On hold. Steps: account, `edshield` organisation, write token, `hf auth login`, `hf upload`, model card with CC BY 4.0 and attribution.
 
