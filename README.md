@@ -26,10 +26,12 @@ The design follows [OpenMed](https://github.com/maziyarpanahi/openmed): small fi
 | Layer | Covers | Needs a model? |
 |---|---|---|
 | Rules | EMAIL, PHONE_NUM, URL_PERSONAL, USERNAME, ID_NUM, STREET_ADDRESS, SSN, DATE, and names introduced with a cue ("my name is…", a signature) | No |
-| Model | NAME_STUDENT anywhere in the text, plus a second opinion on every other label | Yes (PIILO-trained encoder) |
+| Model | The authority for NAME_STUDENT, ID_NUM and STREET_ADDRESS, plus a second opinion on every other label | Yes (PIILO-trained encoder) |
 | Propagation | Once a name is found, every other mention of it in the document is caught | No |
 | Policies | `ferpa`, `coppa`, `research` decide which labels to act on, the confidence floor, and the method per label (mask, surrogate, hash, date-shift) | No |
 | Verifier | Refuses to return output if any acted-on value still appears verbatim | No |
+
+When a model is loaded, the rules for NAME_STUDENT, ID_NUM and STREET_ADDRESS are switched off: they are recall-oriented fallbacks that over-flag ordinary essay text. Without a model the rules cover every label. `analyze_text(..., model_authority=())` runs both layers on everything.
 
 Label schema is the seven types of the [PIILO corpus](https://the-learning-agency-lab.com/learning-exchange/piilo-dataset/) (The Learning Agency Lab, CC BY 4.0), so models trained on it drop straight in.
 

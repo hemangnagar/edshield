@@ -26,6 +26,11 @@ RULE_ONLY_LABELS = ["SSN", "DATE"]
 
 ALL_LABELS = PIILO_LABELS + RULE_ONLY_LABELS
 
+# Labels where the model is the authority whenever one is loaded: the rules
+# for these are recall-oriented fallbacks that over-flag ordinary essay text.
+# Everything else stays with the rules, with the model as a second opinion.
+MODEL_AUTHORITY_LABELS = ["NAME_STUDENT", "ID_NUM", "STREET_ADDRESS"]
+
 
 @dataclass
 class Entity:
