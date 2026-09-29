@@ -32,8 +32,8 @@ def got(text, **kw):
     return {(e.label, e.text, e.source) for e in edshield.analyze_text(text, **kw).entities}
 
 
-ESSAY = ("In 2019 the team moved to 12 Design Thinking Way and tested model RX-7800B "
-         "with Maria Lopez from the district office.")
+ESSAY = ("In 2019 the team moved to 12 Design Thinking Way and cited report 20190412771 "
+         "by Steve Blank.")
 
 
 def test_rules_alone_overflag_the_essay():
@@ -81,10 +81,10 @@ def test_model_is_second_opinion_on_rule_labels(monkeypatch):
 def test_deferred_rule_cannot_crowd_out_a_kept_rule(monkeypatch):
     # "id: <url>" makes the cued ID rule claim the URL's span and win the
     # overlap; with the model in charge of ID_NUM the URL must survive.
-    text = "My id: priyawrites.wordpress.com"
-    assert ("ID_NUM", "priyawrites", "rules") in got(text, model_name="rules")
+    text = "My id: priya2012.wordpress.com"
+    assert ("ID_NUM", "priya2012", "rules") in got(text, model_name="rules")
     stub_model(monkeypatch)
-    assert got(text) == {("URL_PERSONAL", "priyawrites.wordpress.com", "rules")}
+    assert got(text) == {("URL_PERSONAL", "priya2012.wordpress.com", "rules")}
 
 
 def test_falls_back_to_rules_when_model_unavailable(monkeypatch):
