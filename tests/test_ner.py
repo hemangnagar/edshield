@@ -110,6 +110,33 @@ def test_decode_skips_special_tokens_and_leading_space():
     assert [(e.text, e.start) for e in ents] == [("Priya", 3)]
 
 
+def test_decode_covers_the_whole_url_from_any_piece_of_it():
+    text = "See (https://coursera.org/share/b24116a7056d612f). Done"
+    piece = text.index("coursera")
+    ents = ner.decode(text, [(piece, piece + 8)], [one_hot(3)], {**ID2LABEL, 3: "B-URL_PERSONAL"})
+    assert [(e.label, e.text) for e in ents] == [("URL_PERSONAL", "https://coursera.org/share/b24116a7056d612f")]
+
+
+def test_decode_drops_a_one_letter_name():
+    text = "Mind Mapping By C. Challenge"
+    s = text.index("C.")
+    assert ner.decode(text, [(s, s + 1)], [one_hot(1)], ID2LABEL) == []
+
+
+# --- propagation of model names -------------------------------------------------
+
+def test_unsure_model_names_are_flagged_but_not_spread(monkeypatch):
+    text = "Little Red Riding Hood met a wolf. Riding Hood ran. Priya wrote it and Priya drew it."
+
+    def predict(chunk, *a):
+        hood, priya = chunk.index("Hood"), chunk.index("Priya")
+        weak = [0.40, 0.60, 0.0, 0.0, 0.0]
+        return [(hood, hood + 4), (priya, priya + 5)], [weak, one_hot(1)], ID2LABEL
+    monkeypatch.setattr(ner, "_predict", predict)
+    ents = edshield.analyze_text(text, model_name="stub", use_rules=False).entities
+    assert [(e.text, e.source) for e in ents] == [("Hood", "model"), ("Priya", "model"), ("Priya", "propagated")]
+
+
 # --- detect_model -------------------------------------------------------------
 
 @pytest.mark.parametrize("position", [1985, 1990, 1995, 2000, 2005])

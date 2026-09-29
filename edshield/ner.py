@@ -161,6 +161,9 @@ def windows(text: str, max_chars: int = 2000, overlap: int = 200) -> List[Tuple[
 # --- Decoding -------------------------------------------------------------
 
 _JOINERS = " -.'’_"
+_UNBROKEN_LABELS = {"URL_PERSONAL", "EMAIL"}
+_WRAPPERS = "()[]{}<>\"'“”‘’«»"
+NAME_LABELS = ("NAME_STUDENT", "NAME_RELATED")
 
 
 def decode(
@@ -218,10 +221,19 @@ def decode(
         if o_threshold is None and conf < threshold:
             continue
         # Cover the whole word: masking half a name leaves the other half behind.
-        while s > 0 and text[s - 1].isalnum():
+        # A URL or an email is one unbroken run, so a piece of one stands for all of it.
+        unbroken = label in _UNBROKEN_LABELS
+        while s > 0 and (not text[s - 1].isspace() if unbroken else text[s - 1].isalnum()):
             s -= 1
-        while e < len(text) and text[e].isalnum():
+        while e < len(text) and (not text[e].isspace() if unbroken else text[e].isalnum()):
             e += 1
+        if unbroken:
+            while s < e and text[s] in _WRAPPERS:
+                s += 1
+            while e > s and text[e - 1] in _WRAPPERS + ".,;:!?":
+                e -= 1
+        if label in NAME_LABELS and e - s < 2:
+            continue  # an initial ("By C.") is not a name
         if ents and ents[-1].label == label and s <= ents[-1].end:
             ents[-1].end = max(ents[-1].end, e)
             ents[-1].text = text[ents[-1].start:ents[-1].end]

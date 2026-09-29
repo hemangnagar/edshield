@@ -189,13 +189,28 @@ PERSONAL_URL_HINTS = (
 )
 
 
-def _url_is_personal(url: str) -> bool:
+# Either the writer claims it ("my store is ...") or it has just been called
+# somebody's site ("the website of ...", then the link on its own line).
+OWN_SITE_CUE_RE = re.compile(
+    r"\b(?:my|our)\b[^.\n]{0,30}$"
+    r"|\b(?:web-?site|web site|homepage|home page|blog|portfolio|profile|channel)\b[\s\S]{0,150}$",
+    re.IGNORECASE,
+)
+
+
+def _url_is_personal(url: str, before: str = "") -> bool:
+    """`before` is the text leading up to the URL."""
     u = url.lower()
     if any(h in u for h in PERSONAL_URL_HINTS):
         return True
     if any(a in u for a in URL_ALLOWLIST):
         return False
-    # Default: unknown domains in student writing are treated as personal.
+    # A bare site name ("draw.io", "www.klaxoon.com") is a product or a
+    # publication unless the writer calls it theirs ("my store is ...").
+    path = re.sub(r"^(?:https?://)?[^/]+", "", u).strip("/.,;:)]}'\"")
+    if not path:
+        return bool(OWN_SITE_CUE_RE.search(before))
+    # Default: a page on an unknown domain in student writing is treated as personal.
     return True
 
 
@@ -252,7 +267,7 @@ def detect_rules(text: str, labels: Iterable[str] | None = None) -> List[Entity]
             # Domains inside an email address are handled by the EMAIL rule.
             if "@" in text[max(0, m.start() - 1):m.start()]:
                 continue
-            if _url_is_personal(m.group()):
+            if _url_is_personal(m.group(), text[max(0, m.start() - 170):m.start()]):
                 _add(ents, "URL_PERSONAL", m.start(), m.end(), text, 0.9)
 
     if want("USERNAME"):
@@ -376,11 +391,20 @@ def resolve_overlaps(ents: List[Entity]) -> List[Entity]:
     return kept
 
 
-def propagate_names(text: str, ents: List[Entity], min_token_len: int = 3) -> List[Entity]:
+def propagate_names(
+    text: str, ents: List[Entity], min_token_len: int = 3, min_model_confidence: float = 0.75
+) -> List[Entity]:
     """Tag every other occurrence of a detected name (full name and each
     capitalised name token) so a name caught once is caught everywhere.
-    Student names are handled first, so a name that is both keeps that label."""
-    names = [e for e in ents if e.label in NAME_LABELS]
+    Student names are handled first, so a name that is both keeps that label.
+
+    A name the model was unsure of is still flagged where the model found it,
+    but is not spread through the document: one weak guess ("Hood", in
+    "Little Red Riding Hood") should not become six."""
+    names = [
+        e for e in ents
+        if e.label in NAME_LABELS and (e.source != "model" or e.confidence >= min_model_confidence)
+    ]
     if not names:
         return ents
     out = list(ents)

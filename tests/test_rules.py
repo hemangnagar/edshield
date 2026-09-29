@@ -81,6 +81,9 @@ def test_no_pii_clean_text():
     "It has truly succeeded.  5.Approach: we built a prototype.",
     "That can be a solution.Education systems differ.",
     "See https://www.forbes.com/sites/story and http://tutorials.istudy.psu.edu/conceptmaps/ for more.",
+    # URL_PERSONAL: a bare site name is a product, not somebody's page
+    "The tool I used was draw.io and we met on www.klaxoon.com every week.",
+    "Tools such as www.mindmup.com, https://coggle.it/, http://wisemapping.com/ are free.",
 ])
 def test_ordinary_prose_is_not_flagged(text):
     assert {(l, t) for l, t in labels(text) if l != "DATE"} == set()
@@ -106,6 +109,10 @@ def test_ordinary_prose_is_not_flagged(text):
     ("my login for the school portal is aruiz2013 if u need it", ("USERNAME", "aruiz2013")),
     ("Watch it at https://www.youtube.com/watch?v=2sOzgGAeiQV today.", ("URL_PERSONAL", "https://www.youtube.com/watch?v=2sOzgGAeiQV")),
     ("My store is holalili.com and it is new.", ("URL_PERSONAL", "holalili.com")),
+    ("Visit our site at www.theatfc.org for photos.", ("URL_PERSONAL", "www.theatfc.org")),
+    ("I'm including the website of a colleague for anyone interested.\n\nhttp://www.moore.com/\n\nShe works shifts.",
+     ("URL_PERSONAL", "http://www.moore.com/")),
+    ("I posted it at https://hodge-ramsey.com/tagmain.html yesterday.", ("URL_PERSONAL", "https://hodge-ramsey.com/tagmain.html")),
 ])
 def test_real_identifiers_are_still_caught(text, expected):
     assert expected in labels(text)

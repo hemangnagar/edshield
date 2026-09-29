@@ -193,7 +193,10 @@ function detectRules(text, skip = new Set()) {
   for (const m of [...text.matchAll(R.URL), ...text.matchAll(R.BARE_DOMAIN)]) {
     if (text[m.index - 1] === "@") continue;
     const u = m[0].toLowerCase();
-    const personal = HINT.some(h => u.includes(h)) || !ALLOW.some(a => u.includes(a));
+    // a bare site name ("draw.io") is a product or a publication unless the writer calls it theirs ("my store is ...")
+    const path = u.replace(/^(?:https?:\/\/)?[^\/]+/, "").replace(/^[\/.,;:)\]}'"]+|[\/.,;:)\]}'"]+$/g, "");
+    const own = /\b(?:my|our)\b[^.\n]{0,30}$|\b(?:web-?site|web site|homepage|home page|blog|portfolio|profile|channel)\b[\s\S]{0,150}$/i.test(text.slice(Math.max(0, m.index - 170), m.index));
+    const personal = HINT.some(h => u.includes(h)) || (!ALLOW.some(a => u.includes(a)) && (path !== "" || own));
     if (personal) push(out, "URL_PERSONAL", text, m.index, m.index + m[0].length, 0.9);
   }
   for (const m of text.matchAll(R.USERNAME)) {
@@ -247,7 +250,8 @@ function detectRules(text, skip = new Set()) {
 
 function propagateNames(text, ents) {
   // student names first, so a name that is both keeps that label
-  const names = ents.filter(e => NAME_LABELS.includes(e.label)).sort((a, b) => NAME_LABELS.indexOf(a.label) - NAME_LABELS.indexOf(b.label));
+  // a name the model was unsure of stays flagged where it was found but is not spread through the document
+  const names = ents.filter(e => NAME_LABELS.includes(e.label) && (e.source !== "model" || e.confidence >= 0.75)).sort((a, b) => NAME_LABELS.indexOf(a.label) - NAME_LABELS.indexOf(b.label));
   if (!names.length) return ents;
   const seen = new Set(ents.map(e => `${e.start}:${e.end}`));
   const needles = new Map();
