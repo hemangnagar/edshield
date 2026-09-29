@@ -139,6 +139,12 @@ def deidentify(
     out = apply_deidentification(
         text, res.entities, method=method, policy=policy, date_shift_days=date_shift_days, seed=seed
     )
+    out.audit.update(
+        detector=res.model_name or ner.resolve_model_id(None),
+        model_authority=sorted(MODEL_AUTHORITY_LABELS) if res.model_name != "rules" else [],
+        o_threshold=o_threshold,
+        verified=verify,
+    )
     if verify and out.leaks:
         raise RuntimeError(f"De-identification leak detected: {out.leaks}")
     return out

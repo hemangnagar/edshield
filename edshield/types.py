@@ -87,12 +87,22 @@ class DeidResult:
     policy: str
     replacements: dict = field(default_factory=dict)  # original -> surrogate
     leaks: List[str] = field(default_factory=list)  # acted-on values still present verbatim
+    # What was done, by what, under which policy. Holds no document text and
+    # no identifier values, so it can be logged and kept as evidence.
+    audit: dict = field(default_factory=dict)
 
-    def to_dict(self) -> dict:
+    def to_dict(self, include_values: bool = True) -> dict:
+        """`include_values=False` leaves the original identifier values out,
+        for responses and logs that travel with the de-identified text."""
+        ents = [e.to_dict() for e in self.entities]
+        if not include_values:
+            for e in ents:
+                del e["text"]
         return {
             "deidentified_text": self.deidentified_text,
-            "entities": [e.to_dict() for e in self.entities],
+            "entities": ents,
             "method": self.method,
             "policy": self.policy,
             "n_entities": len(self.entities),
+            "audit": self.audit,
         }

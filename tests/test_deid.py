@@ -105,6 +105,43 @@ def test_check_no_leak_whole_words_only():
     assert check_no_leak("it was Ann's idea", ents) == ["Ann"]
 
 
+# --- audit record -----------------------------------------------------------
+
+def test_audit_record_describes_the_run_and_holds_no_pii():
+    import json
+    r = edshield.deidentify(T, policy="ferpa", model_name="rules")
+    a = r.audit
+    assert a["policy"] == "ferpa" and a["method"] == "mask" and a["detector"] == "rules"
+    assert a["edshield_version"] == edshield.__version__
+    assert a["verified"] is True and a["leaks_found"] == 0
+    assert a["entities_acted_on"] == len(r.entities) == sum(a["by_label"].values())
+    assert a["by_label"]["EMAIL"] == 1 and a["by_label"]["NAME_STUDENT"] >= 1
+    assert len(a["policy_sha256"]) == len(a["output_sha256"]) == 64
+    assert a["timestamp"].endswith("+00:00")
+    dumped = json.dumps(a)
+    for e in r.entities:
+        assert e.text not in dumped
+
+
+def test_audit_pins_the_policy_file(tmp_path):
+    from edshield.deid import policy_fingerprint
+    assert policy_fingerprint("ferpa") != policy_fingerprint("coppa")
+    p = tmp_path / "mine.yaml"
+    p.write_text("name: mine\nlabels:\n  EMAIL: {enabled: true}\n")
+    before = policy_fingerprint(str(p))
+    p.write_text("name: mine\nlabels:\n  EMAIL: {enabled: false}\n")
+    assert policy_fingerprint(str(p)) != before
+
+
+def test_to_dict_can_leave_identifier_values_out():
+    r = edshield.deidentify(T, policy="ferpa", model_name="rules")
+    assert any("text" in e for e in r.to_dict()["entities"])
+    safe = r.to_dict(include_values=False)
+    assert all("text" not in e for e in safe["entities"])
+    assert "Priya" not in str(safe) and "4471882" not in str(safe)
+    assert safe["audit"]["policy"] == "ferpa"
+
+
 # --- dates and seeds --------------------------------------------------------
 
 def test_zero_date_shift_is_rejected():
