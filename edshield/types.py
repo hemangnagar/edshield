@@ -39,7 +39,7 @@ class Entity:
     start: int
     end: int
     confidence: float = 1.0
-    source: str = "rules"  # "rules" | "model"
+    source: str = "rules"  # "rules" | "model" | "propagated"
 
     def overlaps(self, other: "Entity") -> bool:
         return self.start < other.end and other.start < self.end
@@ -76,6 +76,7 @@ class DeidResult:
     method: str
     policy: str
     replacements: dict = field(default_factory=dict)  # original -> surrogate
+    leaks: List[str] = field(default_factory=list)  # acted-on values still present verbatim
 
     def to_dict(self) -> dict:
         return {

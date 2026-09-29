@@ -96,7 +96,7 @@ def extract_pii(text: str, model_name: Optional[str] = None, **kw) -> AnalysisRe
 
 def deidentify(
     text: str,
-    method: str = "mask",
+    method: Optional[str] = None,
     policy: str = "ferpa",
     model_name: Optional[str] = None,
     device: str = "cpu",
@@ -104,14 +104,12 @@ def deidentify(
     seed: Optional[int] = None,
     verify: bool = True,
 ) -> DeidResult:
-    """Detect then transform. `verify=True` raises if any acted-on entity
-    still appears verbatim in the output."""
+    """Detect then transform. `method=None` uses the policy's default method.
+    `verify=True` raises if any acted-on value is still present verbatim."""
     res = analyze_text(text, model_name=model_name, device=device)
     out = apply_deidentification(
         text, res.entities, method=method, policy=policy, date_shift_days=date_shift_days, seed=seed
     )
-    if verify:
-        leaks = check_no_leak(out.deidentified_text, out.entities)
-        if leaks:
-            raise RuntimeError(f"De-identification leak detected: {leaks}")
+    if verify and out.leaks:
+        raise RuntimeError(f"De-identification leak detected: {out.leaks}")
     return out

@@ -20,7 +20,7 @@ class ExtractRequest(BaseModel):
 class DeidRequest(BaseModel):
     text: str = Field(..., max_length=200_000)
     policy: str = "ferpa"
-    method: str = "mask"
+    method: Optional[str] = None
     model_name: Optional[str] = None
 
 
