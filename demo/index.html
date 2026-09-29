@@ -129,23 +129,40 @@ chat: `hey can u help me with my essay?? its due tmrw. im Aiden Ruiz btw, my tea
 };
 
 // ---------- Rule detectors (JS port of edshield/rules.py) ----------
-const SUFFIX = "street|st|avenue|ave|road|rd|boulevard|blvd|lane|ln|drive|dr|court|ct|circle|cir|way|place|pl|terrace|ter|parkway|pkwy|highway|hwy|trail|trl|square|sq|mission|flats|forges|port|ridge|run|pass|crossing|loop|point|park|manor|estates|heights|hollow|meadows|springs|valley|village|mills|plaza|station|trace|view|walk|cove|creek|falls|glen|grove|harbor|isle|junction|lake|landing|light|lodge|mount|orchard|path|pike|prairie|rapids|rest|shoals|shore|summit|track|tunnel|turnpike|vista|wells";
+const SUFFIX = "expressway|extensions|throughway|trafficway|crossroad|extension|junctions|mountains|stravenue|underpass|causeway|crescent|crossing|junction|motorway|mountain|overpass|parkways|turnpike|villages|centers|circles|corners|estates|freeway|gardens|gateway|harbors|heights|highway|islands|landing|meadows|mission|orchard|parkway|passage|prairie|springs|squares|station|streets|terrace|valleys|viaduct|village|avenue|branch|bridge|brooks|bypass|canyon|center|circle|cliffs|common|corner|course|courts|divide|drives|estate|fields|forest|forges|garden|greens|groves|harbor|hollow|island|knolls|lights|manors|meadow|plains|points|radial|rapids|ridges|shoals|shores|skyway|spring|square|stream|street|summit|tunnel|unions|valley|alley|brook|burgs|cliff|court|coves|creek|crest|curve|drive|falls|ferry|field|flats|fords|forge|forks|glens|green|grove|haven|hills|inlet|knoll|lakes|light|locks|lodge|manor|mills|mount|parks|pines|place|plain|plaza|point|ports|ranch|rapid|ridge|river|roads|route|shoal|shore|spurs|trace|track|trail|union|views|ville|vista|walks|wells|blvd|burg|camp|cape|club|cove|dale|fall|flat|ford|fork|fort|glen|hill|isle|keys|lake|land|lane|loaf|lock|loop|mall|mews|mill|neck|oval|park|pass|path|pike|pine|pkwy|port|ramp|rest|road|spur|view|walk|wall|ways|well|ave|cir|dam|hwy|key|row|rue|run|ter|trl|via|way|ct|dr|ln|pl|rd|sq|st";
+const CUES_STRONG = "username|user name|user id|userid|screen name|gamertag";
+const CUES_PLATFORM = "handle|login|discord|instagram|insta|snap|snapchat|tiktok|twitter|github|roblox|xbox|psn";
+const CUES = CUES_STRONG + "|" + CUES_PLATFORM;
+// every letter in either case, for the parts of a case-sensitive pattern that should not be
+const anyCase = alts => alts.replace(/[a-z]/g, c => `[${c}${c.toUpperCase()}]`);
 const R = {
   EMAIL: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g,
   SSN: /(?<!\d)(?!000|666|9\d\d)\d{3}[- ](?!00)\d{2}[- ](?!0000)\d{4}(?!\d)/g,
-  PHONE_NUM: /(?<![\w.])(?:\+?1[\s.-]?)?(?:\(\d{3}\)|\d{3})[\s.-]?\d{3}[\s.-]?\d{4}(?!\w)(?!\.\d)|(?<![\w.])\+\d{1,3}[\s.-]?\d{2,4}(?:[\s.-]?\d{2,4}){2,3}(?!\w)(?!\.\d)/g,
-  URL: /\b(?:https?:\/\/|www\.)[^\s<>"']+|\b[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:com|net|org|io|me|edu|co|dev|app|info)(?:\/[^\s<>"']*)?/gi,
-  USERNAME: /(?<![\w@])@([A-Za-z0-9_.]{3,30})\b|\b(?:username|user name|handle|login|user id|userid|screen name|gamertag|discord|instagram|insta|snap|snapchat|tiktok|twitter|github|roblox|xbox|psn)(?![.\/])\s*(?:is|:|=|-)\s*@?([A-Za-z0-9_][A-Za-z0-9_.]{2,29})\b|\b(?:username|user name|handle|login|user id|userid|screen name|gamertag|discord|instagram|insta|snap|snapchat|tiktok|twitter|github|roblox|xbox|psn)\b[^.\n@]{0,40}?\b(?:is|:)\s*@?([A-Za-z0-9_][A-Za-z0-9_.]{2,29})\b|\b(?:username|user name|handle|login|user id|userid|screen name|gamertag|discord|instagram|insta|snap|snapchat|tiktok|twitter|github|roblox|xbox|psn)(?![.\/])\s+@?([A-Za-z]*[0-9_.][A-Za-z0-9_.]*)\b/gi,
-  ID_CUE: /\b(?:student\s*(?:id|number|no\.?|#)|id\s*(?:number|no\.?|#)?|osis|sid|lunch\s*(?:number|#)|badge|library\s*card|account\s*(?:number|no\.?|#)|roll\s*(?:number|no\.?))\s*(?:is|:|=|-|#)?\s*([A-Z0-9][A-Z0-9-]{4,24})\b/gi,
+  PHONE_NUM: /(?<![\w.])(?:\+?1[\s.-]?)?(?:\(\d{3}\)|\d{3})[\s.-]?\d{3}[\s.-]?\d{4}(?:[ \t]?(?:x|ext\.?)[ \t]?\d{1,6})?(?!\w)(?!\.\d)|(?<![\w.])\+\d{1,3}[\s.-]?\d{2,4}(?:[\s.-]?\d{2,4}){2,3}(?!\w)(?!\.\d)/gi,
+  URL: /\b(?:https?:\/\/|www\.)[^\s<>"']+/gi,
+  // case-sensitive, with a boundary after the TLD: "5.Approach" is not a domain
+  BARE_DOMAIN: /(?<![\w@.\/-])(?=[a-z0-9-]*[a-z])[a-z0-9-]{2,}(?:\.[a-z0-9-]+)*\.(?:com|net|org|io|me|edu|co|dev|app|info)(?![A-Za-z0-9-])(?:\/[^\s<>"']*)?/g,
+  // platform words are also ordinary words ("handle the issue"), so after them the value must look like a handle or follow ":" / "="
+  USERNAME: new RegExp(String.raw`(?<![\w@])@([A-Za-z0-9_.]{3,30})\b|\b(?:${CUES})(?![.\/\w])[ \t]*[:=][ \t]*@?([A-Za-z0-9_][A-Za-z0-9_.]{2,29})\b|\b(?:${CUES_STRONG})\b[^.\n@]{0,40}?\bis[ \t]+@?([A-Za-z0-9_][A-Za-z0-9_.]{2,29})\b|\b(?:${CUES_PLATFORM})(?![.\/\w])(?:[ \t]+(?:is|-))?[ \t]+@?([A-Za-z]*[0-9_.][A-Za-z0-9_.]*)\b|\b(?:${CUES_PLATFORM})\b[^.\n@]{0,40}?\bis[ \t]+@?([A-Za-z]*[0-9_][A-Za-z0-9_.]*)\b`, "gi"),
+  // the cue ends at a word boundary ("id" is not a cue inside "identify") and the value contains a digit
+  ID_CUE: /\b(?:student\s*(?:id|number|no\.?|#)|id\s*(?:number|no\.?|#)?|osis|sid|lunch\s*(?:number|#)|badge|library\s*card|account\s*(?:number|no\.?|#)|roll\s*(?:number|no\.?))(?![A-Za-z])\s*(?:is|:|=|-|#)?\s*(?=[A-Z0-9-]*\d)([A-Z0-9][A-Z0-9-]{4,24})\b/gi,
   ID_BARE: /(?<![\w-])(?=[A-Z0-9-]{7,24}(?![\w-]))(?=[A-Z-]*\d)[A-Z0-9-]{7,24}(?![\w-])/g,
-  STREET_ADDRESS: new RegExp(`\\b\\d{1,6}\\s+(?:[A-Z][a-zA-Z0-9]*\\.?\\s+){0,4}(?:${SUFFIX})\\.?(?:\\s*,?\\s*(?:apt|apartment|unit|suite|ste|#)\\.?\\s*\\w+)?(?:\\s*,?\\s*[A-Z][a-zA-Z]+(?:\\s[A-Z][a-zA-Z]+)?\\s*,?\\s*[A-Z]{2}\\s*\\d{5}(?:-\\d{4})?)?`, "gi"),
+  // capitalised street-name words and a suffix that ends at a word boundary: "4 stakeholders" is not an address
+  STREET_ADDRESS: new RegExp(String.raw`\b\d{1,6}[ \t]+(?:(?:[A-Z][a-zA-Z'’]*\.?|\d{1,3}(?:st|nd|rd|th))[ \t]+){1,4}(?:${anyCase(SUFFIX)})\b\.?(?:[ \t]*,?[ \t]*(?:${anyCase("apt|apartment|unit|suite|ste")}|#)\.?[ \t]*\w+)?(?:\s*,?\s*[A-Z][a-zA-Z]+(?:[ \t][A-Z][a-zA-Z]+)?[ \t]*,?[ \t]*[A-Z]{2}[ \t]*\d{5}(?:-\d{4})?)?`, "g"),
   DATE: /\b(?:0?[1-9]|1[0-2])[\/.-](?:0?[1-9]|[12]\d|3[01])[\/.-](?:19|20)\d{2}\b|\b(?:19|20)\d{2}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])\b|\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\.?\s+\d{1,2}(?:st|nd|rd|th)?,?\s+(?:19|20)\d{2}\b/gi,
-  NAME_STRONG: /\b(?:my name is|my name's|i am|i'm|im|this is|it's|its|name:|sincerely,?|thanks,?|thank you,?|regards,?|love,?|yours,?)\s+([A-Za-z][a-z'’-]+(?:\s+(?:[A-Za-z][a-z'’-]+|[A-Za-z]\.?)){0,2})/gi,
-  NAME_WEAK: /\b(?:written by|by|from|interviewed|with|and)\s+([A-Za-z][a-z'’-]+(?:\s+(?:[A-Za-z][a-z'’-]+|[A-Za-z]\.?)){1,2})/gi,
+  // a name never runs across a line break
+  NAME_STRONG: /\b(?:my name is|my name's|i am|i'm|im|this is|name:)[ \t]+([A-Za-z][a-z'’-]+(?:[ \t]+(?:[A-Za-z][a-z'’-]+|[A-Za-z]\.?)){0,2})/gi,
+  NAME_SIGNATURE: /\b(?:sincerely,?|thanks,?|thank you,?|regards,?|love,?|yours,?)\s+([A-Za-z][a-z'’-]+(?:[ \t]+(?:[A-Za-z][a-z'’-]+|[A-Za-z]\.?)){0,2})/gi,
+  NAME_WEAK: /\b(?:written by|interviewed by|by)[ \t]+([A-Za-z][a-z'’-]+(?:[ \t]+(?:[A-Za-z][a-z'’-]+|[A-Za-z]\.?)){1,2})/gi,
 };
-const STOP = new Set(["Hi","Hello","Hey","Oh","Thanks","Yeah","Well","Um","Hmm","Wait","Ms","Mr","Mrs","Dr","Miss","Mx","Tutor","Student","Teacher","Okay","Ok","Yes","No","Just","Still","Only","All","My","Your","Our","Their","Good","The","This","That","What","When","Where","Why","How","Which","Who","In","On","At","For","From","With","About","Going","Not","Very","Really","Also","Then","Now","Here","There","So","But","And","Or","A","An","It","We","They","He","She","You","I","Sure","Sorry","Middle","School"]);
-const ALLOW = ["wikipedia.org","khanacademy.org","google.com","youtube.com","youtu.be","britannica.com","nasa.gov",".gov","nytimes.com","bbc.com","coursera.org","edx.org","doi.org","jstor.org","arxiv.org","quizlet.com","desmos.com","stackoverflow.com"];
-const HINT = ["linkedin.com/in/","facebook.com/","instagram.com/","twitter.com/","x.com/","tiktok.com/@","github.com/","youtube.com/@","medium.com/@","wordpress.com","blogspot.com","wixsite.com","carrd.co","about.me","linktr.ee"];
+const STOP = new Set(["Hi","Hello","Hey","Oh","Thanks","Yeah","Well","Um","Hmm","Wait","Ms","Mr","Mrs","Dr","Miss","Mx","Tutor","Student","Teacher","Okay","Ok","Yes","No","Just","Still","Only","All","My","Your","Our","Their","Good","The","This","That","What","When","Where","Why","How","Which","Who","In","On","At","For","From","With","About","Going","Not","Very","Really","Also","Then","Now","Here","There","So","But","And","Or","A","An","It","We","They","He","She","You","I","Sure","Sorry","Middle","School","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday","January","February","March","April","May","June","July","August","September","October","November","December","Spring","Summer","Fall","Winter"]);
+const USERNAME_STOP = new Set(["not","the","a","an","my","your","our","is","was","and","or","but","already","taken","wrong","required","invalid","incorrect","missing","what","something","still","also","now"]);
+// digit groups that are dates, number ranges or round numbers, not IDs
+const NOT_AN_ID = /^(?:\d{1,4}-\d{1,4}|\d{1,2}-\d{1,2}-\d{2,4}|\d{4}-\d{1,2}-\d{1,2}|\d+0{3})$/;
+// with a model loaded these labels come from the model only (edshield.MODEL_AUTHORITY_LABELS)
+const MODEL_AUTHORITY = new Set(["NAME_STUDENT","ID_NUM","STREET_ADDRESS"]);
+const ALLOW = [".edu",".ac.uk","who.int","un.org","forbes.com","hbr.org","ted.com","researchgate.net","sciencedirect.com","springer.com","investopedia.com","mckinsey.com","ideo.com","ideou.com","interaction-design.org","mindtools.com","miro.com","mural.co","wikipedia.org","khanacademy.org","google.com","britannica.com","nasa.gov",".gov","nytimes.com","bbc.com","cnn.com","coursera.org","edx.org","doi.org","jstor.org","arxiv.org","scholar.google","quizlet.com","desmos.com","wolframalpha.com","stackoverflow.com"];
+const HINT = ["linkedin.com/in/","facebook.com/","instagram.com/","twitter.com/","x.com/","tiktok.com/@","github.com/","youtube.com/","youtu.be/","medium.com/@","wordpress.com","blogspot.com","wixsite.com","carrd.co","about.me","linktr.ee"];
 
 function trim(text, s, e) { while (e > s && ".,;:)]}'\"".includes(text[e-1])) e--; return [s, e]; }
 function push(out, label, text, s, e, conf, source="rules") { [s, e] = trim(text, s, e); if (e > s) out.push({label, text: text.slice(s, e), start: s, end: e, confidence: conf, source}); }
@@ -155,23 +172,32 @@ function detectRules(text) {
   for (const m of text.matchAll(R.EMAIL)) push(out, "EMAIL", text, m.index, m.index + m[0].length, 0.99);
   for (const m of text.matchAll(R.SSN)) push(out, "SSN", text, m.index, m.index + m[0].length, 0.97);
   for (const m of text.matchAll(R.PHONE_NUM)) { const d = m[0].replace(/\D/g, ""); if (d.length >= 10 && d.length <= 15) push(out, "PHONE_NUM", text, m.index, m.index + m[0].length, 0.95); }
-  for (const m of text.matchAll(R.URL)) {
+  for (const m of [...text.matchAll(R.URL), ...text.matchAll(R.BARE_DOMAIN)]) {
     if (text[m.index - 1] === "@") continue;
     const u = m[0].toLowerCase();
     const personal = HINT.some(h => u.includes(h)) || !ALLOW.some(a => u.includes(a));
     if (personal) push(out, "URL_PERSONAL", text, m.index, m.index + m[0].length, 0.9);
   }
-  for (const m of text.matchAll(R.USERNAME)) { const g = [1,2,3,4].find(i => m[i]); if (!g) continue; const s = m.index + m[0].lastIndexOf(m[g]); push(out, "USERNAME", text, s, s + m[g].length, 0.9); }
+  for (const m of text.matchAll(R.USERNAME)) {
+    const g = [1,2,3,4,5].find(i => m[i]); if (!g) continue;
+    const v = m[g].replace(/\.+$/, "");
+    if (v.length < 3 || !/[A-Za-z]/.test(v)) continue;
+    if (g === 2 && /^[A-Z][A-Za-z]*$/.test(v)) continue;  // "Instagram: Familiarity ..." is a heading, not a handle
+    if (g === 3 && USERNAME_STOP.has(v.toLowerCase())) continue;
+    const s = m.index + m[0].lastIndexOf(m[g]); push(out, "USERNAME", text, s, s + m[g].length, 0.9);
+  }
   for (const m of text.matchAll(R.ID_CUE)) { const s = m.index + m[0].lastIndexOf(m[1]); push(out, "ID_NUM", text, s, s + m[1].length, 0.92); }
-  for (const m of text.matchAll(R.ID_BARE)) { const d = m[0].replace(/\D/g, ""); push(out, "ID_NUM", text, m.index, m.index + m[0].length, d.length >= 7 ? 0.75 : 0.6); }
+  for (const m of text.matchAll(R.ID_BARE)) { const d = m[0].replace(/\D/g, ""); if (d.length < 5 || NOT_AN_ID.test(m[0])) continue; push(out, "ID_NUM", text, m.index, m.index + m[0].length, d.length >= 7 ? 0.75 : 0.6); }
   for (const m of text.matchAll(R.STREET_ADDRESS)) push(out, "STREET_ADDRESS", text, m.index, m.index + m[0].length, 0.85);
   for (const m of text.matchAll(R.DATE)) push(out, "DATE", text, m.index, m.index + m[0].length, 0.8);
-  for (const [re, minTok] of [[R.NAME_STRONG, 1], [R.NAME_WEAK, 2]]) for (const m of text.matchAll(re)) {
+  for (const [re, minTok] of [[R.NAME_STRONG, 1], [R.NAME_SIGNATURE, 1], [R.NAME_WEAK, 2]]) for (const m of text.matchAll(re)) {
     // keep the leading run of capitalised tokens (the i flag is only for the cue)
-    const toks = m[1].split(/\s+/); let keep = [];
+    const toks = m[1].split(/[ \t]+/); let keep = [];
     for (const t of toks) { if (/^[A-Z]/.test(t)) keep.push(t); else break; }
     if (keep.length < minTok || STOP.has(keep[0])) continue;
-    const name = keep.join(" "); const s = m.index + m[0].indexOf(m[1]); push(out, "NAME_STUDENT", text, s, s + name.length, 0.7);
+    const s = m.index + m[0].length - m[1].length;
+    const name = m[1].match(new RegExp(String.raw`^\S+(?:[ \t]+\S+){${keep.length - 1}}`))[0];
+    push(out, "NAME_STUDENT", text, s, s + name.length, 0.7);
   }
   return out;
 }
@@ -187,7 +213,7 @@ function propagateNames(text, ents) {
   }
   const out = [...ents];
   for (const [needle, conf] of [...needles].sort((a, b) => b[0].length - a[0].length)) {
-    const re = new RegExp(`(?<![\\w'’])${needle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\w'’])`, "g");
+    const re = new RegExp(`(?<![\\w'’])${needle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?!\\w|['’](?!s\\b)\\w)`, "g");  // "Priya's" is a mention; "O'Brien" is not "Brien"
     for (const m of text.matchAll(re)) {
       const key = `${m.index}:${m.index + needle.length}`;
       if (seen.has(key)) continue;
@@ -293,7 +319,7 @@ $("run").addEventListener("click", async () => {
   const text = $("in").value, t0 = performance.now();
   let ents = detectRules(text);
   if ($("engine").value === "model") {
-    try { ents = ents.concat(await detectModel(text)); }
+    try { const found = await detectModel(text); ents = ents.filter(e => !MODEL_AUTHORITY.has(e.label)).concat(found); }
     catch (err) {
       status("No model found at demo/models/piilo-deberta-v3-small-onnx. Run training/export_onnx.py, or switch to Rules only. Showing rules-only result.", true);
     }

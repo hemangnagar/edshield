@@ -46,7 +46,8 @@ USERNAME_RE = re.compile(
     r"(?<![\w@])@([A-Za-z0-9_.]{3,30})\b"                                                    # @handle
     rf"|\b(?:{USERNAME_CUES})(?![./\w])[ \t]*[:=][ \t]*@?([A-Za-z0-9_][A-Za-z0-9_.]{{2,29}})\b"  # cue: value
     rf"|\b(?:{USERNAME_STRONG_CUES})\b[^.\n@]{{0,40}}?\bis[ \t]+@?([A-Za-z0-9_][A-Za-z0-9_.]{{2,29}})\b"  # strong cue ... is value
-    rf"|\b(?:{USERNAME_PLATFORM_CUES})(?![./\w])(?:[ \t]+(?:is|-))?[ \t]+@?([A-Za-z]*[0-9_.][A-Za-z0-9_.]*)\b",  # platform cue + handle-like value
+    rf"|\b(?:{USERNAME_PLATFORM_CUES})(?![./\w])(?:[ \t]+(?:is|-))?[ \t]+@?([A-Za-z]*[0-9_.][A-Za-z0-9_.]*)\b"  # platform cue + handle-like value
+    rf"|\b(?:{USERNAME_PLATFORM_CUES})\b[^.\n@]{{0,40}}?\bis[ \t]+@?([A-Za-z]*[0-9_][A-Za-z0-9_.]*)\b",          # platform cue ... is handle-like value
     re.IGNORECASE,
 )
 USERNAME_STOPWORDS = {
@@ -195,7 +196,7 @@ def detect_rules(text: str, labels: Iterable[str] | None = None) -> List[Entity]
 
     if want("USERNAME"):
         for m in USERNAME_RE.finditer(text):
-            g = next((i for i in (1, 2, 3, 4) if m.group(i)), None)
+            g = next((i for i in (1, 2, 3, 4, 5) if m.group(i)), None)
             if g is None:
                 continue
             # Skip handles that are actually part of an email.

@@ -103,6 +103,7 @@ def test_ordinary_prose_is_not_flagged(text):
     ("My username on the class site is zjones.", ("USERNAME", "zjones")),
     ("username: marcus_hoops", ("USERNAME", "marcus_hoops")),
     ("my discord is marcus_77", ("USERNAME", "marcus_77")),
+    ("my login for the school portal is aruiz2013 if u need it", ("USERNAME", "aruiz2013")),
     ("Watch it at https://www.youtube.com/watch?v=2sOzgGAeiQV today.", ("URL_PERSONAL", "https://www.youtube.com/watch?v=2sOzgGAeiQV")),
     ("My store is holalili.com and it is new.", ("URL_PERSONAL", "holalili.com")),
 ])
