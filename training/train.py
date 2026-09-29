@@ -106,7 +106,7 @@ def main():
     val_ds = explode(dd["validation"].map(tokenize, remove_columns=cols, batched=False))
 
     model = AutoModelForTokenClassification.from_pretrained(
-        a.base, num_labels=len(bio), id2label=id2label, label2id=label2id
+        a.base, num_labels=len(bio), id2label=id2label, label2id=label2id, dtype=torch.float32
     )
 
     class_weights = torch.ones(len(bio))
@@ -117,7 +117,7 @@ def main():
             labels = inputs.pop("labels")
             outputs = model(**inputs)
             logits = outputs.logits
-            loss_fct = torch.nn.CrossEntropyLoss(weight=class_weights.to(logits.device), ignore_index=-100)
+            loss_fct = torch.nn.CrossEntropyLoss(weight=class_weights.to(logits.device, logits.dtype), ignore_index=-100)
             loss = loss_fct(logits.view(-1, len(bio)), labels.view(-1))
             return (loss, outputs) if return_outputs else loss
 
@@ -155,9 +155,11 @@ def main():
         per_device_eval_batch_size=a.bs,
         num_train_epochs=a.epochs,
         weight_decay=0.01,
-        warmup_ratio=0.1,
+        warmup_steps=int(0.1 * a.epochs * len(train_ds) / a.bs),
         eval_strategy="epoch",
         save_strategy="epoch",
+        save_only_model=True,  # no optimizer state: a checkpoint is ~0.6 GB instead of ~1.7 GB
+        save_total_limit=1,    # the best checkpoint is always kept as well
         load_best_model_at_end=True,
         metric_for_best_model="f5",
         fp16=a.fp16,

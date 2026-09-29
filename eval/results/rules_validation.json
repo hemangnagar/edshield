@@ -1,0 +1,577 @@
+{
+  "model": "rules",
+  "docs": 680,
+  "overall": {
+    "tp": 64,
+    "fp": 55,
+    "fn": 101,
+    "precision": 0.5378,
+    "recall": 0.3879,
+    "f5": 0.3921
+  },
+  "per_label": {
+    "NAME_STUDENT": {
+      "tp": 44,
+      "fp": 42,
+      "fn": 99,
+      "precision": 0.5116,
+      "recall": 0.3077,
+      "f5": 0.3125
+    },
+    "EMAIL": {
+      "tp": 4,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f5": 1.0
+    },
+    "USERNAME": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 2,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f5": 0.0
+    },
+    "ID_NUM": {
+      "tp": 7,
+      "fp": 3,
+      "fn": 0,
+      "precision": 0.7,
+      "recall": 1.0,
+      "f5": 0.9838
+    },
+    "PHONE_NUM": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f5": 0.0
+    },
+    "URL_PERSONAL": {
+      "tp": 8,
+      "fp": 10,
+      "fn": 0,
+      "precision": 0.4444,
+      "recall": 1.0,
+      "f5": 0.9541
+    },
+    "STREET_ADDRESS": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f5": 1.0
+    }
+  },
+  "leaks": [
+    {
+      "document": 12198,
+      "label": "NAME_STUDENT",
+      "text": "Tina Shields"
+    },
+    {
+      "document": 13047,
+      "label": "NAME_STUDENT",
+      "text": "Matteo Sanna"
+    },
+    {
+      "document": 11521,
+      "label": "NAME_STUDENT",
+      "text": "Samantha Busatta"
+    },
+    {
+      "document": 12172,
+      "label": "NAME_STUDENT",
+      "text": "Jesus Smith"
+    },
+    {
+      "document": 10044,
+      "label": "NAME_STUDENT",
+      "text": "Jessica Riyad"
+    },
+    {
+      "document": 6023,
+      "label": "NAME_STUDENT",
+      "text": "Sarah Calixto"
+    },
+    {
+      "document": 6023,
+      "label": "NAME_STUDENT",
+      "text": "Sarah Calixto"
+    },
+    {
+      "document": 3935,
+      "label": "NAME_STUDENT",
+      "text": "Ismael Garcia"
+    },
+    {
+      "document": 3935,
+      "label": "NAME_STUDENT",
+      "text": "Ismael Garcia"
+    },
+    {
+      "document": 8028,
+      "label": "NAME_STUDENT",
+      "text": "Paola Romano"
+    },
+    {
+      "document": 12248,
+      "label": "NAME_STUDENT",
+      "text": "Daniel"
+    },
+    {
+      "document": 6139,
+      "label": "NAME_STUDENT",
+      "text": "Stephanie Johnstone"
+    },
+    {
+      "document": 10973,
+      "label": "NAME_STUDENT",
+      "text": "Aoife Farrelly"
+    },
+    {
+      "document": 10973,
+      "label": "NAME_STUDENT",
+      "text": "Aoife Farrelly"
+    },
+    {
+      "document": 9219,
+      "label": "NAME_STUDENT",
+      "text": "Sachin Cordova"
+    },
+    {
+      "document": 11144,
+      "label": "NAME_STUDENT",
+      "text": "Paola Garcia"
+    },
+    {
+      "document": 1447,
+      "label": "NAME_STUDENT",
+      "text": "Valdecir Pereira"
+    },
+    {
+      "document": 10,
+      "label": "NAME_STUDENT",
+      "text": "Diego Estrada"
+    },
+    {
+      "document": 10,
+      "label": "NAME_STUDENT",
+      "text": "Diego Estrada"
+    },
+    {
+      "document": 4825,
+      "label": "NAME_STUDENT",
+      "text": "Ioanna Singh"
+    },
+    {
+      "document": 6600,
+      "label": "NAME_STUDENT",
+      "text": "Mario Lopez"
+    },
+    {
+      "document": 93,
+      "label": "NAME_STUDENT",
+      "text": "Silvia Villalobos"
+    },
+    {
+      "document": 8070,
+      "label": "NAME_STUDENT",
+      "text": "Fernanda Moreira"
+    },
+    {
+      "document": 6296,
+      "label": "NAME_STUDENT",
+      "text": "Carlos Hernandez"
+    },
+    {
+      "document": 10874,
+      "label": "NAME_STUDENT",
+      "text": "Fernando Johnson"
+    },
+    {
+      "document": 12565,
+      "label": "NAME_STUDENT",
+      "text": "Adebayo Isiaka"
+    },
+    {
+      "document": 4263,
+      "label": "NAME_STUDENT",
+      "text": "Zakir"
+    },
+    {
+      "document": 1817,
+      "label": "NAME_STUDENT",
+      "text": "Mike Montenegro"
+    },
+    {
+      "document": 4669,
+      "label": "NAME_STUDENT",
+      "text": "Md Shamim"
+    },
+    {
+      "document": 1613,
+      "label": "NAME_STUDENT",
+      "text": "Jacqueline Stuurman"
+    },
+    {
+      "document": 12227,
+      "label": "NAME_STUDENT",
+      "text": "Mohd Amir"
+    },
+    {
+      "document": 12227,
+      "label": "NAME_STUDENT",
+      "text": "Mohd Amir"
+    },
+    {
+      "document": 12227,
+      "label": "NAME_STUDENT",
+      "text": "Mohd Amir"
+    },
+    {
+      "document": 6769,
+      "label": "NAME_STUDENT",
+      "text": "Antonio Coppola"
+    },
+    {
+      "document": 8805,
+      "label": "NAME_STUDENT",
+      "text": "Sipho Mofokeng"
+    },
+    {
+      "document": 3882,
+      "label": "NAME_STUDENT",
+      "text": "Sanam Khan"
+    },
+    {
+      "document": 3882,
+      "label": "NAME_STUDENT",
+      "text": "Sanam Khan"
+    },
+    {
+      "document": 10989,
+      "label": "NAME_STUDENT",
+      "text": "Pako Dattolo"
+    },
+    {
+      "document": 10955,
+      "label": "NAME_STUDENT",
+      "text": "Max Sanchez"
+    },
+    {
+      "document": 10955,
+      "label": "NAME_STUDENT",
+      "text": "Max Sanchez"
+    },
+    {
+      "document": 5116,
+      "label": "NAME_STUDENT",
+      "text": "Perle Kamdem"
+    },
+    {
+      "document": 5116,
+      "label": "NAME_STUDENT",
+      "text": "Perle Kamdem"
+    },
+    {
+      "document": 7265,
+      "label": "NAME_STUDENT",
+      "text": "Bruno Milani"
+    },
+    {
+      "document": 7858,
+      "label": "NAME_STUDENT",
+      "text": "Mickael Richardson"
+    },
+    {
+      "document": 7858,
+      "label": "NAME_STUDENT",
+      "text": "Mickael Richardson"
+    },
+    {
+      "document": 12962,
+      "label": "NAME_STUDENT",
+      "text": "Brittany Robinson"
+    },
+    {
+      "document": 13293,
+      "label": "NAME_STUDENT",
+      "text": "Said Catania"
+    },
+    {
+      "document": 2058,
+      "label": "NAME_STUDENT",
+      "text": "Ravneet Williams"
+    },
+    {
+      "document": 11975,
+      "label": "NAME_STUDENT",
+      "text": "Mayar Lim"
+    },
+    {
+      "document": 11975,
+      "label": "NAME_STUDENT",
+      "text": "Mayar Lim"
+    },
+    {
+      "document": 4287,
+      "label": "NAME_STUDENT",
+      "text": "Fernando Soares"
+    },
+    {
+      "document": 4750,
+      "label": "NAME_STUDENT",
+      "text": "Mohammad Azwan"
+    },
+    {
+      "document": 4561,
+      "label": "NAME_STUDENT",
+      "text": "Cedric Sanchez"
+    },
+    {
+      "document": 8894,
+      "label": "NAME_STUDENT",
+      "text": "Monica Garcia"
+    },
+    {
+      "document": 11806,
+      "label": "NAME_STUDENT",
+      "text": "Majid Ali"
+    },
+    {
+      "document": 11806,
+      "label": "NAME_STUDENT",
+      "text": "Majid Ali"
+    },
+    {
+      "document": 11806,
+      "label": "NAME_STUDENT",
+      "text": "Majid Ali"
+    },
+    {
+      "document": 11806,
+      "label": "NAME_STUDENT",
+      "text": "Majid Ali"
+    },
+    {
+      "document": 1798,
+      "label": "NAME_STUDENT",
+      "text": "Neha Sharma"
+    },
+    {
+      "document": 470,
+      "label": "NAME_STUDENT",
+      "text": "Daniel"
+    },
+    {
+      "document": 3391,
+      "label": "NAME_STUDENT",
+      "text": "Diana Vazquez"
+    },
+    {
+      "document": 4465,
+      "label": "NAME_STUDENT",
+      "text": "Mithilesh Gupta"
+    },
+    {
+      "document": 11942,
+      "label": "NAME_STUDENT",
+      "text": "Bahar"
+    },
+    {
+      "document": 10682,
+      "label": "NAME_STUDENT",
+      "text": "Ahmed Mohammed"
+    },
+    {
+      "document": 10682,
+      "label": "NAME_STUDENT",
+      "text": "Ahmed Mohammed"
+    },
+    {
+      "document": 10682,
+      "label": "NAME_STUDENT",
+      "text": "Ahmed Mohammed"
+    },
+    {
+      "document": 13260,
+      "label": "NAME_STUDENT",
+      "text": "Alina Ijaz"
+    },
+    {
+      "document": 1810,
+      "label": "NAME_STUDENT",
+      "text": "Shailesh Jain"
+    },
+    {
+      "document": 3892,
+      "label": "NAME_STUDENT",
+      "text": "Joyce Ka"
+    },
+    {
+      "document": 8768,
+      "label": "NAME_STUDENT",
+      "text": "Asia Ibrahim"
+    },
+    {
+      "document": 13144,
+      "label": "NAME_STUDENT",
+      "text": "Sarah Roberto"
+    },
+    {
+      "document": 13144,
+      "label": "NAME_STUDENT",
+      "text": "Sarah Roberto"
+    },
+    {
+      "document": 3664,
+      "label": "NAME_STUDENT",
+      "text": "Blanca Villa"
+    },
+    {
+      "document": 3553,
+      "label": "NAME_STUDENT",
+      "text": "Diego Claro"
+    },
+    {
+      "document": 7779,
+      "label": "NAME_STUDENT",
+      "text": "Leroy"
+    },
+    {
+      "document": 7779,
+      "label": "NAME_STUDENT",
+      "text": "Sullivan Leroy"
+    },
+    {
+      "document": 7779,
+      "label": "NAME_STUDENT",
+      "text": "Leroy"
+    },
+    {
+      "document": 7779,
+      "label": "NAME_STUDENT",
+      "text": "Sullivan Leroy"
+    },
+    {
+      "document": 7779,
+      "label": "NAME_STUDENT",
+      "text": "Sullivan Leroy"
+    },
+    {
+      "document": 7779,
+      "label": "NAME_STUDENT",
+      "text": "Sullivan Leroy"
+    },
+    {
+      "document": 7779,
+      "label": "NAME_STUDENT",
+      "text": "Sullivan Leroy"
+    },
+    {
+      "document": 12106,
+      "label": "NAME_STUDENT",
+      "text": "Maria Sara"
+    },
+    {
+      "document": 12106,
+      "label": "NAME_STUDENT",
+      "text": "Maria Sara"
+    },
+    {
+      "document": 1175,
+      "label": "NAME_STUDENT",
+      "text": "Jose Torres"
+    },
+    {
+      "document": 1578,
+      "label": "NAME_STUDENT",
+      "text": "Frutos Orellana"
+    },
+    {
+      "document": 13198,
+      "label": "NAME_STUDENT",
+      "text": "Barbie Refaat"
+    },
+    {
+      "document": 1221,
+      "label": "NAME_STUDENT",
+      "text": "Simon Nkabinde"
+    },
+    {
+      "document": 6694,
+      "label": "NAME_STUDENT",
+      "text": "Ahmad Ahmad"
+    },
+    {
+      "document": 8316,
+      "label": "NAME_STUDENT",
+      "text": "Angela Torres"
+    },
+    {
+      "document": 8316,
+      "label": "NAME_STUDENT",
+      "text": "Angela Torres"
+    },
+    {
+      "document": 8316,
+      "label": "NAME_STUDENT",
+      "text": "Angela Torres"
+    },
+    {
+      "document": 7668,
+      "label": "NAME_STUDENT",
+      "text": "Amira Ali"
+    },
+    {
+      "document": 10431,
+      "label": "NAME_STUDENT",
+      "text": "Anas Naser"
+    },
+    {
+      "document": 4462,
+      "label": "USERNAME",
+      "text": "fdixon"
+    },
+    {
+      "document": 4462,
+      "label": "USERNAME",
+      "text": "fdixon"
+    },
+    {
+      "document": 11793,
+      "label": "NAME_STUDENT",
+      "text": "Juber Millet"
+    },
+    {
+      "document": 6900,
+      "label": "NAME_STUDENT",
+      "text": "Claudio Said"
+    },
+    {
+      "document": 6900,
+      "label": "NAME_STUDENT",
+      "text": "Claudio Said"
+    },
+    {
+      "document": 3540,
+      "label": "NAME_STUDENT",
+      "text": "Fabian Jones"
+    },
+    {
+      "document": 4094,
+      "label": "NAME_STUDENT",
+      "text": "Leo Ine"
+    },
+    {
+      "document": 4717,
+      "label": "NAME_STUDENT",
+      "text": "Qais"
+    }
+  ]
+}

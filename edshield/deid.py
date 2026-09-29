@@ -11,7 +11,7 @@ import hashlib
 import os
 import random
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -22,14 +22,24 @@ from .types import Entity, DeidResult
 POLICY_DIR = Path(__file__).resolve().parent / "policies"
 
 
-def load_policy(name_or_path: str) -> dict:
+def _policy_path(name_or_path: str) -> Path:
     p = Path(name_or_path)
     if not p.exists():
         p = POLICY_DIR / f"{name_or_path}.yaml"
     if not p.exists():
         raise FileNotFoundError(f"Unknown policy '{name_or_path}'. Built-ins: {available_policies()}")
-    with open(p) as fh:
+    return p
+
+
+def load_policy(name_or_path: str) -> dict:
+    with open(_policy_path(name_or_path), encoding="utf-8") as fh:
         return yaml.safe_load(fh)
+
+
+def policy_fingerprint(name_or_path: str) -> str:
+    """SHA-256 of the policy file, so an audit record pins the exact rules applied."""
+    text = _policy_path(name_or_path).read_text(encoding="utf-8").replace("\r\n", "\n")
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
 def available_policies() -> List[str]:
@@ -50,6 +60,7 @@ class SurrogateFactory:
         self.fake = Faker(locale)
         if seed is not None:
             self.fake.seed_instance(seed)
+        self.rng = random.Random(seed)
         self._memo: Dict[str, str] = {}
 
     def for_entity(self, ent: Entity) -> str:
@@ -58,7 +69,7 @@ class SurrogateFactory:
             return self._memo[key]
         f = self.fake
         n_words = len(ent.text.split())
-        if ent.label == "NAME_STUDENT":
+        if ent.label in ("NAME_STUDENT", "NAME_RELATED"):
             val = f.first_name() if n_words == 1 else f"{f.first_name()} {f.last_name()}"
         elif ent.label == "EMAIL":
             val = f.free_email()
@@ -66,7 +77,7 @@ class SurrogateFactory:
             val = f.user_name()
         elif ent.label == "ID_NUM":
             digits = sum(ch.isdigit() for ch in ent.text)
-            val = "".join(random.choice("0123456789") for _ in range(max(6, digits)))
+            val = "".join(self.rng.choice("0123456789") for _ in range(max(6, digits)))
         elif ent.label == "PHONE_NUM":
             val = f.numerify("555-###-####")
         elif ent.label == "URL_PERSONAL":
@@ -105,7 +116,7 @@ def _shift_date(value: str, days: int) -> str:
 def apply_deidentification(
     text: str,
     entities: List[Entity],
-    method: str = "mask",
+    method: Optional[str] = None,
     policy: str = "ferpa",
     date_shift_days: Optional[int] = None,
     seed: Optional[int] = None,
@@ -113,11 +124,18 @@ def apply_deidentification(
 ) -> DeidResult:
     pol = load_policy(policy)
     rules: dict = pol.get("labels", {})
-    default_method = pol.get("default_method", method)
+    # The caller's method applies only if given and the policy allows it.
+    if method is None or not pol.get("allow_method_override", True):
+        method = pol.get("default_method", "mask")
     min_conf = float(pol.get("min_confidence", 0.0))
     salt = salt or os.environ.get("EDSHIELD_HASH_SALT", "edshield")
+    if date_shift_days == 0:
+        raise ValueError("date_shift_days=0 would leave every date unchanged; pass a non-zero shift or None")
     if date_shift_days is None:
-        date_shift_days = int(pol.get("date_shift_days", 0)) or random.randint(-365, 365)
+        date_shift_days = int(pol.get("date_shift_days", 0))
+    if not date_shift_days:
+        rng = random.Random(seed)
+        date_shift_days = rng.choice([-1, 1]) * rng.randint(1, 365)
 
     factory: Optional[SurrogateFactory] = None
     replacements: Dict[str, str] = {}
@@ -126,11 +144,11 @@ def apply_deidentification(
         nonlocal factory
         cfg = rules.get(ent.label, {})
         # Precedence: an explicit per-label method in the policy always wins;
-        # otherwise the caller's method; otherwise the policy default.
+        # otherwise the method resolved above.
         if isinstance(cfg, dict) and cfg.get("method"):
             m = cfg["method"]
         else:
-            m = method or default_method
+            m = method
         if m == "mask":
             out = cfg.get("mask", f"[{ent.label}]") if isinstance(cfg, dict) else f"[{ent.label}]"
         elif m == "replace":
@@ -159,26 +177,65 @@ def apply_deidentification(
 
     acted.sort(key=lambda e: e.start)
     out_parts: List[str] = []
+    untouched: List[str] = []
+    unchanged: List[str] = []
     cursor = 0
     for e in acted:
-        out_parts.append(text[cursor:e.start])
-        out_parts.append(render(e))
+        untouched.append(text[cursor:e.start])
+        out_parts.append(untouched[-1])
+        rendered = render(e)
+        if rendered == e.text and e.text not in unchanged:
+            unchanged.append(e.text)
+        out_parts.append(rendered)
         cursor = e.end
-    out_parts.append(text[cursor:])
+    untouched.append(text[cursor:])
+    out_parts.append(untouched[-1])
+    # Verify against the text that was left in place, not the output, so a
+    # surrogate or shifted date that happens to equal another original value
+    # is not mistaken for a leak.
+    leaks = unchanged + [v for v in check_no_leak("\n".join(untouched), acted) if v not in unchanged]
+    output = "".join(out_parts)
+    counts: Dict[str, int] = {}
+    for e in acted:
+        counts[e.label] = counts.get(e.label, 0) + 1
+    audit = {
+        "edshield_version": _version(),
+        "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "policy": pol.get("name", policy),
+        "policy_sha256": policy_fingerprint(policy),
+        "method": method,
+        "entities_acted_on": len(acted),
+        "entities_below_policy_threshold": len(entities) - len(acted),
+        "by_label": dict(sorted(counts.items())),
+        "input_chars": len(text),
+        "output_sha256": hashlib.sha256(output.encode("utf-8")).hexdigest(),
+        "leaks_found": len(leaks),
+    }
     return DeidResult(
         original_text=text,
-        deidentified_text="".join(out_parts),
+        deidentified_text=output,
         entities=acted,
         method=method,
         policy=policy,
         replacements=replacements,
+        leaks=leaks,
+        audit=audit,
     )
 
 
+def _version() -> str:
+    from . import __version__  # noqa: WPS433 - the package imports this module
+    return __version__
+
+
 def check_no_leak(deidentified_text: str, entities: List[Entity]) -> List[str]:
-    """Return original entity strings that still appear verbatim in the output."""
+    """Return original entity strings that still appear verbatim, as whole
+    words, in the text ("Ann" inside "Annual" is not a leak)."""
     leaks = []
     for e in entities:
-        if len(e.text.strip()) >= 3 and re.search(re.escape(e.text.strip()), deidentified_text):
-            leaks.append(e.text)
+        value = e.text.strip()
+        if len(value) < 3 or value in leaks:
+            continue
+        if re.search(r"(?<!\w)" + re.escape(value) + r"(?!\w)", deidentified_text):
+            leaks.append(value)
     return leaks

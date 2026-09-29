@@ -19,3 +19,11 @@ labels:
   STREET_ADDRESS: {enabled: true, method: mask}
   SSN: {enabled: true, method: mask}
   DATE: {enabled: true, method: shift_dates}
+  # Persistent identifiers and geolocation (16 CFR 312.2), and the people and places around the child.
+  NAME_RELATED: {enabled: true, mask: "[PERSON]", min_confidence: 0.3}
+  SCHOOL: {enabled: true, method: mask}
+  LOCATION: {enabled: true, method: mask}
+  AGE: {enabled: true, method: mask}
+  IP_ADDRESS: {enabled: true, method: mask}
+  DEVICE_ID: {enabled: true, method: mask}
+  GEO: {enabled: true, method: mask}

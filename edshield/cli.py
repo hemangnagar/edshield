@@ -28,7 +28,8 @@ def main(argv=None) -> int:
     rd = sub.add_parser("redact", help="De-identify a document under a policy")
     rd.add_argument("path")
     rd.add_argument("--policy", default="ferpa")
-    rd.add_argument("--method", default="mask", choices=["mask", "replace", "hash", "shift_dates"])
+    rd.add_argument("--method", default=None, choices=["mask", "replace", "hash", "shift_dates"],
+                    help="default: the policy's own method")
     rd.add_argument("--model", default=None)
     rd.add_argument("--device", default="cpu")
     rd.add_argument("--json", action="store_true", help="emit JSON instead of text")

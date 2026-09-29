@@ -1,0 +1,1358 @@
+{
+  "model": "rules",
+  "docs": 400,
+  "overall": {
+    "tp": 330,
+    "fp": 2,
+    "fn": 1103,
+    "precision": 0.994,
+    "recall": 0.2303,
+    "f5": 0.2373
+  },
+  "per_label": {
+    "NAME_STUDENT": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 351,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f5": 0.0
+    },
+    "EMAIL": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 90,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f5": 0.0
+    },
+    "USERNAME": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 72,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f5": 0.0
+    },
+    "ID_NUM": {
+      "tp": 57,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f5": 1.0
+    },
+    "PHONE_NUM": {
+      "tp": 75,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f5": 1.0
+    },
+    "URL_PERSONAL": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f5": 0.0
+    },
+    "STREET_ADDRESS": {
+      "tp": 0,
+      "fp": 2,
+      "fn": 34,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f5": 0.0
+    },
+    "SSN": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f5": 0.0
+    },
+    "DATE": {
+      "tp": 33,
+      "fp": 0,
+      "fn": 38,
+      "precision": 1.0,
+      "recall": 0.4648,
+      "f5": 0.4746
+    },
+    "NAME_RELATED": {
+      "tp": 45,
+      "fp": 0,
+      "fn": 195,
+      "precision": 1.0,
+      "recall": 0.1875,
+      "f5": 0.1935
+    },
+    "SCHOOL": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 116,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f5": 0.0
+    },
+    "LOCATION": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 122,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f5": 0.0
+    },
+    "AGE": {
+      "tp": 120,
+      "fp": 0,
+      "fn": 85,
+      "precision": 1.0,
+      "recall": 0.5854,
+      "f5": 0.5949
+    },
+    "IP_ADDRESS": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f5": 0.0
+    },
+    "DEVICE_ID": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f5": 0.0
+    },
+    "GEO": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f5": 0.0
+    }
+  },
+  "identifiers": 1433,
+  "exposed": 1100,
+  "exposed_by_label": {
+    "DATE": 38,
+    "STREET_ADDRESS": 34,
+    "LOCATION": 122,
+    "NAME_RELATED": 195,
+    "USERNAME": 72,
+    "NAME_STUDENT": 349,
+    "SCHOOL": 116,
+    "AGE": 84,
+    "EMAIL": 90
+  },
+  "removed_under_any_label": 0.2324,
+  "leaks": [
+    {
+      "document": 0,
+      "label": "DATE",
+      "text": "16th of February",
+      "exposed": true
+    },
+    {
+      "document": 0,
+      "label": "STREET_ADDRESS",
+      "text": "Mayer Drive",
+      "exposed": true
+    },
+    {
+      "document": 1,
+      "label": "LOCATION",
+      "text": "woodtown",
+      "exposed": true
+    },
+    {
+      "document": 1,
+      "label": "NAME_RELATED",
+      "text": "taylor",
+      "exposed": true
+    },
+    {
+      "document": 2,
+      "label": "USERNAME",
+      "text": "johndraws18",
+      "exposed": true
+    },
+    {
+      "document": 2,
+      "label": "LOCATION",
+      "text": "West Kelly",
+      "exposed": true
+    },
+    {
+      "document": 3,
+      "label": "NAME_STUDENT",
+      "text": "Lori",
+      "exposed": true
+    },
+    {
+      "document": 3,
+      "label": "NAME_STUDENT",
+      "text": "Lori Rivers",
+      "exposed": true
+    },
+    {
+      "document": 3,
+      "label": "NAME_STUDENT",
+      "text": "Lori",
+      "exposed": true
+    },
+    {
+      "document": 4,
+      "label": "NAME_STUDENT",
+      "text": "CHARLES",
+      "exposed": true
+    },
+    {
+      "document": 4,
+      "label": "NAME_STUDENT",
+      "text": "CLINE",
+      "exposed": true
+    },
+    {
+      "document": 4,
+      "label": "NAME_STUDENT",
+      "text": "CHARLES",
+      "exposed": true
+    },
+    {
+      "document": 4,
+      "label": "NAME_STUDENT",
+      "text": "CLINE",
+      "exposed": true
+    },
+    {
+      "document": 5,
+      "label": "NAME_STUDENT",
+      "text": "mikayla",
+      "exposed": true
+    },
+    {
+      "document": 5,
+      "label": "NAME_STUDENT",
+      "text": "mikayla",
+      "exposed": true
+    },
+    {
+      "document": 6,
+      "label": "LOCATION",
+      "text": "East Kerry",
+      "exposed": true
+    },
+    {
+      "document": 6,
+      "label": "NAME_RELATED",
+      "text": "Amanda",
+      "exposed": true
+    },
+    {
+      "document": 6,
+      "label": "NAME_STUDENT",
+      "text": "Kimberly",
+      "exposed": true
+    },
+    {
+      "document": 7,
+      "label": "SCHOOL",
+      "text": "mosley middle school",
+      "exposed": true
+    },
+    {
+      "document": 7,
+      "label": "NAME_STUDENT",
+      "text": "katie",
+      "exposed": true
+    },
+    {
+      "document": 7,
+      "label": "NAME_RELATED",
+      "text": "melinda",
+      "exposed": true
+    },
+    {
+      "document": 7,
+      "label": "LOCATION",
+      "text": "kennethport",
+      "exposed": true
+    },
+    {
+      "document": 7,
+      "label": "SCHOOL",
+      "text": "mosley middle school",
+      "exposed": true
+    },
+    {
+      "document": 8,
+      "label": "AGE",
+      "text": "11",
+      "exposed": true
+    },
+    {
+      "document": 8,
+      "label": "NAME_RELATED",
+      "text": "James",
+      "exposed": true
+    },
+    {
+      "document": 8,
+      "label": "NAME_STUDENT",
+      "text": "John",
+      "exposed": true
+    },
+    {
+      "document": 8,
+      "label": "STREET_ADDRESS",
+      "text": "Ross Drive",
+      "exposed": true
+    },
+    {
+      "document": 9,
+      "label": "LOCATION",
+      "text": "west alicia",
+      "exposed": true
+    },
+    {
+      "document": 9,
+      "label": "AGE",
+      "text": "7m",
+      "exposed": true
+    },
+    {
+      "document": 9,
+      "label": "AGE",
+      "text": "7m",
+      "exposed": true
+    },
+    {
+      "document": 9,
+      "label": "EMAIL",
+      "text": "shannonbarnett at gmail dot com",
+      "exposed": true
+    },
+    {
+      "document": 10,
+      "label": "NAME_STUDENT",
+      "text": "Jillian",
+      "exposed": true
+    },
+    {
+      "document": 11,
+      "label": "STREET_ADDRESS",
+      "text": "Johnson Drive",
+      "exposed": true
+    },
+    {
+      "document": 11,
+      "label": "NAME_STUDENT",
+      "text": "Karen",
+      "exposed": true
+    },
+    {
+      "document": 12,
+      "label": "LOCATION",
+      "text": "west amyside",
+      "exposed": true
+    },
+    {
+      "document": 12,
+      "label": "EMAIL",
+      "text": "helenlittle at gmail dot com",
+      "exposed": true
+    },
+    {
+      "document": 12,
+      "label": "SCHOOL",
+      "text": "griffith high school",
+      "exposed": true
+    },
+    {
+      "document": 12,
+      "label": "EMAIL",
+      "text": "helenlittle at gmail dot com",
+      "exposed": true
+    },
+    {
+      "document": 13,
+      "label": "AGE",
+      "text": "11m",
+      "exposed": true
+    },
+    {
+      "document": 13,
+      "label": "NAME_RELATED",
+      "text": "james",
+      "exposed": true
+    },
+    {
+      "document": 14,
+      "label": "SCHOOL",
+      "text": "wyatt elementary",
+      "exposed": true
+    },
+    {
+      "document": 14,
+      "label": "NAME_STUDENT",
+      "text": "jack",
+      "exposed": true
+    },
+    {
+      "document": 14,
+      "label": "NAME_STUDENT",
+      "text": "JACK",
+      "exposed": true
+    },
+    {
+      "document": 14,
+      "label": "NAME_STUDENT",
+      "text": "JENKINS",
+      "exposed": true
+    },
+    {
+      "document": 15,
+      "label": "NAME_STUDENT",
+      "text": "victoria",
+      "exposed": true
+    },
+    {
+      "document": 15,
+      "label": "NAME_STUDENT",
+      "text": "VICTORIA",
+      "exposed": true
+    },
+    {
+      "document": 15,
+      "label": "NAME_STUDENT",
+      "text": "CAMPBELL",
+      "exposed": true
+    },
+    {
+      "document": 16,
+      "label": "DATE",
+      "text": "14th of May",
+      "exposed": true
+    },
+    {
+      "document": 16,
+      "label": "SCHOOL",
+      "text": "Reed",
+      "exposed": true
+    },
+    {
+      "document": 17,
+      "label": "EMAIL",
+      "text": "davidlee at gmail dot com",
+      "exposed": true
+    },
+    {
+      "document": 17,
+      "label": "EMAIL",
+      "text": "davidlee at gmail dot com",
+      "exposed": true
+    },
+    {
+      "document": 18,
+      "label": "NAME_STUDENT",
+      "text": "blake",
+      "exposed": true
+    },
+    {
+      "document": 18,
+      "label": "NAME_STUDENT",
+      "text": "BLAKE",
+      "exposed": true
+    },
+    {
+      "document": 18,
+      "label": "NAME_STUDENT",
+      "text": "JONES",
+      "exposed": true
+    },
+    {
+      "document": 18,
+      "label": "SCHOOL",
+      "text": "vazquez elementary school",
+      "exposed": true
+    },
+    {
+      "document": 19,
+      "label": "NAME_RELATED",
+      "text": "Mckenzie",
+      "exposed": true
+    },
+    {
+      "document": 19,
+      "label": "NAME_RELATED",
+      "text": "Mckenzie",
+      "exposed": true
+    },
+    {
+      "document": 20,
+      "label": "SCHOOL",
+      "text": "Vance",
+      "exposed": true
+    },
+    {
+      "document": 20,
+      "label": "NAME_RELATED",
+      "text": "April",
+      "exposed": true
+    },
+    {
+      "document": 20,
+      "label": "EMAIL",
+      "text": "christinaperry at gmail dot com",
+      "exposed": true
+    },
+    {
+      "document": 21,
+      "label": "SCHOOL",
+      "text": "Richards",
+      "exposed": true
+    },
+    {
+      "document": 21,
+      "label": "NAME_STUDENT",
+      "text": "Amy Wright",
+      "exposed": true
+    },
+    {
+      "document": 22,
+      "label": "NAME_STUDENT",
+      "text": "matthew",
+      "exposed": true
+    },
+    {
+      "document": 22,
+      "label": "AGE",
+      "text": "16m",
+      "exposed": true
+    },
+    {
+      "document": 22,
+      "label": "NAME_STUDENT",
+      "text": "matthew",
+      "exposed": true
+    },
+    {
+      "document": 23,
+      "label": "NAME_RELATED",
+      "text": "Melissa",
+      "exposed": true
+    },
+    {
+      "document": 23,
+      "label": "USERNAME",
+      "text": "brian_plays75",
+      "exposed": true
+    },
+    {
+      "document": 24,
+      "label": "NAME_STUDENT",
+      "text": "alejandra",
+      "exposed": true
+    },
+    {
+      "document": 24,
+      "label": "USERNAME",
+      "text": "alejandra.gonz23",
+      "exposed": true
+    },
+    {
+      "document": 24,
+      "label": "NAME_STUDENT",
+      "text": "ALEJANDRA",
+      "exposed": true
+    },
+    {
+      "document": 24,
+      "label": "NAME_STUDENT",
+      "text": "GONZALEZ",
+      "exposed": true
+    },
+    {
+      "document": 25,
+      "label": "SCHOOL",
+      "text": "Lynch",
+      "exposed": true
+    },
+    {
+      "document": 25,
+      "label": "EMAIL",
+      "text": "reneeward at gmail dot com",
+      "exposed": true
+    },
+    {
+      "document": 26,
+      "label": "NAME_RELATED",
+      "text": "Alexis",
+      "exposed": true
+    },
+    {
+      "document": 26,
+      "label": "LOCATION",
+      "text": "Jeffreytown",
+      "exposed": true
+    },
+    {
+      "document": 26,
+      "label": "NAME_STUDENT",
+      "text": "Matthew Maynard",
+      "exposed": true
+    },
+    {
+      "document": 27,
+      "label": "NAME_STUDENT",
+      "text": "katherine",
+      "exposed": true
+    },
+    {
+      "document": 28,
+      "label": "LOCATION",
+      "text": "North Victoria",
+      "exposed": true
+    },
+    {
+      "document": 29,
+      "label": "NAME_RELATED",
+      "text": "Rebecca",
+      "exposed": true
+    },
+    {
+      "document": 30,
+      "label": "NAME_STUDENT",
+      "text": "LESLIE",
+      "exposed": true
+    },
+    {
+      "document": 30,
+      "label": "NAME_STUDENT",
+      "text": "RUBIO",
+      "exposed": true
+    },
+    {
+      "document": 30,
+      "label": "SCHOOL",
+      "text": "hernandez elementary school",
+      "exposed": true
+    },
+    {
+      "document": 30,
+      "label": "NAME_STUDENT",
+      "text": "LESLIE",
+      "exposed": true
+    },
+    {
+      "document": 30,
+      "label": "NAME_STUDENT",
+      "text": "RUBIO",
+      "exposed": true
+    },
+    {
+      "document": 31,
+      "label": "EMAIL",
+      "text": "jeffreyhunter at gmail dot com",
+      "exposed": true
+    },
+    {
+      "document": 31,
+      "label": "NAME_RELATED",
+      "text": "Pamela",
+      "exposed": true
+    },
+    {
+      "document": 32,
+      "label": "NAME_STUDENT",
+      "text": "louis",
+      "exposed": true
+    },
+    {
+      "document": 32,
+      "label": "AGE",
+      "text": "14m",
+      "exposed": true
+    },
+    {
+      "document": 33,
+      "label": "LOCATION",
+      "text": "Samuelside",
+      "exposed": true
+    },
+    {
+      "document": 33,
+      "label": "NAME_STUDENT",
+      "text": "Brett",
+      "exposed": true
+    },
+    {
+      "document": 33,
+      "label": "USERNAME",
+      "text": "brettdraws41",
+      "exposed": true
+    },
+    {
+      "document": 33,
+      "label": "LOCATION",
+      "text": "Samuelside",
+      "exposed": true
+    },
+    {
+      "document": 34,
+      "label": "NAME_STUDENT",
+      "text": "Lisa",
+      "exposed": true
+    },
+    {
+      "document": 34,
+      "label": "EMAIL",
+      "text": "lisaramos at gmail dot com",
+      "exposed": true
+    },
+    {
+      "document": 35,
+      "label": "STREET_ADDRESS",
+      "text": "Burke Street",
+      "exposed": true
+    },
+    {
+      "document": 35,
+      "label": "NAME_STUDENT",
+      "text": "Paul",
+      "exposed": true
+    },
+    {
+      "document": 35,
+      "label": "SCHOOL",
+      "text": "Hernandez",
+      "exposed": true
+    },
+    {
+      "document": 36,
+      "label": "USERNAME",
+      "text": "mackenzieflor65",
+      "exposed": true
+    },
+    {
+      "document": 38,
+      "label": "NAME_STUDENT",
+      "text": "Michael",
+      "exposed": true
+    },
+    {
+      "document": 39,
+      "label": "NAME_STUDENT",
+      "text": "Julie",
+      "exposed": true
+    },
+    {
+      "document": 39,
+      "label": "SCHOOL",
+      "text": "Castro",
+      "exposed": true
+    },
+    {
+      "document": 39,
+      "label": "NAME_STUDENT",
+      "text": "Julie",
+      "exposed": true
+    },
+    {
+      "document": 39,
+      "label": "LOCATION",
+      "text": "Brendaburgh",
+      "exposed": true
+    },
+    {
+      "document": 39,
+      "label": "SCHOOL",
+      "text": "Castro",
+      "exposed": true
+    },
+    {
+      "document": 40,
+      "label": "NAME_RELATED",
+      "text": "Ryan",
+      "exposed": true
+    },
+    {
+      "document": 40,
+      "label": "SCHOOL",
+      "text": "Brown",
+      "exposed": true
+    },
+    {
+      "document": 40,
+      "label": "LOCATION",
+      "text": "New Michaelshire",
+      "exposed": true
+    },
+    {
+      "document": 41,
+      "label": "NAME_STUDENT",
+      "text": "James",
+      "exposed": true
+    },
+    {
+      "document": 41,
+      "label": "NAME_RELATED",
+      "text": "Sherri",
+      "exposed": true
+    },
+    {
+      "document": 42,
+      "label": "NAME_RELATED",
+      "text": "Brenda",
+      "exposed": true
+    },
+    {
+      "document": 42,
+      "label": "STREET_ADDRESS",
+      "text": "Robinson Drive",
+      "exposed": true
+    },
+    {
+      "document": 43,
+      "label": "AGE",
+      "text": "7",
+      "exposed": true
+    },
+    {
+      "document": 43,
+      "label": "NAME_RELATED",
+      "text": "Catherine",
+      "exposed": true
+    },
+    {
+      "document": 43,
+      "label": "NAME_STUDENT",
+      "text": "Ryan Rodriguez",
+      "exposed": true
+    },
+    {
+      "document": 44,
+      "label": "NAME_RELATED",
+      "text": "Nicole",
+      "exposed": true
+    },
+    {
+      "document": 44,
+      "label": "STREET_ADDRESS",
+      "text": "Roberson Court",
+      "exposed": true
+    },
+    {
+      "document": 44,
+      "label": "LOCATION",
+      "text": "West Randy",
+      "exposed": true
+    },
+    {
+      "document": 45,
+      "label": "DATE",
+      "text": "11th of December",
+      "exposed": true
+    },
+    {
+      "document": 45,
+      "label": "NAME_RELATED",
+      "text": "Jordan",
+      "exposed": true
+    },
+    {
+      "document": 46,
+      "label": "NAME_RELATED",
+      "text": "Gregory",
+      "exposed": true
+    },
+    {
+      "document": 46,
+      "label": "NAME_RELATED",
+      "text": "Gregory",
+      "exposed": true
+    },
+    {
+      "document": 46,
+      "label": "SCHOOL",
+      "text": "Abbott",
+      "exposed": true
+    },
+    {
+      "document": 46,
+      "label": "NAME_STUDENT",
+      "text": "Sarah",
+      "exposed": true
+    },
+    {
+      "document": 46,
+      "label": "AGE",
+      "text": "12",
+      "exposed": true
+    },
+    {
+      "document": 46,
+      "label": "DATE",
+      "text": "13th of February",
+      "exposed": true
+    },
+    {
+      "document": 46,
+      "label": "NAME_RELATED",
+      "text": "Gregory",
+      "exposed": true
+    },
+    {
+      "document": 47,
+      "label": "LOCATION",
+      "text": "bergside",
+      "exposed": true
+    },
+    {
+      "document": 47,
+      "label": "EMAIL",
+      "text": "susanmayer at gmail dot com",
+      "exposed": true
+    },
+    {
+      "document": 47,
+      "label": "LOCATION",
+      "text": "bergside",
+      "exposed": true
+    },
+    {
+      "document": 47,
+      "label": "EMAIL",
+      "text": "susanmayer at gmail dot com",
+      "exposed": true
+    },
+    {
+      "document": 48,
+      "label": "LOCATION",
+      "text": "new jamesbury",
+      "exposed": true
+    },
+    {
+      "document": 48,
+      "label": "EMAIL",
+      "text": "kathrynrocha at gmail dot com",
+      "exposed": true
+    },
+    {
+      "document": 48,
+      "label": "EMAIL",
+      "text": "kathrynrocha at gmail dot com",
+      "exposed": true
+    },
+    {
+      "document": 48,
+      "label": "NAME_STUDENT",
+      "text": "kathryn",
+      "exposed": true
+    },
+    {
+      "document": 48,
+      "label": "NAME_STUDENT",
+      "text": "KATHRYN",
+      "exposed": true
+    },
+    {
+      "document": 48,
+      "label": "NAME_STUDENT",
+      "text": "ROCHA",
+      "exposed": true
+    },
+    {
+      "document": 49,
+      "label": "EMAIL",
+      "text": "heathergonzales at gmail dot com",
+      "exposed": true
+    },
+    {
+      "document": 49,
+      "label": "EMAIL",
+      "text": "heathergonzales at gmail dot com",
+      "exposed": true
+    },
+    {
+      "document": 49,
+      "label": "NAME_STUDENT",
+      "text": "heather",
+      "exposed": true
+    },
+    {
+      "document": 49,
+      "label": "NAME_STUDENT",
+      "text": "heather",
+      "exposed": true
+    },
+    {
+      "document": 49,
+      "label": "SCHOOL",
+      "text": "curtis elementary",
+      "exposed": true
+    },
+    {
+      "document": 50,
+      "label": "SCHOOL",
+      "text": "riley elementary",
+      "exposed": true
+    },
+    {
+      "document": 51,
+      "label": "SCHOOL",
+      "text": "olson elementary",
+      "exposed": true
+    },
+    {
+      "document": 51,
+      "label": "AGE",
+      "text": "11m",
+      "exposed": true
+    },
+    {
+      "document": 51,
+      "label": "AGE",
+      "text": "11m",
+      "exposed": true
+    },
+    {
+      "document": 52,
+      "label": "SCHOOL",
+      "text": "Miranda",
+      "exposed": true
+    },
+    {
+      "document": 52,
+      "label": "NAME_STUDENT",
+      "text": "Alvin Pace",
+      "exposed": true
+    },
+    {
+      "document": 53,
+      "label": "AGE",
+      "text": "9",
+      "exposed": true
+    },
+    {
+      "document": 53,
+      "label": "NAME_STUDENT",
+      "text": "John Wong",
+      "exposed": true
+    },
+    {
+      "document": 53,
+      "label": "NAME_STUDENT",
+      "text": "John",
+      "exposed": true
+    },
+    {
+      "document": 53,
+      "label": "NAME_RELATED",
+      "text": "Mathew",
+      "exposed": true
+    },
+    {
+      "document": 54,
+      "label": "NAME_RELATED",
+      "text": "Christopher",
+      "exposed": true
+    },
+    {
+      "document": 54,
+      "label": "STREET_ADDRESS",
+      "text": "Morgan Avenue",
+      "exposed": true
+    },
+    {
+      "document": 55,
+      "label": "USERNAME",
+      "text": "james.draws52",
+      "exposed": true
+    },
+    {
+      "document": 55,
+      "label": "SCHOOL",
+      "text": "Carter",
+      "exposed": true
+    },
+    {
+      "document": 55,
+      "label": "USERNAME",
+      "text": "james.draws52",
+      "exposed": true
+    },
+    {
+      "document": 56,
+      "label": "EMAIL",
+      "text": "mariagregory at gmail dot com",
+      "exposed": true
+    },
+    {
+      "document": 56,
+      "label": "EMAIL",
+      "text": "mariagregory at gmail dot com",
+      "exposed": true
+    },
+    {
+      "document": 57,
+      "label": "LOCATION",
+      "text": "Port Vernonborough",
+      "exposed": true
+    },
+    {
+      "document": 57,
+      "label": "NAME_STUDENT",
+      "text": "Amber",
+      "exposed": true
+    },
+    {
+      "document": 57,
+      "label": "NAME_RELATED",
+      "text": "Charles",
+      "exposed": true
+    },
+    {
+      "document": 57,
+      "label": "LOCATION",
+      "text": "Port Vernonborough",
+      "exposed": true
+    },
+    {
+      "document": 57,
+      "label": "LOCATION",
+      "text": "Port Vernonborough",
+      "exposed": true
+    },
+    {
+      "document": 58,
+      "label": "NAME_STUDENT",
+      "text": "James",
+      "exposed": true
+    },
+    {
+      "document": 58,
+      "label": "LOCATION",
+      "text": "Julieborough",
+      "exposed": true
+    },
+    {
+      "document": 59,
+      "label": "LOCATION",
+      "text": "Christopherhaven",
+      "exposed": true
+    },
+    {
+      "document": 59,
+      "label": "LOCATION",
+      "text": "Christopherhaven",
+      "exposed": true
+    },
+    {
+      "document": 59,
+      "label": "AGE",
+      "text": "7",
+      "exposed": true
+    },
+    {
+      "document": 59,
+      "label": "AGE",
+      "text": "7",
+      "exposed": true
+    },
+    {
+      "document": 59,
+      "label": "NAME_RELATED",
+      "text": "Debra",
+      "exposed": true
+    },
+    {
+      "document": 60,
+      "label": "DATE",
+      "text": "17th of September",
+      "exposed": true
+    },
+    {
+      "document": 60,
+      "label": "NAME_STUDENT",
+      "text": "Brandy",
+      "exposed": true
+    },
+    {
+      "document": 60,
+      "label": "LOCATION",
+      "text": "North Lindafort",
+      "exposed": true
+    },
+    {
+      "document": 60,
+      "label": "NAME_RELATED",
+      "text": "Jeanette",
+      "exposed": true
+    },
+    {
+      "document": 60,
+      "label": "NAME_STUDENT",
+      "text": "Brandy Bradley",
+      "exposed": true
+    },
+    {
+      "document": 61,
+      "label": "NAME_STUDENT",
+      "text": "Joshua",
+      "exposed": true
+    },
+    {
+      "document": 61,
+      "label": "NAME_RELATED",
+      "text": "Samantha",
+      "exposed": true
+    },
+    {
+      "document": 61,
+      "label": "STREET_ADDRESS",
+      "text": "Murphy Lane",
+      "exposed": true
+    },
+    {
+      "document": 62,
+      "label": "NAME_STUDENT",
+      "text": "rebekah",
+      "exposed": true
+    },
+    {
+      "document": 63,
+      "label": "USERNAME",
+      "text": "timothy_xd47",
+      "exposed": true
+    },
+    {
+      "document": 63,
+      "label": "AGE",
+      "text": "14m",
+      "exposed": true
+    },
+    {
+      "document": 63,
+      "label": "NAME_STUDENT",
+      "text": "timothy",
+      "exposed": true
+    },
+    {
+      "document": 63,
+      "label": "EMAIL",
+      "text": "timothychambers at gmail dot com",
+      "exposed": true
+    },
+    {
+      "document": 65,
+      "label": "USERNAME",
+      "text": "tony.xd75",
+      "exposed": true
+    },
+    {
+      "document": 66,
+      "label": "SCHOOL",
+      "text": "moore academy",
+      "exposed": true
+    },
+    {
+      "document": 66,
+      "label": "NAME_RELATED",
+      "text": "daniel",
+      "exposed": true
+    },
+    {
+      "document": 66,
+      "label": "LOCATION",
+      "text": "north stephen",
+      "exposed": true
+    },
+    {
+      "document": 66,
+      "label": "USERNAME",
+      "text": "eric.hull62",
+      "exposed": true
+    },
+    {
+      "document": 67,
+      "label": "NAME_STUDENT",
+      "text": "michael",
+      "exposed": true
+    },
+    {
+      "document": 67,
+      "label": "SCHOOL",
+      "text": "hardy elementary",
+      "exposed": true
+    },
+    {
+      "document": 67,
+      "label": "NAME_STUDENT",
+      "text": "michael",
+      "exposed": true
+    },
+    {
+      "document": 68,
+      "label": "NAME_STUDENT",
+      "text": "Jonathan",
+      "exposed": true
+    },
+    {
+      "document": 68,
+      "label": "DATE",
+      "text": "5th of May",
+      "exposed": true
+    },
+    {
+      "document": 68,
+      "label": "STREET_ADDRESS",
+      "text": "Walter Court",
+      "exposed": true
+    },
+    {
+      "document": 68,
+      "label": "NAME_RELATED",
+      "text": "David",
+      "exposed": true
+    },
+    {
+      "document": 69,
+      "label": "SCHOOL",
+      "text": "reese elementary school",
+      "exposed": true
+    },
+    {
+      "document": 69,
+      "label": "NAME_STUDENT",
+      "text": "JOHN",
+      "exposed": true
+    },
+    {
+      "document": 69,
+      "label": "NAME_STUDENT",
+      "text": "WILSON",
+      "exposed": true
+    },
+    {
+      "document": 69,
+      "label": "NAME_STUDENT",
+      "text": "john",
+      "exposed": true
+    },
+    {
+      "document": 69,
+      "label": "LOCATION",
+      "text": "carlton",
+      "exposed": true
+    }
+  ]
+}

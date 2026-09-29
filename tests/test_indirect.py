@@ -1,0 +1,86 @@
+"""Indirect and persistent identifiers: the people and places around a
+student (FERPA) and device, network and location identifiers (COPPA)."""
+import pytest
+
+import edshield
+from edshield.rules import detect_rules
+
+
+def found(text):
+    return {(e.label, e.text) for e in edshield.analyze_text(text, model_name="rules").entities}
+
+
+@pytest.mark.parametrize("text,expected", [
+    # family, friends, teachers
+    ("I got 42 but my brother Jordan said that's wrong.", ("NAME_RELATED", "Jordan")),
+    ("My friend Daniel Okafor helped me count trays.", ("NAME_RELATED", "Daniel Okafor")),
+    ("my mom is Sarah and she works nights", ("NAME_RELATED", "Sarah")),
+    ("My little sister Maya broke it.", ("NAME_RELATED", "Maya")),
+    ("my teacher Ms. Patel said to use the rubric", ("NAME_RELATED", "Patel")),
+    ("Ask Coach Ramirez or Dr. Nguyen about it.", ("NAME_RELATED", "Ramirez")),
+    ("Ask Coach Ramirez or Dr. Nguyen about it.", ("NAME_RELATED", "Nguyen")),
+    # schools and places
+    ("I'm in 8th grade at Rachel Carson Middle School.", ("SCHOOL", "Rachel Carson Middle School")),
+    ("At Lincoln High School we have a big gym.", ("SCHOOL", "Lincoln High School")),
+    ("She studies at the University of Toledo now.", ("SCHOOL", "University of Toledo")),
+    ("We moved to Cedar Falls last summer.", ("LOCATION", "Cedar Falls")),
+    ("I live in Vienna with my family.", ("LOCATION", "Vienna")),
+    ("The game was in Round Rock, TX this year.", ("LOCATION", "Round Rock, TX")),
+    # age and birthday
+    ("I am 11 years old and I like soccer.", ("AGE", "11")),
+    ("im 12 btw", ("AGE", "12")),
+    ("I'm turning 13 in May.", ("AGE", "13")),
+    ("my 9-year-old brother", ("AGE", "9")),
+    ("My birthday is March 3 and I want a bike.", ("DATE", "March 3")),
+    # device, network, location
+    ("The log shows 192.168.1.44 at login.", ("IP_ADDRESS", "192.168.1.44")),
+    ("Connected from 2001:0db8:85a3:0000:0000:8a2e:0370:7334 today.", ("IP_ADDRESS", "2001:0db8:85a3:0000:0000:8a2e:0370:7334")),
+    ("The tablet's MAC is 3C:22:FB:9A:10:5E.", ("DEVICE_ID", "3C:22:FB:9A:10:5E")),
+    ("Advertising id 38400000-8cf0-11bd-b23e-10b96e40000d was sent.", ("DEVICE_ID", "38400000-8cf0-11bd-b23e-10b96e40000d")),
+    ("Pinned at 38.9012, -77.2653 on the map.", ("GEO", "38.9012, -77.2653")),
+])
+def test_indirect_identifiers_are_found(text, expected):
+    assert expected in found(text)
+
+
+@pytest.mark.parametrize("text", [
+    "I scored 12 points and my answer was 42.",
+    "We read chapters 3.1.2 and 4.10 of the book.",
+    "The ratio was 1.5 and the time was 10:30:15.",
+    "In High School you get more homework.",
+    "My teacher said the quiz is on Friday.",
+    "My friend and I went to the park.",
+    "I am 3 problems behind on the worksheet.",
+    "The Design Thinking course was useful.",
+    "We live in a small apartment.",
+])
+def test_ordinary_text_has_no_indirect_identifiers(text):
+    new = {"NAME_RELATED", "SCHOOL", "LOCATION", "AGE", "IP_ADDRESS", "DEVICE_ID", "GEO"}
+    assert {(l, t) for l, t in found(text) if l in new} == set()
+
+
+def test_related_names_propagate_and_keep_their_label():
+    text = "My brother Jordan helped. Later Jordan's friend left. My name is Priya and Priya agreed."
+    got = sorted((e.start, e.label, e.text) for e in edshield.analyze_text(text, model_name="rules").entities)
+    assert [(l, t) for _, l, t in got] == [
+        ("NAME_RELATED", "Jordan"), ("NAME_RELATED", "Jordan"), ("NAME_STUDENT", "Priya"), ("NAME_STUDENT", "Priya")]
+
+
+def test_address_wins_over_the_city_inside_it():
+    got = found("We live at 1420 Maple Ridge Ct, Vienna, VA 22182 now.")
+    assert ("STREET_ADDRESS", "1420 Maple Ridge Ct, Vienna, VA 22182") in got
+    assert not any(l == "LOCATION" for l, _ in got)
+
+
+@pytest.mark.parametrize("policy", ["ferpa", "coppa", "research"])
+def test_every_policy_acts_on_the_new_labels(policy):
+    text = ("My name is Priya Raman. My brother Jordan goes to Lincoln High School in Round Rock, TX. "
+            "I am 11 years old. Device 3C:22:FB:9A:10:5E at 192.168.1.44, pinned at 38.9012, -77.2653.")
+    out = edshield.deidentify(text, policy=policy, model_name="rules", seed=1).deidentified_text
+    for value in ["Priya", "Jordan", "Lincoln", "Round Rock", "11 years", "3C:22", "192.168", "38.9012"]:
+        assert value not in out, (policy, value, out)
+
+
+def test_labels_are_selectable():
+    ents = detect_rules("My brother Jordan is 9 years old.", labels=["AGE"])
+    assert [(e.label, e.text) for e in ents] == [("AGE", "9")]
