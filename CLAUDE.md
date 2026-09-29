@@ -17,8 +17,8 @@ State saved 2026-09-29. Update the "Current state" and "Open decisions" sections
 
 ## Current state
 
-- Pull request 1 was merged into `main` on 2026-09-29 (merge commit `eebae07`), up to the Google Fonts removal.
-- Branch `worktree-model-authority` is pushed and one change ahead of `main`: the browser model fix (`8cbc0c7`). It needs a second pull request.
+- Pull requests 1 and 2 were merged into `main` on 2026-09-29. `main` has everything through the browser model fix (merge commit `1079fcb`).
+- New work goes on branch `worktree-model-authority` and reaches `main` through a new pull request, which the user creates and merges on GitHub.
 - Worktree: `C:\edshield\.claude\worktrees\model-authority`. Main checkout: `C:\edshield`.
 - 183 tests pass locally. CI (`.github/workflows/ci.yml`) is green on Python 3.10 and 3.12.
 - The main checkout still has staged changes (`data/synthetic.json`, `eval/results/deberta_small_piilo.json`, `training/train.py`). All three are now in the branch; discard them there before pulling `main`.
@@ -81,9 +81,8 @@ Caveats: PIILO is adult writing. The K-12 sets are synthetic. The PIILO false-al
 
 ## Open decisions
 
-1. Open and merge a pull request for the browser model fix: `https://github.com/hemangnagar/edshield/compare/main...worktree-model-authority?expand=1`.
-2. Retrain with child-style synthetic text, worded differently from the test set, to close the 22% gap on the hard set. About 42 minutes.
-3. Publish to the Hugging Face Hub. On hold. Steps: account, `edshield` organisation, write token, `hf auth login`, `hf upload`, model card with CC BY 4.0 and attribution.
+1. Retrain with child-style synthetic text, worded differently from the test set, to close the 22% gap on the hard set. About 42 minutes. Afterwards re-export the browser file and score it with `eval/evaluate_onnx.py`.
+2. Publish to the Hugging Face Hub. On hold. Steps: account, `edshield` organisation, write token, `hf auth login`, `hf upload`, model card with CC BY 4.0 and attribution.
 
 Known small issues: the model labels `priyawrites.wordpress.com` as `EMAIL` (still removed); "I'll be 15 soon" is not caught as an age.
 
