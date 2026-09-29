@@ -67,23 +67,23 @@ Three synthetic samples (essay, tutoring transcript, chatbot message), three pol
 
 All numbers are span-level from `eval/evaluate.py`; F5 weights recall 5:1, as the PIILO competition did.
 
-**Real student essays.** 280 PIILO documents held out from training of `piilo-deberta-v3-small`:
+**Real student essays.** 680 PIILO documents held out from training of `piilo-deberta-v3-small` (DeBERTa-v3-small, 3 epochs), in the corpus's natural mix: 581 of them contain no PII at all.
 
 | Detector | Precision | Recall | F5 | Missed entities |
 |---|---|---|---|---|
-| Rules only | 0.614 | 0.305 | 0.311 | 98 of 141 |
-| Rules + model | 0.698 | 1.000 | 0.984 | 0 of 141 |
+| Rules only | 0.500 | 0.388 | 0.391 | 101 of 165 |
+| Rules + model | 0.589 | 1.000 | 0.974 | 0 of 165 |
 
 | Rules + model, by label | Precision | Recall | n |
 |---|---|---|---|
-| NAME_STUDENT | 0.706 | 1.000 | 113 |
-| URL_PERSONAL | 0.577 | 1.000 | 15 |
-| ID_NUM | 0.750 | 1.000 | 6 |
-| EMAIL | 1.000 | 1.000 | 5 |
-| PHONE_NUM | 1.000 | 1.000 | 1 |
+| NAME_STUDENT | 0.622 | 1.000 | 143 |
+| URL_PERSONAL | 0.258 | 1.000 | 8 |
+| ID_NUM | 0.636 | 1.000 | 7 |
+| EMAIL | 1.000 | 1.000 | 4 |
+| USERNAME | 1.000 | 1.000 | 2 |
 | STREET_ADDRESS | 0.500 | 1.000 | 1 |
 
-The held-out set is small: the rare labels have a handful of examples each, so their rows say little. Most name false positives are real names of people who are not students (cited authors, lecturers), which PIILO does not label.
+The rare labels have a handful of examples each, so their rows say little. Most name false positives are real names of people who are not students (cited authors, lecturers), which PIILO does not label; most URL false positives are cited articles. Reports are in `eval/results/`.
 
 **Synthetic transcripts and essays.** Rules only, 500 documents (`eval/synthetic_bench.py --n 500 --seed 1`). The generator's sentences use the same cues the rules look for, so read this as a regression check, not as expected accuracy on real text:
 
