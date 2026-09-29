@@ -1,11 +1,15 @@
 """Evaluate any detector (rules, model, or both) on PIILO-format JSON.
 
-Reports the competition's micro F5 at token level plus span-level P/R and,
-most importantly for a privacy tool, the leak count: gold entities that the
-detector missed entirely.
+Reports span-level precision, recall and F5 (the competition's metric weights
+recall 5:1, but scores tokens; this scores spans, and any overlap with a gold
+span of the same label counts as finding it) and, most importantly for a
+privacy tool, the leak count: gold entities that the detector missed entirely.
 
-    python eval/evaluate.py --input data/piilo/train.json --model rules
-    python eval/evaluate.py --input data/piilo/train.json --model models/piilo-deberta-v3-small
+Evaluate a model on documents it was not trained on. prepare_piilo.py writes
+the held-out split next to the training data:
+
+    python eval/evaluate.py --input data/piilo_hf/validation.json --model rules
+    python eval/evaluate.py --input data/piilo_hf/validation.json --model models/piilo-deberta-v3-small
 """
 from __future__ import annotations
 
@@ -43,16 +47,43 @@ def rebuild(doc):
     return "".join(text), spans
 
 
+def score(gold, pred):
+    """Compare (start, end, label) spans. Returns (tp, fp, fn) Counters by label
+    and the gold spans that were missed.
+
+    A gold span is found if any prediction of its label overlaps it. A
+    prediction is a false positive only if it overlaps no gold span of its
+    label, so two predictions covering one gold name are not penalised.
+    """
+    tp = Counter(); fp = Counter(); fn = Counter()
+    missed = []
+
+    def overlaps(a, b):
+        return a[2] == b[2] and a[0] < b[1] and b[0] < a[1]
+
+    for g in gold:
+        if any(overlaps(g, p) for p in pred):
+            tp[g[2]] += 1
+        else:
+            fn[g[2]] += 1
+            missed.append(g)
+    for p in pred:
+        if not any(overlaps(g, p) for g in gold):
+            fp[p[2]] += 1
+    return tp, fp, fn, missed
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--input", required=True)
     ap.add_argument("--model", default="rules")
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--device", default="cpu")
+    ap.add_argument("--o_threshold", type=float, default=None, help="entity whenever P(O) < this (default: argmax)")
     ap.add_argument("--report", default=None, help="write JSON report here")
     a = ap.parse_args()
 
-    docs = json.loads(Path(a.input).read_text())
+    docs = json.loads(Path(a.input).read_text(encoding="utf-8"))
     if a.limit:
         docs = docs[: a.limit]
 
@@ -60,24 +91,11 @@ def main():
     leaks = []
     for d in docs:
         text, gold = rebuild(d)
-        pred = edshield.analyze_text(text, model_name=a.model, device=a.device).entities
+        pred = edshield.analyze_text(text, model_name=a.model, device=a.device, o_threshold=a.o_threshold).entities
         pred_spans = [(e.start, e.end, e.label) for e in pred if e.label in edshield.PIILO_LABELS]
-        matched = set()
-        for gs, ge, gl in gold:
-            hit = None
-            for i, (ps, pe, pl) in enumerate(pred_spans):
-                if pl == gl and ps < ge and gs < pe:  # overlap counts (competition is token-level)
-                    hit = i
-                    break
-            if hit is None:
-                fn[gl] += 1
-                leaks.append({"document": d["document"], "label": gl, "text": text[gs:ge]})
-            else:
-                tp[gl] += 1
-                matched.add(hit)
-        for i, (_, _, pl) in enumerate(pred_spans):
-            if i not in matched:
-                fp[pl] += 1
+        d_tp, d_fp, d_fn, missed = score(gold, pred_spans)
+        tp += d_tp; fp += d_fp; fn += d_fn
+        leaks.extend({"document": d["document"], "label": gl, "text": text[gs:ge]} for gs, ge, gl in missed)
 
     def prf(label=None):
         t = tp[label] if label else sum(tp.values())

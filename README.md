@@ -90,7 +90,7 @@ unzip pii-detection-removal-from-educational-data.zip -d data/piilo
 python eval/synthetic_bench.py --n 2000 --out data/synthetic.json      # augmentation for rare labels
 python training/prepare_piilo.py --input data/piilo/train.json --out data/piilo_hf --extra data/synthetic.json
 python training/train.py --data data/piilo_hf --base microsoft/deberta-v3-small --out models/piilo-deberta-v3-small --epochs 3
-python eval/evaluate.py --input data/piilo/train.json --model models/piilo-deberta-v3-small --limit 1000
+python eval/evaluate.py --input data/piilo_hf/validation.json --model models/piilo-deberta-v3-small --device cuda
 python training/export_onnx.py --model models/piilo-deberta-v3-small --out demo/models/piilo-deberta-v3-small-onnx
 ```
 
