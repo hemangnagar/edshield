@@ -19,7 +19,7 @@ State saved 2026-09-29. Update the "Current state" and "Open decisions" sections
 
 - Branch `worktree-model-authority`, pushed, open as pull request 1. `main` is still at the v0.1.0 commit `cc30519`.
 - Worktree: `C:\edshield\.claude\worktrees\model-authority`. Main checkout: `C:\edshield`.
-- 182 tests pass locally. CI (`.github/workflows/ci.yml`) is green on Python 3.10 and 3.12.
+- 183 tests pass locally. CI (`.github/workflows/ci.yml`) is green on Python 3.10 and 3.12.
 - The main checkout still has staged changes (`data/synthetic.json`, `eval/results/deberta_small_piilo.json`, `training/train.py`). All three are now in the branch; discard them there before pulling the merged branch.
 
 ## What is where
@@ -80,8 +80,7 @@ Caveats: PIILO is adult writing. The K-12 sets are synthetic. The PIILO false-al
 1. Merge pull request 1.
 2. Retrain with child-style synthetic text, worded differently from the test set, to close the 22% gap on the hard set. About 42 minutes.
 3. Try gentler quantization for the browser model; the INT8 file misses 7 identifiers the full model catches.
-4. Remove the Google Fonts link from `demo/index.html` so the demo is fully offline.
-5. Publish to the Hugging Face Hub. On hold. Steps: account, `edshield` organisation, write token, `hf auth login`, `hf upload`, model card with CC BY 4.0 and attribution.
+4. Publish to the Hugging Face Hub. On hold. Steps: account, `edshield` organisation, write token, `hf auth login`, `hf upload`, model card with CC BY 4.0 and attribution.
 
 Known small issues: the model labels `priyawrites.wordpress.com` as `EMAIL` (still removed); "I'll be 15 soon" is not caught as an age.
 
