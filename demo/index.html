@@ -133,6 +133,10 @@ const SUFFIX = "expressway|extensions|throughway|trafficway|crossroad|extension|
 const CUES_STRONG = "username|user name|user id|userid|screen name|gamertag";
 const CUES_PLATFORM = "handle|login|discord|instagram|insta|snap|snapchat|tiktok|twitter|github|roblox|xbox|psn";
 const CUES = CUES_STRONG + "|" + CUES_PLATFORM;
+const PERSON = String.raw`[A-Z][a-z'’-]+(?:[ \t]+[A-Z][a-z'’-]+)?`, PLACE = String.raw`[A-Z][a-z]+(?:[ \t][A-Z][a-z]+){0,2}`;
+const RELATIONS = "mom|mum|mommy|mother|dad|daddy|father|stepmom|stepdad|stepmother|stepfather|parent|guardian|brother|sister|sibling|grandma|grandpa|grandmother|grandfather|aunt|auntie|uncle|cousin|best friend|friend|bff|teacher|tutor|coach|principal|counselor|neighbor|neighbour|classmate|partner|boyfriend|girlfriend";
+const SCHOOL_TYPES = "Elementary School|Middle School|High School|Junior High|Primary School|Secondary School|Charter School|Preparatory School|Elementary|Academy|School|College|University|Institute";
+const US_STATES = "AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY|DC";
 // every letter in either case, for the parts of a case-sensitive pattern that should not be
 const anyCase = alts => alts.replace(/[a-z]/g, c => `[${c}${c.toUpperCase()}]`);
 const R = {
@@ -154,7 +158,21 @@ const R = {
   NAME_STRONG: /\b(?:my name is|my name's|i am|i'm|im|this is|name:)[ \t]+([A-Za-z][a-z'’-]+(?:[ \t]+(?:[A-Za-z][a-z'’-]+|[A-Za-z]\.?)){0,2})/gi,
   NAME_SIGNATURE: /\b(?:sincerely,?|thanks,?|thank you,?|regards,?|love,?|yours,?)\s+([A-Za-z][a-z'’-]+(?:[ \t]+(?:[A-Za-z][a-z'’-]+|[A-Za-z]\.?)){0,2})/gi,
   NAME_WEAK: /\b(?:written by|interviewed by|by)[ \t]+([A-Za-z][a-z'’-]+(?:[ \t]+(?:[A-Za-z][a-z'’-]+|[A-Za-z]\.?)){1,2})/gi,
+  // indirect and persistent identifiers: the people and places around a student, devices, network, location
+  NAME_RELATED: new RegExp(String.raw`\b(?:${anyCase("my|our|his|her|their")})[ \t]+(?:[a-z]+[ \t]+)?(?:${anyCase(RELATIONS)})s?,?[ \t]+(?:(?:${anyCase("is|named|called|name is")})[ \t]+)?(${PERSON})`, "g"),
+  NAME_TITLE: new RegExp(String.raw`\b(?:Mr|Mrs|Ms|Miss|Mx|Dr|Coach|Principal|Professor|Prof)\.?[ \t]+(${PERSON})`, "g"),
+  SCHOOL: new RegExp(String.raw`\b((?:[A-Z][A-Za-z'’.-]*[ \t]+){1,4})(?:${SCHOOL_TYPES})\b|\b(?:University|College|School|Academy|Institute)[ \t]+of[ \t]+(?:the[ \t]+)?[A-Z][a-z]+(?:[ \t]+[A-Z][a-z]+){0,2}`, "g"),
+  LOCATION: new RegExp(String.raw`\b(${PLACE},[ \t]*(?:${US_STATES}))\b|\b(?:${anyCase("i live in|we live in|i'm from|i’m from|i am from|im from|we moved to|i moved to|i was born in|born in|my hometown is")})[ \t]+(${PLACE})`, "g"),
+  AGE: /\b(\d{1,2})[ -]?(?:years?|yrs?)[ -]old\b|\b(\d{1,2})[ \t]?(?:yo|y\/o)\b|\b(?:age|aged|turning|turned|turn)[ \t]+(\d{1,2})\b|\b(?:i am|i'm|i’m|im)[ \t]+(\d{1,2})(?=[ \t]*(?:[.,!?;]|$|and\b|but\b|so\b|btw\b))/gimd,
+  BIRTHDAY: /\b(?:birthday|bday|born)\b[^.\n]{0,20}?\b((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\.?[ \t]+\d{1,2}(?:st|nd|rd|th)?)\b(?!,?[ \t]+(?:19|20)\d{2})/gid,
+  IPV4: /(?<![\w.])(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)(?!\.?\d)(?!\w)/g,
+  IPV6: /(?<![\w:])(?:[0-9A-Fa-f]{1,4}:){3,7}(?::?[0-9A-Fa-f]{1,4}){1,4}(?![\w:])/g,
+  MAC: /(?<![\w:-])(?:[0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}(?![\w:-])/g,
+  UUID: /(?<![\w-])[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}(?![\w-])/g,
+  GEO: /(?<![\w.])-?\d{1,2}\.\d{3,8},[ \t]*-?\d{1,3}\.\d{3,8}(?!\.?\d)(?!\w)/g,
 };
+const SCHOOL_KIND = new Set(["High","Middle","Elementary","Junior","Senior","Primary","Secondary","Charter","Preparatory","Public","Private","Grade","Summer","Sunday","Business","Law","Medical","Graduate","Community"]);
+const NAME_LABELS = ["NAME_STUDENT","NAME_RELATED"];
 const STOP = new Set(["Hi","Hello","Hey","Oh","Thanks","Yeah","Well","Um","Hmm","Wait","Ms","Mr","Mrs","Dr","Miss","Mx","Tutor","Student","Teacher","Okay","Ok","Yes","No","Just","Still","Only","All","My","Your","Our","Their","Good","The","This","That","What","When","Where","Why","How","Which","Who","In","On","At","For","From","With","About","Going","Not","Very","Really","Also","Then","Now","Here","There","So","But","And","Or","A","An","It","We","They","He","She","You","I","Sure","Sorry","Middle","School","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday","January","February","March","April","May","June","July","August","September","October","November","December","Spring","Summer","Fall","Winter"]);
 const USERNAME_STOP = new Set(["not","the","a","an","my","your","our","is","was","and","or","but","already","taken","wrong","required","invalid","incorrect","missing","what","something","still","also","now"]);
 // digit groups that are dates, number ranges or round numbers, not IDs
@@ -167,7 +185,7 @@ const HINT = ["linkedin.com/in/","facebook.com/","instagram.com/","twitter.com/"
 function trim(text, s, e) { while (e > s && ".,;:)]}'\"".includes(text[e-1])) e--; return [s, e]; }
 function push(out, label, text, s, e, conf, source="rules") { [s, e] = trim(text, s, e); if (e > s) out.push({label, text: text.slice(s, e), start: s, end: e, confidence: conf, source}); }
 
-function detectRules(text) {
+function detectRules(text, skip = new Set()) {
   const out = [];
   for (const m of text.matchAll(R.EMAIL)) push(out, "EMAIL", text, m.index, m.index + m[0].length, 0.99);
   for (const m of text.matchAll(R.SSN)) push(out, "SSN", text, m.index, m.index + m[0].length, 0.97);
@@ -199,26 +217,53 @@ function detectRules(text) {
     const name = m[1].match(new RegExp(String.raw`^\S+(?:[ \t]+\S+){${keep.length - 1}}`))[0];
     push(out, "NAME_STUDENT", text, s, s + name.length, 0.7);
   }
-  return out;
+  for (const m of [...text.matchAll(R.NAME_RELATED), ...text.matchAll(R.NAME_TITLE)]) {
+    if (STOP.has(m[1].split(/\s+/)[0])) continue;
+    const s = m.index + m[0].length - m[1].length; push(out, "NAME_RELATED", text, s, s + m[1].length, 0.7);
+  }
+  for (const m of text.matchAll(R.SCHOOL)) {
+    let s = m.index;
+    if (m[1]) {
+      const words = [...m[1].matchAll(/\S+/g)];
+      while (words.length && STOP.has(words[0][0])) words.shift();   // "At Lincoln Middle School"
+      if (words.every(w => SCHOOL_KIND.has(w[0]))) continue;         // "In High School you get more homework"
+      s = m.index + words[0].index;
+    }
+    push(out, "SCHOOL", text, s, m.index + m[0].length, 0.75);
+  }
+  for (const m of text.matchAll(R.LOCATION)) {
+    const v = m[1] || m[2]; if (STOP.has(v.split(/\s+/)[0])) continue;
+    const s = m[1] ? m.index : m.index + m[0].length - v.length; push(out, "LOCATION", text, s, s + v.length, 0.75);
+  }
+  for (const m of text.matchAll(R.AGE)) { const g = [1,2,3,4].find(i => m[i]); if (+m[g] > 0) push(out, "AGE", text, m.indices[g][0], m.indices[g][1], 0.8); }
+  for (const m of text.matchAll(R.BIRTHDAY)) push(out, "DATE", text, m.indices[1][0], m.indices[1][1], 0.8);
+  for (const m of text.matchAll(R.IPV4)) push(out, "IP_ADDRESS", text, m.index, m.index + m[0].length, 0.95);
+  for (const m of text.matchAll(R.IPV6)) push(out, "IP_ADDRESS", text, m.index, m.index + m[0].length, 0.9);
+  for (const m of [...text.matchAll(R.MAC), ...text.matchAll(R.UUID)]) push(out, "DEVICE_ID", text, m.index, m.index + m[0].length, 0.95);
+  for (const m of text.matchAll(R.GEO)) push(out, "GEO", text, m.index, m.index + m[0].length, 0.9);
+  // labels in `skip` are dropped before overlaps are resolved, so they cannot crowd out a label that is kept
+  return resolve(out.filter(e => !skip.has(e.label)));
 }
 
 function propagateNames(text, ents) {
-  const names = ents.filter(e => e.label === "NAME_STUDENT");
+  // student names first, so a name that is both keeps that label
+  const names = ents.filter(e => NAME_LABELS.includes(e.label)).sort((a, b) => NAME_LABELS.indexOf(a.label) - NAME_LABELS.indexOf(b.label));
   if (!names.length) return ents;
   const seen = new Set(ents.map(e => `${e.start}:${e.end}`));
   const needles = new Map();
+  const add = (k, v) => { if (!needles.has(k)) needles.set(k, v); };
   for (const e of names) {
-    needles.set(e.text.trim(), e.confidence);
-    for (let tok of e.text.split(/\s+/)) { tok = tok.replace(/\.$/, ""); if (tok.length >= 3 && /^[A-Z]/.test(tok) && !STOP.has(tok)) needles.set(tok, e.confidence * 0.9); }
+    add(e.text.trim(), [e.label, e.confidence]);
+    for (let tok of e.text.trim().split(/\s+/)) { tok = tok.replace(/^\.+|\.+$/g, ""); if (tok.length >= 3 && /^[A-Z]/.test(tok) && !STOP.has(tok)) add(tok, [e.label, e.confidence * 0.9]); }
   }
   const out = [...ents];
-  for (const [needle, conf] of [...needles].sort((a, b) => b[0].length - a[0].length)) {
+  for (const [needle, [label, conf]] of [...needles].sort((a, b) => b[0].length - a[0].length)) {
     const re = new RegExp(`(?<![\\w'’])${needle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?!\\w|['’](?!s\\b)\\w)`, "g");  // "Priya's" is a mention; "O'Brien" is not "Brien"
     for (const m of text.matchAll(re)) {
       const key = `${m.index}:${m.index + needle.length}`;
       if (seen.has(key)) continue;
-      if (ents.some(k => k.label !== "NAME_STUDENT" && k.start <= m.index && m.index + needle.length <= k.end)) continue;
-      out.push({label: "NAME_STUDENT", text: needle, start: m.index, end: m.index + needle.length, confidence: conf, source: "propagated"});
+      if (ents.some(k => !NAME_LABELS.includes(k.label) && k.start <= m.index && m.index + needle.length <= k.end)) continue;
+      out.push({label, text: needle, start: m.index, end: m.index + needle.length, confidence: conf, source: "propagated"});
       seen.add(key);
     }
   }
@@ -233,10 +278,12 @@ function resolve(ents) {
 }
 
 // ---------- Policies (mirror of edshield/policies/*.yaml) ----------
+const M = {method: "mask"};
+const INDIRECT = { SCHOOL: M, LOCATION: M, AGE: M, IP_ADDRESS: M, DEVICE_ID: M, GEO: M };
 const POLICY = {
-  ferpa:    { min: 0.5,  labels: { NAME_STUDENT: {mask: "[STUDENT]", min: 0.4}, EMAIL: {}, USERNAME: {}, ID_NUM: {min: 0.6}, PHONE_NUM: {}, URL_PERSONAL: {}, STREET_ADDRESS: {}, SSN: {method: "mask"}, DATE: {method: "shift"} } },
-  coppa:    { min: 0.35, labels: { NAME_STUDENT: {mask: "[CHILD]", min: 0.3}, EMAIL: {method: "mask"}, USERNAME: {method: "mask", min: 0.3}, ID_NUM: {min: 0.5}, PHONE_NUM: {method: "mask"}, URL_PERSONAL: {method: "mask"}, STREET_ADDRESS: {method: "mask"}, SSN: {method: "mask"}, DATE: {method: "shift"} } },
-  research: { min: 0.5,  method: "replace", labels: { NAME_STUDENT: {}, EMAIL: {}, USERNAME: {}, ID_NUM: {}, PHONE_NUM: {}, URL_PERSONAL: {}, STREET_ADDRESS: {}, SSN: {method: "mask"}, DATE: {method: "shift"} } },
+  ferpa:    { min: 0.5,  labels: { NAME_STUDENT: {mask: "[STUDENT]", min: 0.4}, EMAIL: {}, USERNAME: {}, ID_NUM: {min: 0.6}, PHONE_NUM: {}, URL_PERSONAL: {}, STREET_ADDRESS: {}, SSN: M, DATE: {method: "shift"}, NAME_RELATED: {mask: "[PERSON]", min: 0.4}, ...INDIRECT } },
+  coppa:    { min: 0.35, labels: { NAME_STUDENT: {mask: "[CHILD]", min: 0.3}, EMAIL: M, USERNAME: {method: "mask", min: 0.3}, ID_NUM: {min: 0.5}, PHONE_NUM: M, URL_PERSONAL: M, STREET_ADDRESS: M, SSN: M, DATE: {method: "shift"}, NAME_RELATED: {mask: "[PERSON]", min: 0.3}, ...INDIRECT } },
+  research: { min: 0.5,  method: "replace", labels: { NAME_STUDENT: {}, EMAIL: {}, USERNAME: {}, ID_NUM: {}, PHONE_NUM: {}, URL_PERSONAL: {}, STREET_ADDRESS: {}, SSN: M, DATE: {method: "shift"}, NAME_RELATED: {}, ...INDIRECT } },
 };
 const FIRST = ["Avery","Jordan","Riley","Sam","Taylor","Morgan","Casey","Quinn","Rowan","Elliot"], LAST = ["Nguyen","Patel","Garcia","Okoro","Kim","Rossi","Haddad","Lindqvist","Mensah","Sato"];
 function surrogate(e, memo) {
@@ -245,7 +292,7 @@ function surrogate(e, memo) {
   const pick = a => a[Math.floor(Math.random() * a.length)];
   let v;
   switch (e.label) {
-    case "NAME_STUDENT": v = e.text.trim().includes(" ") ? `${pick(FIRST)} ${pick(LAST)}` : pick(FIRST); break;
+    case "NAME_STUDENT": case "NAME_RELATED": v = e.text.trim().includes(" ") ? `${pick(FIRST)} ${pick(LAST)}` : pick(FIRST); break;
     case "EMAIL": v = `${pick(FIRST).toLowerCase()}${Math.floor(Math.random()*90+10)}@example.com`; break;
     case "USERNAME": v = `${pick(FIRST).toLowerCase()}_${Math.floor(Math.random()*900+100)}`; break;
     case "ID_NUM": v = String(Math.floor(Math.random()*9e6+1e6)); break;
@@ -319,7 +366,7 @@ $("run").addEventListener("click", async () => {
   const text = $("in").value, t0 = performance.now();
   let ents = detectRules(text);
   if ($("engine").value === "model") {
-    try { const found = await detectModel(text); ents = ents.filter(e => !MODEL_AUTHORITY.has(e.label)).concat(found); }
+    try { const found = await detectModel(text); ents = detectRules(text, MODEL_AUTHORITY).concat(found); }
     catch (err) {
       status("No model found at demo/models/piilo-deberta-v3-small-onnx. Run training/export_onnx.py, or switch to Rules only. Showing rules-only result.", true);
     }

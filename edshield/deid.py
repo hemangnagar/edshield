@@ -59,7 +59,7 @@ class SurrogateFactory:
             return self._memo[key]
         f = self.fake
         n_words = len(ent.text.split())
-        if ent.label == "NAME_STUDENT":
+        if ent.label in ("NAME_STUDENT", "NAME_RELATED"):
             val = f.first_name() if n_words == 1 else f"{f.first_name()} {f.last_name()}"
         elif ent.label == "EMAIL":
             val = f.free_email()

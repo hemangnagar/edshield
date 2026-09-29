@@ -22,7 +22,17 @@ PIILO_LABELS = [
 ]
 
 # Extra labels produced only by the rule layer.
-RULE_ONLY_LABELS = ["SSN", "DATE"]
+RULE_ONLY_LABELS = [
+    "SSN",
+    "DATE",
+    "NAME_RELATED",  # family members, teachers, friends
+    "SCHOOL",
+    "LOCATION",
+    "AGE",
+    "IP_ADDRESS",
+    "DEVICE_ID",  # MAC addresses, advertising and device UUIDs
+    "GEO",  # latitude/longitude
+]
 
 ALL_LABELS = PIILO_LABELS + RULE_ONLY_LABELS
 

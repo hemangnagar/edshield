@@ -56,6 +56,23 @@ SENTENCES = [
     "Due 03/14/2012 and again on March 3, 2013.",
     "My name is Priya Raman. Priya's poster won. Mr. O'Raman and Ramanathan were there.",
     "My   name is Ann Lee. Ann went to the Annual fair with Ann's brother.",
+    # indirect and persistent identifiers
+    "I got 42 but my brother Jordan said that's wrong. Later Jordan's friend left.",
+    "My friend Daniel Okafor helped me count trays.",
+    "my mom is Sarah and my teacher Ms. Patel said to use the rubric",
+    "Ask Coach Ramirez or Dr. Nguyen about it.",
+    "I'm in 8th grade at Rachel Carson Middle School.",
+    "At Lincoln High School we have a big gym. In High School you get more homework.",
+    "She studies at the University of Toledo now.",
+    "We moved to Cedar Falls last summer. The game was in Round Rock, TX this year.",
+    "We live at 1420 Maple Ridge Ct, Vienna, VA 22182 now.",
+    "I am 11 years old and I like soccer.\nim 12 btw\nI'm turning 13 in May. my 9-year-old brother",
+    "I am 3 problems behind on the worksheet. My friend and I went to the park.",
+    "My birthday is March 3 and I want a bike. I was born on March 3, 2012.",
+    "The log shows 192.168.1.44 at login. We read chapters 3.1.2 and 4.10.",
+    "Connected from 2001:0db8:85a3:0000:0000:8a2e:0370:7334 at 10:30:15.",
+    "The tablet's MAC is 3C:22:FB:9A:10:5E and id 38400000-8cf0-11bd-b23e-10b96e40000d.",
+    "Pinned at 38.9012, -77.2653.",
 ]
 
 HARNESS = """

@@ -15,6 +15,8 @@ from typing import Iterable, List
 
 from .types import Entity
 
+NAME_LABELS = ["NAME_STUDENT", "NAME_RELATED"]
+
 # --- Patterns -------------------------------------------------------------
 
 EMAIL_RE = re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b")
@@ -108,6 +110,65 @@ NAME_STOPWORDS = {
     "January", "February", "March", "April", "May", "June", "July", "August",
     "September", "October", "November", "December", "Spring", "Summer", "Fall", "Winter",
 }
+
+# --- Indirect and persistent identifiers ------------------------------------
+# FERPA counts family members' names and indirect identifiers (date and place
+# of birth, anything that identifies a student in combination); COPPA counts
+# persistent identifiers and geolocation. None of these are PIILO labels.
+
+_OCTET = r"(?:25[0-5]|2[0-4]\d|1?\d?\d)"
+IPV4_RE = re.compile(rf"(?<![\w.])(?:{_OCTET}\.){{3}}{_OCTET}(?!\.?\d)(?!\w)")
+IPV6_RE = re.compile(r"(?<![\w:])(?:[0-9A-Fa-f]{1,4}:){3,7}(?::?[0-9A-Fa-f]{1,4}){1,4}(?![\w:])")
+MAC_RE = re.compile(r"(?<![\w:-])(?:[0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}(?![\w:-])")
+UUID_RE = re.compile(r"(?<![\w-])[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}(?![\w-])")
+GEO_RE = re.compile(r"(?<![\w.])-?\d{1,2}\.\d{3,8},[ \t]*-?\d{1,3}\.\d{3,8}(?!\.?\d)(?!\w)")
+
+AGE_RE = re.compile(
+    r"\b(\d{1,2})[ -]?(?:years?|yrs?)[ -]old\b"
+    r"|\b(\d{1,2})[ \t]?(?:yo|y/o)\b"
+    r"|\b(?:age|aged|turning|turned|turn)[ \t]+(\d{1,2})\b"
+    r"|\b(?:i am|i'm|i’m|im)[ \t]+(\d{1,2})(?=[ \t]*(?:[.,!?;]|$|and\b|but\b|so\b|btw\b))",
+    re.IGNORECASE | re.MULTILINE,
+)
+_MONTHS = r"(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*"
+BIRTHDAY_RE = re.compile(
+    rf"\b(?:birthday|bday|born)\b[^.\n]{{0,20}}?\b({_MONTHS}\.?[ \t]+\d{{1,2}}(?:st|nd|rd|th)?)\b(?!,?[ \t]+(?:19|20)\d{{2}})",
+    re.IGNORECASE,
+)
+
+_PERSON = r"[A-Z][a-z'’-]+(?:[ \t]+[A-Z][a-z'’-]+)?"
+RELATIONS = (
+    "mom|mum|mommy|mother|dad|daddy|father|stepmom|stepdad|stepmother|stepfather|parent|guardian|brother|sister|"
+    "sibling|grandma|grandpa|grandmother|grandfather|aunt|auntie|uncle|cousin|best friend|friend|bff|teacher|tutor|"
+    "coach|principal|counselor|neighbor|neighbour|classmate|partner|boyfriend|girlfriend"
+)
+NAME_RELATED_RE = re.compile(
+    rf"\b(?i:my|our|his|her|their)[ \t]+(?:[a-z]+[ \t]+)?(?i:{RELATIONS})s?,?[ \t]+(?:(?i:is|named|called|name is)[ \t]+)?({_PERSON})"
+)
+NAME_TITLE_RE = re.compile(rf"\b(?:Mr|Mrs|Ms|Miss|Mx|Dr|Coach|Principal|Professor|Prof)\.?[ \t]+({_PERSON})")
+
+SCHOOL_TYPES = (
+    "Elementary School|Middle School|High School|Junior High|Primary School|Secondary School|Charter School|"
+    "Preparatory School|Elementary|Academy|School|College|University|Institute"
+)
+SCHOOL_KIND_WORDS = {
+    "High", "Middle", "Elementary", "Junior", "Senior", "Primary", "Secondary", "Charter", "Preparatory",
+    "Public", "Private", "Grade", "Summer", "Sunday", "Business", "Law", "Medical", "Graduate", "Community",
+}
+SCHOOL_RE = re.compile(
+    rf"\b((?:[A-Z][A-Za-z'’.-]*[ \t]+){{1,4}})(?:{SCHOOL_TYPES})\b"
+    r"|\b(?:University|College|School|Academy|Institute)[ \t]+of[ \t]+(?:the[ \t]+)?[A-Z][a-z]+(?:[ \t]+[A-Z][a-z]+){0,2}"
+)
+
+US_STATES = (
+    "AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|"
+    "OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY|DC"
+)
+_PLACE = r"[A-Z][a-z]+(?:[ \t][A-Z][a-z]+){0,2}"
+LOCATION_RE = re.compile(
+    rf"\b({_PLACE},[ \t]*(?:{US_STATES}))\b"
+    rf"|\b(?i:i live in|we live in|i'm from|i’m from|i am from|im from|we moved to|i moved to|i was born in|born in|my hometown is)[ \t]+({_PLACE})"
+)
 
 # URLs at reference domains are not personal.
 URL_ALLOWLIST = (
@@ -242,6 +303,59 @@ def detect_rules(text: str, labels: Iterable[str] | None = None) -> List[Entity]
                 continue
             _add(ents, "NAME_STUDENT", m.start(g), m.end(g), text, 0.7)
 
+    if want("NAME_RELATED"):
+        for m in list(NAME_RELATED_RE.finditer(text)) + list(NAME_TITLE_RE.finditer(text)):
+            if m.group(1).split()[0] in NAME_STOPWORDS:
+                continue
+            _add(ents, "NAME_RELATED", m.start(1), m.end(1), text, 0.7)
+
+    if want("SCHOOL"):
+        for m in SCHOOL_RE.finditer(text):
+            start = m.start()
+            if m.group(1):
+                # "At Lincoln Middle School": the sentence opener is not part of the name.
+                words = list(re.finditer(r"\S+", m.group(1)))
+                while words and words[0].group() in NAME_STOPWORDS:
+                    words.pop(0)
+                # "In High School you get more homework" names no school.
+                if all(w.group() in SCHOOL_KIND_WORDS for w in words):
+                    continue
+                start = m.start(1) + words[0].start()
+            _add(ents, "SCHOOL", start, m.end(), text, 0.75)
+
+    if want("LOCATION"):
+        for m in LOCATION_RE.finditer(text):
+            g = 1 if m.group(1) else 2
+            if m.group(g).split()[0] in NAME_STOPWORDS:
+                continue
+            _add(ents, "LOCATION", m.start(g), m.end(g), text, 0.75)
+
+    if want("AGE"):
+        for m in AGE_RE.finditer(text):
+            g = next(i for i in (1, 2, 3, 4) if m.group(i))
+            if int(m.group(g)) > 0:
+                _add(ents, "AGE", m.start(g), m.end(g), text, 0.8)
+
+    if want("DATE"):
+        for m in BIRTHDAY_RE.finditer(text):
+            _add(ents, "DATE", m.start(1), m.end(1), text, 0.8)
+
+    if want("IP_ADDRESS"):
+        for m in IPV4_RE.finditer(text):
+            _add(ents, "IP_ADDRESS", m.start(), m.end(), text, 0.95)
+        for m in IPV6_RE.finditer(text):
+            _add(ents, "IP_ADDRESS", m.start(), m.end(), text, 0.9)
+
+    if want("DEVICE_ID"):
+        for m in MAC_RE.finditer(text):
+            _add(ents, "DEVICE_ID", m.start(), m.end(), text, 0.95)
+        for m in UUID_RE.finditer(text):
+            _add(ents, "DEVICE_ID", m.start(), m.end(), text, 0.95)
+
+    if want("GEO"):
+        for m in GEO_RE.finditer(text):
+            _add(ents, "GEO", m.start(), m.end(), text, 0.9)
+
     return resolve_overlaps(ents)
 
 
@@ -263,29 +377,30 @@ def resolve_overlaps(ents: List[Entity]) -> List[Entity]:
 
 
 def propagate_names(text: str, ents: List[Entity], min_token_len: int = 3) -> List[Entity]:
-    """Tag every other occurrence of a detected student name (full name and
-    each capitalised name token) so a name caught once is caught everywhere."""
-    names = [e for e in ents if e.label == "NAME_STUDENT"]
+    """Tag every other occurrence of a detected name (full name and each
+    capitalised name token) so a name caught once is caught everywhere.
+    Student names are handled first, so a name that is both keeps that label."""
+    names = [e for e in ents if e.label in NAME_LABELS]
     if not names:
         return ents
     out = list(ents)
     seen = {(e.start, e.end) for e in ents}
-    needles = set()
-    for e in names:
+    needles = {}  # text -> (label, confidence); the first label wins
+    for e in sorted(names, key=lambda e: NAME_LABELS.index(e.label)):
         full = e.text.strip()
-        needles.add((full, e.confidence))
+        needles.setdefault(full, (e.label, e.confidence))
         for tok in full.split():
             tok = tok.strip(".")
             if len(tok) >= min_token_len and tok[0].isupper() and tok not in NAME_STOPWORDS:
-                needles.add((tok, e.confidence * 0.9))
-    for needle, conf in sorted(needles, key=lambda n: -len(n[0])):
+                needles.setdefault(tok, (e.label, e.confidence * 0.9))
+    for needle, (label, conf) in sorted(needles.items(), key=lambda n: -len(n[0])):
         # "Priya's" is a mention of Priya; "O'Brien" is not a mention of Brien.
         for m in re.finditer(r"(?<![\w'’])" + re.escape(needle) + r"(?!\w|['’](?!s\b)\w)", text):
             if (m.start(), m.end()) in seen:
                 continue
             # skip if inside an email/url/username span already found
-            if any(k.start <= m.start() and m.end() <= k.end for k in ents if k.label != "NAME_STUDENT"):
+            if any(k.start <= m.start() and m.end() <= k.end for k in ents if k.label not in NAME_LABELS):
                 continue
-            out.append(Entity("NAME_STUDENT", needle, m.start(), m.end(), conf, source="propagated"))
+            out.append(Entity(label, needle, m.start(), m.end(), conf, source="propagated"))
             seen.add((m.start(), m.end()))
     return out

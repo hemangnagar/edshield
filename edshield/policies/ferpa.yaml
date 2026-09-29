@@ -21,3 +21,11 @@ labels:
   STREET_ADDRESS: {enabled: true}
   SSN: {enabled: true, method: mask}
   DATE: {enabled: true, method: shift_dates}
+  # Family members' names and indirect identifiers (34 CFR 99.3).
+  NAME_RELATED: {enabled: true, mask: "[PERSON]", min_confidence: 0.4}
+  SCHOOL: {enabled: true, method: mask}
+  LOCATION: {enabled: true, method: mask}
+  AGE: {enabled: true, method: mask}
+  IP_ADDRESS: {enabled: true, method: mask}
+  DEVICE_ID: {enabled: true, method: mask}
+  GEO: {enabled: true, method: mask}
