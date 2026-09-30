@@ -3,6 +3,8 @@
 **Local-first student-privacy layer for AI in education.**
 Detects and removes student PII from essays, tutoring transcripts and chat messages before the text reaches any language model. Runs on a laptop CPU, Apple Silicon, or inside a Chromebook browser. No cloud, no student text leaves the device. Apache-2.0.
 
+**[Try the live demo](https://hemangnagar.github.io/edshield/)**: it runs in your browser, and the text you paste stays on your device. Models: [edshield/piilo-deberta-v3-small](https://huggingface.co/edshield/piilo-deberta-v3-small) and its [browser export](https://huggingface.co/edshield/piilo-deberta-v3-small-onnx).
+
 ```python
 from edshield import extract_pii, deidentify
 
@@ -35,7 +37,14 @@ The design follows [OpenMed](https://github.com/maziyarpanahi/openmed): small fi
 
 When a model is loaded, the rules for NAME_STUDENT, ID_NUM and STREET_ADDRESS are switched off: they are recall-oriented fallbacks that over-flag ordinary essay text. Without a model the rules cover every label. `analyze_text(..., model_authority=())` runs both layers on everything.
 
-**Loading a model.** Models load from disk only: a directory you pass, the `local_path` in `models.jsonl`, or the Hugging Face cache. Nothing is downloaded unless you set `EDSHIELD_ALLOW_DOWNLOAD=1`. If you name a model (`model_name=...` or `EDSHIELD_MODEL`) and it cannot be loaded, edshield raises `ModelUnavailableError` rather than quietly doing less. If you name none and the default is not installed, the rules run alone and a `RuntimeWarning` says so; pass `model_name="rules"` to choose that on purpose.
+**Loading a model.** The default model is [edshield/piilo-deberta-v3-small](https://huggingface.co/edshield/piilo-deberta-v3-small) on the Hugging Face Hub. edshield downloads nothing unless you allow it, so fetch the model once:
+
+```bash
+pip install "edshield[hf]"
+EDSHIELD_ALLOW_DOWNLOAD=1 edshield extract essay.txt     # PowerShell: $env:EDSHIELD_ALLOW_DOWNLOAD = "1"
+```
+
+After that it loads from the Hugging Face cache with no network and the variable is not needed. Without the variable, models load from disk only: a directory you pass, the `local_path` in `edshield/models.jsonl`, or the cache. If you name a model (`model_name=...` or `EDSHIELD_MODEL`) and it cannot be loaded, edshield raises `ModelUnavailableError` rather than quietly doing less. If you name none and the default is not installed, the rules run alone and a `RuntimeWarning` says so; pass `model_name="rules"` to choose that on purpose.
 
 **Recall-first decoding.** `analyze_text(..., o_threshold=0.99)` marks a token as an entity whenever P(O) < 0.99 instead of taking the most likely class. It is off by default: on held-out PIILO essays it lowered precision from 0.69 to 0.57 with recall already at 1.00.
 
@@ -44,11 +53,13 @@ Label schema is the seven types of the [PIILO corpus](https://the-learning-agenc
 ## Install
 
 ```bash
-pip install -e .                 # rules, policies, CLI. No torch.
-pip install -e ".[hf]"           # + PyTorch model inference
-pip install -e ".[service]"      # + REST service
-pip install -e ".[train,onnx]"   # + training and ONNX/browser export
+pip install edshield                 # rules, policies, CLI. No torch.
+pip install "edshield[hf]"           # + PyTorch model inference
+pip install "edshield[service]"      # + REST service
+pip install "edshield[train,onnx]"   # + training and ONNX/browser export
 ```
+
+From a clone, use `pip install -e ".[dev]"` instead.
 
 ```bash
 edshield redact essay.txt --policy ferpa
@@ -58,12 +69,14 @@ edshield serve --port 8080       # POST /pii/extract, POST /pii/deidentify
 
 ## Demo
 
+Live at **https://hemangnagar.github.io/edshield/**, or from a clone:
+
 ```bash
 python -m http.server 8000 -d demo
 # open http://localhost:8000
 ```
 
-Three synthetic samples (essay, tutoring transcript, chatbot message), three policies, and a detector switch. "Rules only" runs entirely from the page's own JavaScript. "Rules + on-device model" loads an ONNX model from `demo/models/` through Transformers.js and runs it in the browser, so the same layer works on a Chromebook with no backend.
+Three synthetic samples (essay, tutoring transcript, chatbot message), three policies, and a detector switch. "Rules only" runs entirely from the page's own JavaScript, with no network. "Rules + on-device model" runs an ONNX model in the browser through Transformers.js, so the same layer works on a Chromebook with no backend. The model file (205 MB) is fetched once from the Hugging Face Hub and cached by the browser; the text is never uploaded. To run the model with no network at all, put a copy in `demo/models/piilo-deberta-v3-small-onnx` and the page uses that instead.
 
 ## Benchmarks
 
@@ -129,19 +142,19 @@ python eval/evaluate.py --input data/piilo_hf/validation.json --model models/pii
 python training/export_onnx.py --model models/piilo-deberta-v3-small --out demo/models/piilo-deberta-v3-small-onnx
 ```
 
-`train.py` uses the recall tricks that won the competition: down-weighted O class, a P(O) threshold instead of argmax at inference, long context with stride, synthetic augmentation. `models.jsonl` is the manifest; add a line per published model.
+`train.py` uses the recall tricks that won the competition: down-weighted O class, a P(O) threshold instead of argmax at inference, long context with stride, synthetic augmentation. `edshield/models.jsonl` is the manifest; add a line per published model. `training/publish_hub.py` uploads a model and its card from `hub/` to the Hugging Face Hub.
 
 ## Layout
 
 ```
-edshield/         runtime: rules.py, ner.py, deid.py, policies/, cli.py, service.py
-training/         prepare_piilo.py, train.py, export_onnx.py
+edshield/         runtime: rules.py, ner.py, deid.py, policies/, cli.py, service.py, models.jsonl (model manifest)
+training/         prepare_piilo.py, train.py, export_onnx.py, publish_hub.py
+hub/              model cards for the Hugging Face Hub
 eval/             evaluate.py (F5 + leak count), evaluate_onnx.py, synthetic_bench.py, results/
-demo/             single-file browser demo; drop exported models in demo/models/
+demo/             single-file browser demo; a model in demo/models/ is used in place of the Hub
 tests/            pytest
 docs/             COVERAGE.md: what is detected, how well, and what can be claimed
-.github/          GitHub Actions workflow: tests and the rules benchmark on every push
-models.jsonl      model manifest
+.github/          GitHub Actions: tests on every push, the demo to GitHub Pages, releases to PyPI
 ```
 
 ## Roadmap
@@ -149,8 +162,9 @@ models.jsonl      model manifest
 - [x] Rule layer with validators, name propagation, leak verifier
 - [x] FERPA / COPPA / research policies
 - [x] Browser demo, REST service, CLI
-- [ ] First PIILO-trained encoders (DeBERTa-v3-small/base, ModernBERT-base) published to the Hub
-- [ ] ONNX INT8 export and browser benchmark on a Chromebook
+- [x] First PIILO-trained encoder (DeBERTa-v3-small) and its ONNX INT8 export published to the Hub
+- [ ] DeBERTa-v3-base and ModernBERT-base
+- [ ] Browser benchmark on a Chromebook
 - [ ] Transcript models: teacher/tutor discourse moves (TalkMoves, NCTE), argumentative elements (PERSUADE)
 - [ ] MLX backend and a Swift package
 - [ ] MCP server and agent skills

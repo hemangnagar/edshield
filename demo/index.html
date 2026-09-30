@@ -381,12 +381,25 @@ function decodeTokens(text, tokens, threshold = 0.5) {
 }
 
 // ---------- Optional on-device model (Transformers.js) ----------
-let pipe = null;
+// A copy in ./models is used when there is one, so the demo runs with no network. Otherwise the
+// model file is fetched once from the Hugging Face Hub and kept in the browser's cache. Either
+// way the model runs in this page: what is downloaded is the model, and no text is uploaded.
+const MODEL_FOLDER = "piilo-deberta-v3-small-onnx", MODEL_HUB_ID = "edshield/" + MODEL_FOLDER;
+let pipe = null, modelSource = "";
 async function loadModel() {
-  status("Loading model from ./models on this machine…");
+  status("Loading the model…");
   const { pipeline, env } = await import("https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.2");
-  env.allowRemoteModels = false; env.allowLocalModels = true; env.localModelPath = "./models/";
-  pipe = await pipeline("token-classification", "piilo-deberta-v3-small-onnx", { dtype: "q8" });
+  env.localModelPath = "./models/";
+  try {
+    env.allowLocalModels = true; env.allowRemoteModels = false;
+    pipe = await pipeline("token-classification", MODEL_FOLDER, { dtype: "q8" });
+    modelSource = "this machine";
+  } catch (err) {
+    status("Downloading the model from the Hugging Face Hub (205 MB, first time only). Your text stays on this device…");
+    env.allowLocalModels = false; env.allowRemoteModels = true;
+    pipe = await pipeline("token-classification", MODEL_HUB_ID, { dtype: "q8" });
+    modelSource = "the Hugging Face Hub";
+  }
 }
 async function detectModel(text) {
   if (!pipe) await loadModel();
@@ -406,7 +419,7 @@ $("run").addEventListener("click", async () => {
   if ($("engine").value === "model") {
     try { const found = await detectModel(text); ents = detectRules(text, MODEL_AUTHORITY).concat(found); }
     catch (err) {
-      status("No model found at demo/models/piilo-deberta-v3-small-onnx. Run training/export_onnx.py, or switch to Rules only. Showing rules-only result.", true);
+      status("The model could not be loaded from ./models or from the Hugging Face Hub. Check the connection, or switch to Rules only. Showing rules-only result.", true);
     }
   }
   ents = resolve(propagateNames(text, ents));
@@ -418,7 +431,7 @@ $("run").addEventListener("click", async () => {
   $("n-chars").textContent = r.acted.reduce((n, e) => n + (e.end - e.start), 0);
   $("n-ms").textContent = `${ms} ms`;
   $("json").textContent = JSON.stringify({ policy: $("policy").value, entities: ents.map(({label, text, start, end, confidence, source}) => ({label, text, start, end, confidence: +confidence.toFixed(2), source})) }, null, 2);
-  if (!$("status").classList.contains("warn")) status(`Done in ${ms} ms on this device with ${$("engine").value === "model" && pipe ? "rules + model" : "rules only"}. Nothing was sent anywhere.`);
+  if (!$("status").classList.contains("warn")) status(`Done in ${ms} ms on this device with ${$("engine").value === "model" && pipe ? `rules + model (loaded from ${modelSource})` : "rules only"}. Nothing was sent anywhere.`);
 });
 </script>
 </body>

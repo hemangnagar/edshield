@@ -8,3 +8,5 @@ demo/models/*
 !demo/models/.gitkeep
 *.onnx
 .DS_Store
+build/
+dist/
