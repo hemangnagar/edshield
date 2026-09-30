@@ -17,12 +17,12 @@ State saved 2026-09-29. Update the "Current state" and "Open decisions" sections
 
 ## Current state
 
-- Pull requests 1 and 2 were merged into `main` on 2026-09-29. `main` has everything through the browser model fix (merge commit `1079fcb`).
+- Pull requests 1, 2 and 3 were merged into `main` on 2026-09-29 and 2026-09-30. `origin/main` (`7312d3b`) now holds everything, including the 0.2.0 preparation. Branch `worktree-model-authority` is identical to `origin/main`.
 - New work goes on branch `worktree-model-authority` and reaches `main` through a new pull request, which the user creates and merges on GitHub.
-- Worktree: `C:\edshield\.claude\worktrees\model-authority`. Main checkout: `C:\edshield`.
-- Release 0.2.0 is prepared on the branch but nothing is published yet. Waiting on the user: a Hugging Face account, `edshield` organisation and write token; a PyPI account with a trusted publisher; GitHub Pages switched to "GitHub Actions". See "Open decisions".
-- 184 tests pass locally. CI (`.github/workflows/ci.yml`) is green on Python 3.10 and 3.12.
-- The main checkout still has staged changes (`data/synthetic.json`, `eval/results/deberta_small_piilo.json`, `training/train.py`). All three are now in the branch; discard them there before pulling `main`.
+- Worktree: `C:\edshield\.claude\worktrees\model-authority`. Main checkout: `C:\edshield`, whose local `main` is still at v0.1.0 (`cc30519`) with an untracked, stale copy of this file. Delete that copy before `git pull` there, or the pull refuses. The main checkout has no staged changes any more.
+- 184 tests pass locally. CI (`.github/workflows/ci.yml`) is green on `main` at `7312d3b`, Python 3.10 and 3.12.
+- Release 0.2.0 is on `main` but nothing is published: no `v0.2.0` tag, PyPI has no `edshield`, the Hub repositories do not exist, and `hf auth whoami` says not logged in.
+- The `pages` workflow failed on `main` at `configure-pages` because GitHub Pages is not enabled for the repository (the Pages API returns 404). `hemangnagar.github.io` redirects to the custom domain `hemangnagar.dev`, so the demo will be at `https://hemangnagar.dev/edshield/` once Pages is set to "GitHub Actions".
 
 ## What is where
 
@@ -88,9 +88,9 @@ The plan was given by the user on 2026-09-29. Phases 2 and 3 are instructions, n
 
 **Phase 1, in progress.** Code, model cards, workflows and README are done on the branch. Remaining steps, in order:
 
-1. User merges the release pull request into `main`.
+1. Done: pull request 3 merged the release into `main` (`7312d3b`).
 2. User creates the Hugging Face account and `edshield` organisation, then runs `hf auth login` on the PC. Then `python training/publish_hub.py --root C:\edshield` uploads both repositories (about 1.3 GB).
-3. User sets GitHub Pages to "GitHub Actions" (Settings, Pages, Source). Then run the `pages` workflow. URL: `https://hemangnagar.github.io/edshield/`.
+3. User sets GitHub Pages to "GitHub Actions" (Settings, Pages, Source). Then run the `pages` workflow. The first run failed at `configure-pages` for this reason; re-run it after the setting changes. URL: `https://hemangnagar.dev/edshield/` (the user's Pages domain redirects there).
 4. Check the Pages demo with "Rules + on-device model" against Python output on the three samples.
 5. User adds a trusted publisher on PyPI (project `edshield`, owner `hemangnagar`, repository `edshield`, workflow `release.yml`, environment `pypi`). Then tag `v0.2.0` on `main` and push the tag; `release.yml` publishes.
 6. Report the Pages URL and Hub links, then stop. Hemang sends the note to the edtech contact.
