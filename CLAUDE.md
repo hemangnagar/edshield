@@ -21,7 +21,7 @@ State saved 2026-09-29. Update the "Current state" and "Open decisions" sections
 - New work goes on branch `worktree-model-authority` and reaches `main` through a new pull request, which the user creates and merges on GitHub.
 - Worktree: `C:\edshield\.claude\worktrees\model-authority`. Main checkout: `C:\edshield`, on `main`, clean and up to date with `origin/main`.
 - 184 tests pass locally. CI (`.github/workflows/ci.yml`) is green on `main`, Python 3.10 and 3.12. `python -m build` succeeds locally and the wheel contains the policies and `models.jsonl`, so `release.yml` should pass on the tag.
-- Release 0.2.0 is on `main`. Published so far: the two Hub repositories and the Pages demo. Not yet: the `v0.2.0` tag and PyPI.
+- Release 0.2.0 is published in full on 2026-09-30: tag `v0.2.0` on `main` (`ec79594`), `edshield 0.2.0` on PyPI via `release.yml` and trusted publishing (`https://pypi.org/project/edshield/0.2.0/`), the two Hub repositories, and the Pages demo. A clean `pip install edshield==0.2.0` runs rules-only redaction and the CLI without torch.
 - Hub: `https://huggingface.co/edshield/piilo-deberta-v3-small` and `https://huggingface.co/edshield/piilo-deberta-v3-small-onnx`, public, CC BY 4.0, uploaded 2026-09-30 by `training/publish_hub.py`. The PC is logged in as `hemangnagar`, a member of the `edshield` organisation.
 - GitHub Pages is enabled (source "GitHub Actions") and the demo is live at `https://hemangnagar.dev/edshield/`, serving `demo/index.html` from `main`. Both detectors work there; the model mode downloads the 205 MB file from the Hub on first use. Checked 2026-09-30: on the three built-in samples the live model mode and Python with the full model agree on all 19 spans (label, text, offsets). Only confidences differ by a few hundredths, and one email in the transcript is credited to the model in the browser and to the rules in Python.
 
@@ -87,14 +87,14 @@ Caveats: PIILO is adult writing. The K-12 sets are synthetic. The PIILO false-al
 
 The plan was given by the user on 2026-09-29. Phases 2 and 3 are instructions, not suggestions, but must not start before the conditions stated.
 
-**Phase 1, in progress.** Code, model cards, workflows and README are done on the branch. Remaining steps, in order:
+**Phase 1, complete on 2026-09-30.** Steps kept for the record:
 
 1. Done: pull request 3 merged the release into `main` (`7312d3b`).
 2. Done: both repositories are on the Hub (see "Current state"). Re-run `python training/publish_hub.py --root C:\edshield` to push new weights.
 3. Done: Pages enabled and deployed, `https://hemangnagar.dev/edshield/`. The `pages` workflow re-runs on any push to `main` that touches `demo/`.
 4. Done: live model mode matches Python on the three samples, 19 of 19 spans.
-5. User adds a trusted publisher on PyPI (project `edshield`, owner `hemangnagar`, repository `edshield`, workflow `release.yml`, environment `pypi`). Then tag `v0.2.0` on `main` and push the tag; `release.yml` publishes.
-6. Report the Pages URL and Hub links, then stop. Hemang sends the note to the edtech contact.
+5. Done: trusted publisher added on PyPI; tag `v0.2.0` pushed; `release.yml` built and published. For the next release: bump `version` in `pyproject.toml`, merge to `main`, tag `vX.Y.Z`, push the tag.
+6. Done: links reported. Hemang sends the note to the edtech contact. Phase 2 waits for that conversation.
 
 **Phase 2, only after that first conversation.**
 
