@@ -17,10 +17,10 @@ State saved 2026-09-29. Update the "Current state" and "Open decisions" sections
 
 ## Current state
 
-- Pull requests 1, 2 and 3 were merged into `main` on 2026-09-29 and 2026-09-30. `origin/main` (`7312d3b`) now holds everything, including the 0.2.0 preparation. Branch `worktree-model-authority` is identical to `origin/main`.
+- Pull requests 1, 2 and 3 were merged into `main` on 2026-09-29 and 2026-09-30. Since then CLAUDE.md updates have gone to `main` by fast-forward from the branch, so branch `worktree-model-authority` and `main` are identical.
 - New work goes on branch `worktree-model-authority` and reaches `main` through a new pull request, which the user creates and merges on GitHub.
-- Worktree: `C:\edshield\.claude\worktrees\model-authority`. Main checkout: `C:\edshield`, whose local `main` is still at v0.1.0 (`cc30519`) with an untracked, stale copy of this file. Delete that copy before `git pull` there, or the pull refuses. The main checkout has no staged changes any more.
-- 184 tests pass locally. CI (`.github/workflows/ci.yml`) is green on `main` at `7312d3b`, Python 3.10 and 3.12.
+- Worktree: `C:\edshield\.claude\worktrees\model-authority`. Main checkout: `C:\edshield`, on `main`, clean and up to date with `origin/main`.
+- 184 tests pass locally. CI (`.github/workflows/ci.yml`) is green on `main`, Python 3.10 and 3.12. `python -m build` succeeds locally and the wheel contains the policies and `models.jsonl`, so `release.yml` should pass on the tag.
 - Release 0.2.0 is on `main`. Published so far: the two Hub repositories and the Pages demo. Not yet: the `v0.2.0` tag and PyPI.
 - Hub: `https://huggingface.co/edshield/piilo-deberta-v3-small` and `https://huggingface.co/edshield/piilo-deberta-v3-small-onnx`, public, CC BY 4.0, uploaded 2026-09-30 by `training/publish_hub.py`. The PC is logged in as `hemangnagar`, a member of the `edshield` organisation.
 - GitHub Pages is enabled (source "GitHub Actions") and the demo is live at `https://hemangnagar.dev/edshield/`, serving `demo/index.html` from `main`. Both detectors work there; the model mode downloads the 205 MB file from the Hub on first use. Checked 2026-09-30: on the three built-in samples the live model mode and Python with the full model agree on all 19 spans (label, text, offsets). Only confidences differ by a few hundredths, and one email in the transcript is credited to the model in the browser and to the rules in Python.
