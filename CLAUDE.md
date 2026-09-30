@@ -22,7 +22,7 @@ State saved 2026-09-29. Update the "Current state" and "Open decisions" sections
 - Worktree: `C:\edshield\.claude\worktrees\model-authority`. Main checkout: `C:\edshield`, whose local `main` is still at v0.1.0 (`cc30519`) with an untracked, stale copy of this file. Delete that copy before `git pull` there, or the pull refuses. The main checkout has no staged changes any more.
 - 184 tests pass locally. CI (`.github/workflows/ci.yml`) is green on `main` at `7312d3b`, Python 3.10 and 3.12.
 - Release 0.2.0 is on `main` but nothing is published: no `v0.2.0` tag, PyPI has no `edshield`, the Hub repositories do not exist, and `hf auth whoami` says not logged in.
-- The `pages` workflow failed on `main` at `configure-pages` because GitHub Pages is not enabled for the repository (the Pages API returns 404). `hemangnagar.github.io` redirects to the custom domain `hemangnagar.dev`, so the demo will be at `https://hemangnagar.dev/edshield/` once Pages is set to "GitHub Actions".
+- GitHub Pages is enabled (source "GitHub Actions", set through the API on 2026-09-30) and the demo is live at `https://hemangnagar.dev/edshield/`, serving `demo/index.html` from `main`. "Rules only" works there. "Rules + on-device model" cannot work yet: the page falls back to `edshield/piilo-deberta-v3-small-onnx` on the Hub, which does not exist until step 2 of Phase 1 is done.
 
 ## What is where
 
@@ -90,8 +90,8 @@ The plan was given by the user on 2026-09-29. Phases 2 and 3 are instructions, n
 
 1. Done: pull request 3 merged the release into `main` (`7312d3b`).
 2. User creates the Hugging Face account and `edshield` organisation, then runs `hf auth login` on the PC. Then `python training/publish_hub.py --root C:\edshield` uploads both repositories (about 1.3 GB).
-3. User sets GitHub Pages to "GitHub Actions" (Settings, Pages, Source). Then run the `pages` workflow. The first run failed at `configure-pages` for this reason; re-run it after the setting changes. URL: `https://hemangnagar.dev/edshield/` (the user's Pages domain redirects there).
-4. Check the Pages demo with "Rules + on-device model" against Python output on the three samples.
+3. Done: Pages enabled and deployed, `https://hemangnagar.dev/edshield/`. The `pages` workflow re-runs on any push to `main` that touches `demo/`.
+4. After step 2: check the Pages demo with "Rules + on-device model" against Python output on the three samples. Until the Hub repository exists the model mode fails on the live site.
 5. User adds a trusted publisher on PyPI (project `edshield`, owner `hemangnagar`, repository `edshield`, workflow `release.yml`, environment `pypi`). Then tag `v0.2.0` on `main` and push the tag; `release.yml` publishes.
 6. Report the Pages URL and Hub links, then stop. Hemang sends the note to the edtech contact.
 
