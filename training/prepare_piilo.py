@@ -32,7 +32,10 @@ import json
 import random
 from pathlib import Path
 
-LABELS = ["NAME_STUDENT", "EMAIL", "USERNAME", "ID_NUM", "PHONE_NUM", "URL_PERSONAL", "STREET_ADDRESS"]
+# The seven PIILO labels, then the two that only the child-register synthetic data carries
+# (training/gen_child_register.py). New labels go at the end so the PIILO ids do not move.
+LABELS = ["NAME_STUDENT", "EMAIL", "USERNAME", "ID_NUM", "PHONE_NUM", "URL_PERSONAL", "STREET_ADDRESS",
+          "LOCATION", "SCHOOL"]
 BIO = ["O"] + [f"{p}-{l}" for l in LABELS for p in ("B", "I")]
 LABEL2ID = {l: i for i, l in enumerate(BIO)}
 
