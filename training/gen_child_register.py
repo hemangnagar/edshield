@@ -138,6 +138,8 @@ TUTOR_PII = [
     "Student: my dad <FAMILY> said to ask about the schedule", "Student: it's <ADDRESS>, do you need the zip?",
     "Student: <SCHOOL_BARE> gives numbers, not letter grades", "Student: I do swim team in <TOWN> on Tuesdays",
     "Parent: This is <FAMILY>, I'm sitting in today.", "Parent: We're at <ADDRESS> if you need to mail anything.",
+    "Tutor: Let's open <ME_FIRST>'s notebook to the last page.", "Student: this is <KID>'s calculator, mine broke",
+    "Tutor: <ME_FIRST>'s answer for part b was close.",
 ]
 TUTOR_NEUTRAL = [
     "Tutor: Compare the left side with the right side.", "Tutor: Take your time.", "Tutor: Let's check that with a drawing.",
@@ -167,6 +169,9 @@ PROSE_PII = [
     "I walk down <STREET> to get to school.", "Replies can go to <EMAIL>.",
     "You can call my mom at <PHONE> about the field trip.", "My library card number is <ID>.",
     "In the game I play as <USER>, and my castle took a week.",
+    "<ME_FIRST>'s Book Review", "<ME_FIRST>'s science journal, week <n>", "<KID>'s idea was to use magnets.",
+    "This is <ME_FIRST>'s story about a lost kitten.", "<FAMILY>'s garden has tomatoes and beans.",
+    "<ME_FIRST>'s <subject> notes for the unit test.",
 ]
 PROSE_NEUTRAL = [
     "The book was about a girl who trains a dragon.", "I think recess should be longer because we need to move.",
