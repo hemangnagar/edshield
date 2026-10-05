@@ -88,22 +88,23 @@ def test_labels_are_selectable():
 
 @pytest.mark.parametrize("text,expected", [
     # dates as children say or type them, without a year
-    ("I was born the 8th of August and my party is next week.", ("DATE", "8th of August")),
+    ("my birthday party is the 8th of August, can u come", ("DATE", "8th of August")),
     ("the field trip is on the 3rd of March", ("DATE", "3rd of March")),
     ("recital is August 8th so i cant come", ("DATE", "August 8th")),
     ("party is jul 27 dont forget", ("DATE", "jul 27")),
     ("tryouts got moved to March 3", ("DATE", "March 3")),
     # ages without "years old"
-    ("When you are 12 like me you can not drive yet.", ("AGE", "12")),
+    ("if you are 12 like me nobody listens to you", ("AGE", "12")),
     ("you're 11?? i thought u were older", ("AGE", "11")),
-    ("14m here, anyone want to study", ("AGE", "14m")),
+    ("15m and i need help with algebra", ("AGE", "15m")),
     ("13f looking for a math buddy", ("AGE", "13f")),
     # school names in lowercase
-    ("i go to johnson middle school", ("SCHOOL", "johnson middle school")),
-    ("i go to riley elementary and i hate fractions", ("SCHOOL", "riley elementary")),
+    ("we moved so now its parker middle school for me", ("SCHOOL", "parker middle school")),
+    ("my little brother is at dawson elementary", ("SCHOOL", "dawson elementary")),
     ("we played against st. mary's high school", ("SCHOOL", "st. mary's high school")),
 ])
 def test_child_register_dates_ages_schools_are_found(text, expected):
+    # Sentences here are written fresh; none is taken from eval/k12_bench.py or its output.
     assert expected in found(text)
 
 

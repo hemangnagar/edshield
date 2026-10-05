@@ -200,6 +200,8 @@ SCHOOL_LOWER_STOPWORDS = {
     "junior", "senior", "elementary", "middle", "high", "primary", "secondary", "preschool", "pre",
     "against", "with", "vs", "versus", "beat", "played", "play", "near", "by", "than", "called", "named", "about",
     "visit", "visited", "attend", "attended", "attends", "join", "joined", "love", "hate", "miss", "leaving",
+    "its", "it's", "it’s", "now", "then", "here", "there", "me", "it", "yes", "well", "also", "still", "just", "even",
+    "actually", "probably", "maybe", "so", "cuz", "because", "when", "where", "since", "after", "before", "until",
 }
 
 US_STATES = (

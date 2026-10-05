@@ -76,6 +76,11 @@ SENTENCES = [
     "Connected from 2001:0db8:85a3:0000:0000:8a2e:0370:7334 at 10:30:15.",
     "The tablet's MAC is 3C:22:FB:9A:10:5E and id 38400000-8cf0-11bd-b23e-10b96e40000d.",
     "Pinned at 38.9012, -77.2653.",
+    # dates, ages and school names the way children type them
+    "my birthday party is the 8th of August, can u come. recital is August 8th. tryouts got moved to March 3 and jul 27.",
+    "if you are 12 like me nobody listens. 15m and i need help with algebra. brb 5m. the pool is 25m long and we are 3 problems behind.",
+    "we moved so now its parker middle school for me. my old high school had a pool. in middle school you switch classes.",
+    "May 5 kids came to the party. I read 20 pages on March 3 nights in a row. you may 5 us later.",
 ]
 
 HARNESS = """

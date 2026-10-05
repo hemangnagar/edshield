@@ -137,6 +137,9 @@ const SCHOOL_TYPES = "Elementary School|Middle School|High School|Junior High|Pr
 const US_STATES = "AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY|DC";
 // every letter in either case, for the parts of a case-sensitive pattern that should not be
 const anyCase = alts => alts.replace(/[a-z]/g, c => `[${c}${c.toUpperCase()}]`);
+const MONTH_ANY = "January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec";
+const DAY = String.raw`(?:[1-9]|[12]\d|3[01])`;
+const NOT_A_COUNT = String.raw`(?![ \t]*(?:points?|problems?|questions?|pages?|chapters?|minutes?|mins?|hours?|days?|nights?|weeks?|weekends?|months?|years?|times?|percent|%|kids?|people|dollars?|laps?|miles?|rounds?|lessons?|semesters?|grades?|more|less)\b)`;
 const R = {
   EMAIL: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g,
   SSN: /(?<!\d)(?!000|666|9\d\d)\d{3}[- ](?!00)\d{2}[- ](?!0000)\d{4}(?!\d)/g,
@@ -161,7 +164,14 @@ const R = {
   NAME_TITLE: new RegExp(String.raw`\b(?:Mr|Mrs|Ms|Miss|Mx|Dr|Coach|Principal|Professor|Prof)\.?[ \t]+(${PERSON})`, "g"),
   SCHOOL: new RegExp(String.raw`\b((?:[A-Z][A-Za-z'’.-]*[ \t]+){1,4})(?:${SCHOOL_TYPES})\b|\b(?:University|College|School|Academy|Institute)[ \t]+of[ \t]+(?:the[ \t]+)?[A-Z][a-z]+(?:[ \t]+[A-Z][a-z]+){0,2}`, "g"),
   LOCATION: new RegExp(String.raw`\b(${PLACE},[ \t]*(?:${US_STATES}))\b|\b(?:${anyCase("i live in|we live in|i'm from|i’m from|i am from|im from|we moved to|i moved to|i was born in|born in|my hometown is")})[ \t]+(${PLACE})`, "g"),
-  AGE: /\b(\d{1,2})[ -]?(?:years?|yrs?)[ -]old\b|\b(\d{1,2})[ \t]?(?:yo|y\/o)\b|\b(?:age|aged|turning|turned|turn)[ \t]+(\d{1,2})\b|\b(?:i am|i'm|i’m|im)[ \t]+(\d{1,2})(?=[ \t]*(?:[.,!?;]|$|and\b|but\b|so\b|btw\b))/gimd,
+  // a number after "I am" / "you are" is an age unless a count noun follows ("I am 3 problems behind")
+  AGE: new RegExp(String.raw`\b(\d{1,2})[ -]?(?:years?|yrs?)[ -]old\b|\b(\d{1,2})[ \t]?(?:yo|y\/o)\b|\b(?:age|aged|turning|turned|turn)[ \t]+(\d{1,2})\b|\b(?:i am|i'm|i’m|im|you are|you're|you’re|we are|we're|we’re|she is|she's|he is|he's|they are)[ \t]+(\d{1,2})(?=[ \t]*(?:[.,!?;:)]|$|and\b|but\b|so\b|btw\b|like\b|now\b|too\b|already\b|tho\b|though\b|lol\b|haha\b|rn\b|next\b|this\b|in\b|by\b))`, "gimd"),
+  // chat shorthand for age and gender ("14m here"); "5m" is also five minutes or metres, so the range is the school age range and duration or distance cues around it rule it out
+  AGE_CHAT: /(?<![\w.$#-])(1[0-9]|[5-9])[mf]\b(?![ \t]*(?:ago|left|later|away|long|tall|wide|deep|high|from now|run|walk|dash|race|sprint)\b)/gi,
+  // dates as spoken or typed in chat, without a year: "the 8th of August", "August 8th", "jul 27"
+  SPOKEN_DATE: new RegExp(String.raw`\b${DAY}(?:st|nd|rd|th)\s+of\s+(?:${MONTH_ANY})\b\.?(?:,?\s+(?:19|20)\d{2})?|\b(?:${MONTH_ANY})\.?\s+${DAY}(?:st|nd|rd|th)\b(?!,?\s+(?:19|20)\d{2})|\b(?!may\b)(?:${MONTH_ANY})\.?\s+${DAY}\b(?![:.\/-]\d)(?!\s*(?:am|pm)\b)${NOT_A_COUNT}(?!,?\s+(?:19|20)\d{2})`, "gi"),
+  // lowercase school names ("johnson middle school"); the words kept before the kind word must be name-like
+  SCHOOL_LOWER: /\b((?:[a-z][a-z'’.-]+[ \t]+){1,3})(elementary school|middle school|high school|junior high|elementary|academy)\b/g,
   BIRTHDAY: /\b(?:birthday|bday|born)\b[^.\n]{0,20}?\b((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\.?[ \t]+\d{1,2}(?:st|nd|rd|th)?)\b(?!,?[ \t]+(?:19|20)\d{2})/gid,
   IPV4: /(?<![\w.])(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)(?!\.?\d)(?!\w)/g,
   IPV6: /(?<![\w:])(?:[0-9A-Fa-f]{1,4}:){3,7}(?::?[0-9A-Fa-f]{1,4}){1,4}(?![\w:])/g,
@@ -173,6 +183,8 @@ const SCHOOL_KIND = new Set(["High","Middle","Elementary","Junior","Senior","Pri
 const NAME_LABELS = ["NAME_STUDENT","NAME_RELATED"];
 const STOP = new Set(["Hi","Hello","Hey","Oh","Thanks","Yeah","Well","Um","Hmm","Wait","Ms","Mr","Mrs","Dr","Miss","Mx","Tutor","Student","Teacher","Okay","Ok","Yes","No","Just","Still","Only","All","My","Your","Our","Their","Good","The","This","That","What","When","Where","Why","How","Which","Who","In","On","At","For","From","With","About","Going","Not","Very","Really","Also","Then","Now","Here","There","So","But","And","Or","A","An","It","We","They","He","She","You","I","Sure","Sorry","Middle","School","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday","January","February","March","April","May","June","July","August","September","October","November","December","Spring","Summer","Fall","Winter"]);
 const USERNAME_STOP = new Set(["not","the","a","an","my","your","our","is","was","and","or","but","already","taken","wrong","required","invalid","incorrect","missing","what","something","still","also","now"]);
+const SCHOOL_LOWER_STOP = new Set(["a", "about", "actually", "after", "against", "also", "am", "an", "and", "another", "any", "are", "at", "attend", "attended", "attends", "bad", "be", "beat", "because", "before", "best", "big", "boarding", "but", "by", "called", "catholic", "charter", "christian", "closest", "community", "cuz", "each", "elementary", "entire", "even", "every", "finished", "first", "for", "from", "go", "goes", "going", "good", "grade", "hate", "her", "here", "high", "his", "in", "into", "is", "it", "it's", "its", "it’s", "jewish", "join", "joined", "junior", "just", "last", "leaving", "left", "like", "local", "love", "maybe", "me", "middle", "miss", "my", "named", "near", "nearby", "nearest", "new", "next", "no", "normal", "not", "now", "of", "old", "online", "or", "other", "our", "play", "played", "pre", "preschool", "primary", "private", "probably", "public", "regular", "same", "secondary", "senior", "since", "small", "so", "some", "start", "started", "starting", "still", "summer", "than", "that", "the", "their", "then", "there", "these", "this", "those", "to", "until", "versus", "virtual", "visit", "visited", "vs", "was", "well", "went", "when", "where", "whole", "with", "worst", "yes", "your"]);
+const AGE_CHAT_NOT_AFTER = new Set(["a", "about", "after", "almost", "another", "around", "before", "brb", "each", "every", "for", "in", "just", "last", "like", "nearly", "next", "only", "over", "per", "ran", "roughly", "run", "swam", "swim", "take", "takes", "taking", "than", "the", "took", "under", "wait", "within"]);
 // digit groups that are dates, number ranges or round numbers, not IDs
 const NOT_AN_ID = /^(?:\d{1,4}-\d{1,4}|\d{1,2}-\d{1,2}-\d{2,4}|\d{4}-\d{1,2}-\d{1,2}|\d+0{3})$/;
 // with a model loaded these labels come from the model only (edshield.MODEL_AUTHORITY_LABELS)
@@ -209,6 +221,7 @@ function detectRules(text, skip = new Set()) {
   for (const m of text.matchAll(R.ID_BARE)) { const d = m[0].replace(/\D/g, ""); if (d.length < 5 || NOT_AN_ID.test(m[0])) continue; push(out, "ID_NUM", text, m.index, m.index + m[0].length, d.length >= 7 ? 0.75 : 0.6); }
   for (const m of text.matchAll(R.STREET_ADDRESS)) push(out, "STREET_ADDRESS", text, m.index, m.index + m[0].length, 0.85);
   for (const m of text.matchAll(R.DATE)) push(out, "DATE", text, m.index, m.index + m[0].length, 0.8);
+  for (const m of text.matchAll(R.SPOKEN_DATE)) push(out, "DATE", text, m.index, m.index + m[0].length, 0.75);
   for (const [re, minTok] of [[R.NAME_STRONG, 1], [R.NAME_SIGNATURE, 1], [R.NAME_WEAK, 2]]) for (const m of text.matchAll(re)) {
     // keep the leading run of capitalised tokens (the i flag is only for the cue)
     const toks = m[1].split(/[ \t]+/); let keep = [];
@@ -232,11 +245,23 @@ function detectRules(text, skip = new Set()) {
     }
     push(out, "SCHOOL", text, s, m.index + m[0].length, 0.75);
   }
+  for (const m of text.matchAll(R.SCHOOL_LOWER)) {
+    // keep the nearest name-like words before the kind word; none means no school name
+    const words = [...m[1].matchAll(/\S+/g)]; const kept = [];
+    for (const w of words.reverse()) { if (SCHOOL_LOWER_STOP.has(w[0].replace(/^[.'’]+|[.'’]+$/g, "").toLowerCase())) break; kept.push(w); }
+    if (!kept.length) continue;
+    push(out, "SCHOOL", text, m.index + kept[kept.length - 1].index, m.index + m[0].length, 0.7);
+  }
   for (const m of text.matchAll(R.LOCATION)) {
     const v = m[1] || m[2]; if (STOP.has(v.split(/\s+/)[0])) continue;
     const s = m[1] ? m.index : m.index + m[0].length - v.length; push(out, "LOCATION", text, s, s + v.length, 0.75);
   }
   for (const m of text.matchAll(R.AGE)) { const g = [1,2,3,4].find(i => m[i]); if (+m[g] > 0) push(out, "AGE", text, m.indices[g][0], m.indices[g][1], 0.8); }
+  for (const m of text.matchAll(R.AGE_CHAT)) {
+    const before = text.slice(Math.max(0, m.index - 12), m.index).match(/[A-Za-z']+/g);
+    if (before && AGE_CHAT_NOT_AFTER.has(before[before.length - 1].toLowerCase())) continue;
+    push(out, "AGE", text, m.index, m.index + m[0].length, 0.7);
+  }
   for (const m of text.matchAll(R.BIRTHDAY)) push(out, "DATE", text, m.indices[1][0], m.indices[1][1], 0.8);
   for (const m of text.matchAll(R.IPV4)) push(out, "IP_ADDRESS", text, m.index, m.index + m[0].length, 0.95);
   for (const m of text.matchAll(R.IPV6)) push(out, "IP_ADDRESS", text, m.index, m.index + m[0].length, 0.9);
