@@ -61,7 +61,7 @@ Precision on the PIILO held-out set is 0.642: 92 flags out of 257 were not label
 | Address of the student or family | `STREET_ADDRESS`, `LOCATION` | Partly. Full addresses are detected; a street or town mentioned in passing often is not. |
 | Personal identifiers: social security number, student number | `SSN`, `ID_NUM` | Detected. |
 | Biometric records | none | Not covered. edshield handles text only. |
-| Indirect identifiers: date of birth | `DATE` | Partly. Numeric and "March 3, 2012" forms are detected; spoken forms often are not. |
+| Indirect identifiers: date of birth | `DATE` | Partly. Numeric, "March 3, 2012" and year-less spoken or chat forms ("the 8th of August", "August 8th", "jul 27") are detected; a date written as a plain number word ("the eighth") is not. |
 | Indirect identifiers: place of birth | `LOCATION` | Partly. Detected after "born in"; otherwise as any other place. |
 | Indirect identifiers: mother's maiden name | `NAME_RELATED` | Partly. Treated as any other family name. |
 | Other information that alone or in combination could identify the student | `SCHOOL`, `AGE` | Partly, for school and age. Combinations in general (a rare hobby plus a small town) are not detected and need human review. |

@@ -84,3 +84,41 @@ def test_every_policy_acts_on_the_new_labels(policy):
 def test_labels_are_selectable():
     ents = detect_rules("My brother Jordan is 9 years old.", labels=["AGE"])
     assert [(e.label, e.text) for e in ents] == [("AGE", "9")]
+
+
+@pytest.mark.parametrize("text,expected", [
+    # dates as children say or type them, without a year
+    ("I was born the 8th of August and my party is next week.", ("DATE", "8th of August")),
+    ("the field trip is on the 3rd of March", ("DATE", "3rd of March")),
+    ("recital is August 8th so i cant come", ("DATE", "August 8th")),
+    ("party is jul 27 dont forget", ("DATE", "jul 27")),
+    ("tryouts got moved to March 3", ("DATE", "March 3")),
+    # ages without "years old"
+    ("When you are 12 like me you can not drive yet.", ("AGE", "12")),
+    ("you're 11?? i thought u were older", ("AGE", "11")),
+    ("14m here, anyone want to study", ("AGE", "14m")),
+    ("13f looking for a math buddy", ("AGE", "13f")),
+    # school names in lowercase
+    ("i go to johnson middle school", ("SCHOOL", "johnson middle school")),
+    ("i go to riley elementary and i hate fractions", ("SCHOOL", "riley elementary")),
+    ("we played against st. mary's high school", ("SCHOOL", "st. mary's high school")),
+])
+def test_child_register_dates_ages_schools_are_found(text, expected):
+    assert expected in found(text)
+
+
+@pytest.mark.parametrize("text", [
+    "brb 5m",
+    "see you in 10m",
+    "the pool is 25m long and i swam 6m",
+    "it took 15m to finish",
+    "we are 3 problems behind and you are 12 points ahead",
+    "May 5 kids came to the party",
+    "you may 5 us later",
+    "my old high school had a pool",
+    "in middle school you switch classes",
+    "the new elementary school opens next year",
+    "I read 20 pages on March 3 nights in a row",
+])
+def test_child_register_rules_leave_ordinary_text_alone(text):
+    assert {(lab, t) for lab, t in found(text) if lab in {"DATE", "AGE", "SCHOOL"}} == set()

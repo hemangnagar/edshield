@@ -88,6 +88,18 @@ DATE_RE = re.compile(
     r"|\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\.?\s+\d{1,2}(?:st|nd|rd|th)?,?\s+(?:19|20)\d{2}\b",
     re.IGNORECASE,
 )
+# Dates the way they are spoken or typed in chat, without a year: "the 8th of August",
+# "August 8th", "jul 27". A day of the month is a date even when the year is left out;
+# the year-less forms stop at the day so a following count noun is not swallowed.
+_MONTH_ANY = r"(?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)"
+_DAY = r"(?:[1-9]|[12]\d|3[01])"
+_NOT_A_COUNT = r"(?![ \t]*(?:points?|problems?|questions?|pages?|chapters?|minutes?|mins?|hours?|days?|nights?|weeks?|weekends?|months?|years?|times?|percent|%|kids?|people|dollars?|laps?|miles?|rounds?|lessons?|semesters?|grades?|more|less)\b)"
+SPOKEN_DATE_RE = re.compile(
+    rf"\b{_DAY}(?:st|nd|rd|th)\s+of\s+{_MONTH_ANY}\b\.?(?:,?\s+(?:19|20)\d{{2}})?"      # 8th of August
+    rf"|\b{_MONTH_ANY}\.?\s+{_DAY}(?:st|nd|rd|th)\b(?!,?\s+(?:19|20)\d{{2}})"            # August 8th
+    rf"|\b(?!may\b){_MONTH_ANY}\.?\s+{_DAY}\b(?![:./-]\d)(?!\s*(?:am|pm)\b){_NOT_A_COUNT}(?!,?\s+(?:19|20)\d{{2}})",  # jul 27, March 3
+    re.IGNORECASE,
+)
 
 # Names introduced by an explicit cue. Strong cues accept a single first
 # name ("this is Marcus"); weak cues need two or three capitalised tokens.
@@ -123,13 +135,25 @@ MAC_RE = re.compile(r"(?<![\w:-])(?:[0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}(?![\w:-
 UUID_RE = re.compile(r"(?<![\w-])[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}(?![\w-])")
 GEO_RE = re.compile(r"(?<![\w.])-?\d{1,2}\.\d{3,8},[ \t]*-?\d{1,3}\.\d{3,8}(?!\.?\d)(?!\w)")
 
+# A number right after "I am" / "you are" is an age unless a count noun follows ("I am 3
+# problems behind"). The lookahead lists what may follow an age in chat and prose.
+_AFTER_AGE = r"(?=[ \t]*(?:[.,!?;:)]|$|and\b|but\b|so\b|btw\b|like\b|now\b|too\b|already\b|tho\b|though\b|lol\b|haha\b|rn\b|next\b|this\b|in\b|by\b))"
 AGE_RE = re.compile(
     r"\b(\d{1,2})[ -]?(?:years?|yrs?)[ -]old\b"
     r"|\b(\d{1,2})[ \t]?(?:yo|y/o)\b"
     r"|\b(?:age|aged|turning|turned|turn)[ \t]+(\d{1,2})\b"
-    r"|\b(?:i am|i'm|i’m|im)[ \t]+(\d{1,2})(?=[ \t]*(?:[.,!?;]|$|and\b|but\b|so\b|btw\b))",
+    rf"|\b(?:i am|i'm|i’m|im|you are|you're|you’re|we are|we're|we’re|she is|she's|he is|he's|they are)[ \t]+(\d{{1,2}}){_AFTER_AGE}",
     re.IGNORECASE | re.MULTILINE,
 )
+# Chat and gaming shorthand for age and gender ("14m here", "13f"). "5m" is also five
+# minutes or five metres, so the token must be an age in the school range, not follow a
+# duration or distance cue, and not be followed by one.
+AGE_CHAT_RE = re.compile(r"(?<![\w.$#-])(1[0-9]|[5-9])[mf]\b(?![ \t]*(?:ago|left|later|away|long|tall|wide|deep|high|from now|run|walk|dash|race|sprint)\b)", re.IGNORECASE)
+AGE_CHAT_NOT_AFTER = {
+    "in", "for", "brb", "wait", "take", "took", "takes", "taking", "last", "next", "every", "about", "another",
+    "like", "within", "after", "before", "under", "over", "than", "only", "just", "the", "a", "per", "each",
+    "ran", "run", "swim", "swam", "about", "around", "roughly", "nearly", "almost",
+}
 _MONTHS = r"(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*"
 BIRTHDAY_RE = re.compile(
     rf"\b(?:birthday|bday|born)\b[^.\n]{{0,20}}?\b({_MONTHS}\.?[ \t]+\d{{1,2}}(?:st|nd|rd|th)?)\b(?!,?[ \t]+(?:19|20)\d{{2}})",
@@ -159,6 +183,24 @@ SCHOOL_RE = re.compile(
     rf"\b((?:[A-Z][A-Za-z'’.-]*[ \t]+){{1,4}})(?:{SCHOOL_TYPES})\b"
     r"|\b(?:University|College|School|Academy|Institute)[ \t]+of[ \t]+(?:the[ \t]+)?[A-Z][a-z]+(?:[ \t]+[A-Z][a-z]+){0,2}"
 )
+# Children type school names in lowercase ("i go to johnson middle school", "riley
+# elementary"). The kind word has to be one that names a school on its own, and the
+# words before it have to be name-like: not an article, a possessive, a preposition or
+# an adjective such as "old", "new", "public" ("my old high school" names no school).
+SCHOOL_LOWER_RE = re.compile(
+    r"\b((?:[a-z][a-z'’.-]+[ \t]+){1,3})(elementary school|middle school|high school|junior high|elementary|academy)\b"
+)
+SCHOOL_LOWER_STOPWORDS = {
+    "my", "the", "a", "an", "our", "your", "their", "his", "her", "this", "that", "these", "those", "at", "to", "in",
+    "from", "of", "for", "and", "or", "but", "like", "into", "is", "was", "am", "are", "be", "go", "goes", "went",
+    "going", "start", "started", "starting", "left", "finished", "old", "new", "local", "public", "private", "big",
+    "small", "same", "other", "another", "whole", "entire", "first", "last", "next", "charter", "community",
+    "nearby", "boarding", "summer", "grade", "regular", "normal", "good", "bad", "best", "worst", "any", "some",
+    "every", "each", "no", "not", "nearest", "closest", "catholic", "christian", "jewish", "online", "virtual",
+    "junior", "senior", "elementary", "middle", "high", "primary", "secondary", "preschool", "pre",
+    "against", "with", "vs", "versus", "beat", "played", "play", "near", "by", "than", "called", "named", "about",
+    "visit", "visited", "attend", "attended", "attends", "join", "joined", "love", "hate", "miss", "leaving",
+}
 
 US_STATES = (
     "AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|"
@@ -309,6 +351,8 @@ def detect_rules(text: str, labels: Iterable[str] | None = None) -> List[Entity]
     if want("DATE"):
         for m in DATE_RE.finditer(text):
             _add(ents, "DATE", m.start(), m.end(), text, 0.8)
+        for m in SPOKEN_DATE_RE.finditer(text):
+            _add(ents, "DATE", m.start(), m.end(), text, 0.75)
 
     if want("NAME_STUDENT"):
         for m in NAME_CUE_RE.finditer(text):
@@ -337,6 +381,18 @@ def detect_rules(text: str, labels: Iterable[str] | None = None) -> List[Entity]
                     continue
                 start = m.start(1) + words[0].start()
             _add(ents, "SCHOOL", start, m.end(), text, 0.75)
+        for m in SCHOOL_LOWER_RE.finditer(text):
+            # Keep the nearest name-like words before the kind word; none means no school name.
+            words = list(re.finditer(r"\S+", m.group(1)))
+            kept = []
+            for w in reversed(words):
+                if w.group().strip(".'’").lower() in SCHOOL_LOWER_STOPWORDS:
+                    break
+                kept.append(w)
+            if not kept:
+                continue
+            start = m.start(1) + kept[-1].start()
+            _add(ents, "SCHOOL", start, m.end(), text, 0.7)
 
     if want("LOCATION"):
         for m in LOCATION_RE.finditer(text):
@@ -350,6 +406,11 @@ def detect_rules(text: str, labels: Iterable[str] | None = None) -> List[Entity]
             g = next(i for i in (1, 2, 3, 4) if m.group(i))
             if int(m.group(g)) > 0:
                 _add(ents, "AGE", m.start(g), m.end(g), text, 0.8)
+        for m in AGE_CHAT_RE.finditer(text):
+            before = re.findall(r"[A-Za-z']+", text[max(0, m.start() - 12):m.start()])
+            if before and before[-1].lower() in AGE_CHAT_NOT_AFTER:
+                continue
+            _add(ents, "AGE", m.start(), m.end(), text, 0.7)
 
     if want("DATE"):
         for m in BIRTHDAY_RE.finditer(text):
