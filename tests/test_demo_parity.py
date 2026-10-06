@@ -181,3 +181,24 @@ def test_demo_rules_agree_with_python():
         ents = resolve_overlaps(propagate_names(text, detect_rules(text)))
         want = [[e.label, e.text, e.start, e.end] for e in ents]
         assert got == want, f"demo and Python disagree on: {text!r}"
+
+
+def test_demo_overlap_resolution_agrees_with_python():
+    from edshield import Entity
+    text = "we moved to Brookfield tbh and Ada Okoye-Lund came too"
+    ents = [
+        ("LOCATION", 12, 26, 0.95, "model"), ("STREET_ADDRESS", 23, 26, 0.98, "model"),
+        ("NAME_RELATED", 31, 45, 0.6, "model"), ("NAME_STUDENT", 35, 40, 0.9, "model"),
+        ("USERNAME", 12, 17, 0.5, "rules"),
+    ]
+    harness = """
+const [text, ents] = JSON.parse(require("fs").readFileSync(0, "utf8"));
+console.log(JSON.stringify(resolve(ents.map(([label, start, end, confidence, source]) =>
+  ({label, text: text.slice(start, end), start, end, confidence, source}))).map(e => [e.label, e.text, e.start, e.end])));
+"""
+    proc = subprocess.run([NODE, "-e", demo_rules_js() + harness], input=json.dumps([text, ents]),
+                          capture_output=True, text=True, encoding="utf-8", timeout=60)
+    assert proc.returncode == 0, proc.stderr
+    want = resolve_overlaps([Entity(l, text[s:e], s, e, c, src) for l, s, e, c, src in ents])
+    assert json.loads(proc.stdout) == [[e.label, e.text, e.start, e.end] for e in want]
+    assert ["LOCATION", "Brookfield", 12, 22] in json.loads(proc.stdout)

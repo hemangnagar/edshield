@@ -164,3 +164,21 @@ def test_seed_makes_output_reproducible():
     assert len(outs) == 1
     other = edshield.deidentify(text, policy="research", model_name="rules", seed=8).deidentified_text
     assert other not in outs
+
+
+def test_confidence_floor_can_be_lifted_for_model_spans():
+    # coppa drops a student name under 0.3; with recall-first decoding the threshold has already decided it
+    weak = Entity("NAME_STUDENT", "Priya", 0, 5, 0.1, "model")
+    weak_rule = Entity("NAME_RELATED", "Tomas", 10, 15, 0.1, "rules")
+    text = "Priya and Tomas wrote this."
+    assert apply_deidentification(text, [weak, weak_rule], policy="coppa").deidentified_text == text
+    lifted = apply_deidentification(text, [weak, weak_rule], policy="coppa", floor_model_spans=False)
+    assert lifted.deidentified_text == "[CHILD] and Tomas wrote this."
+
+
+def test_o_threshold_lifts_the_floor_in_deidentify(monkeypatch):
+    weak = Entity("NAME_STUDENT", "Priya", 0, 5, 0.1, "model")
+    monkeypatch.setattr(edshield.ner, "detect_model", lambda text, **kw: [weak])
+    text = "Priya wrote this."
+    assert edshield.deidentify(text, policy="coppa", model_name="stub").deidentified_text == text
+    assert edshield.deidentify(text, policy="coppa", model_name="stub", o_threshold=0.99).deidentified_text == "[CHILD] wrote this."

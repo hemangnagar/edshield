@@ -124,3 +124,20 @@ def test_propagation_catches_possessive_but_not_name_fragments():
     found = sorted((e.start, e.text) for e in ents if e.label == "NAME_STUDENT")
     assert [t for _, t in found] == ["Priya Raman", "Priya"]
     assert text[found[1][0]:].startswith("Priya's")
+
+
+def test_resolving_an_overlap_never_uncovers_text():
+    from edshield import Entity
+    text = "we moved to Brookfield tbh and Ada Okoye-Lund came too"
+    town = Entity("LOCATION", "Brookfield tbh", 12, 26, 0.95, "model")
+    slang = Entity("STREET_ADDRESS", "tbh", 23, 26, 0.98, "model")  # shorter but surer: it wins the overlap
+    name = Entity("NAME_RELATED", "Ada Okoye-Lund", 31, 45, 0.6, "model")
+    middle = Entity("NAME_STUDENT", "Okoye", 35, 40, 0.9, "model")
+    got = [(e.label, e.text, e.start, e.end) for e in resolve_overlaps([town, slang, name, middle])]
+    assert got == [
+        ("LOCATION", "Brookfield", 12, 22), ("STREET_ADDRESS", "tbh", 23, 26),
+        ("NAME_RELATED", "Ada", 31, 34), ("NAME_STUDENT", "Okoye", 35, 40), ("NAME_RELATED", "-Lund", 40, 45),
+    ]
+    # a loser that is wholly covered still goes
+    inner = Entity("USERNAME", "Brook", 12, 17, 0.5, "rules")
+    assert [e.label for e in resolve_overlaps([town, inner])] == ["LOCATION"]

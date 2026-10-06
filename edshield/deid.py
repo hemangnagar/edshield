@@ -121,7 +121,11 @@ def apply_deidentification(
     date_shift_days: Optional[int] = None,
     seed: Optional[int] = None,
     salt: Optional[str] = None,
+    floor_model_spans: bool = True,
 ) -> DeidResult:
+    """`floor_model_spans=False` exempts model spans from the policy's
+    confidence floor. Recall-first decoding (`o_threshold`) needs it: there
+    the threshold already decided the span, and a floor on top drops names."""
     pol = load_policy(policy)
     rules: dict = pol.get("labels", {})
     # The caller's method applies only if given and the policy allows it.
@@ -172,6 +176,8 @@ def apply_deidentification(
         cfg = rules.get(e.label)
         enabled = cfg is not None and (cfg is True or (isinstance(cfg, dict) and cfg.get("enabled", True)))
         label_min = float(cfg.get("min_confidence", min_conf)) if isinstance(cfg, dict) else min_conf
+        if not floor_model_spans and e.source == "model":
+            label_min = 0.0
         if enabled and e.confidence >= label_min:
             acted.append(e)
 

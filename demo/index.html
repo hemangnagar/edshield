@@ -300,7 +300,19 @@ function propagateNames(text, ents) {
 function resolve(ents) {
   const ordered = [...ents].sort((a, b) => (b.confidence - a.confidence) || ((b.end - b.start) - (a.end - a.start)) || ((a.source === "model" ? 0 : 1) - (b.source === "model" ? 0 : 1)) || (a.start - b.start));
   const kept = [];
-  for (const e of ordered) if (!kept.some(k => e.start < k.end && k.start < e.end)) kept.push(e);
+  for (const e of ordered) {
+    const hits = kept.filter(k => e.start < k.end && k.start < e.end).sort((a, b) => a.start - b.start);
+    if (!hits.length) { kept.push(e); continue; }
+    // the loser keeps whatever the winners do not cover, so resolving an overlap never uncovers text
+    let cursor = e.start;
+    for (const [lo, hi] of [...hits.map(k => [k.start, k.end]), [e.end, e.end]]) {
+      let s = cursor, t = Math.min(lo, e.end); cursor = Math.max(cursor, hi);
+      while (s < t && /\s/.test(e.text[s - e.start])) s++;
+      while (t > s && /\s/.test(e.text[t - 1 - e.start])) t--;
+      const piece = e.text.slice(s - e.start, t - e.start);
+      if (/[\p{L}\p{N}]/u.test(piece)) kept.push({...e, text: piece, start: s, end: t});
+    }
+  }
   return kept.sort((a, b) => a.start - b.start);
 }
 

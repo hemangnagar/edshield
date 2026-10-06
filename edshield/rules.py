@@ -11,6 +11,7 @@ layer; the rules only catch names introduced by explicit cues
 from __future__ import annotations
 
 import re
+from dataclasses import replace
 from typing import Iterable, List
 
 from .types import Entity
@@ -440,7 +441,9 @@ def detect_rules(text: str, labels: Iterable[str] | None = None) -> List[Entity]
 def resolve_overlaps(ents: List[Entity]) -> List[Entity]:
     """Keep the higher-confidence, then longer, entity when spans overlap.
 
-    Model entities win ties against rule entities of the same length.
+    Model entities win ties against rule entities of the same length. The
+    loser keeps whatever the winners do not cover, so resolving an overlap
+    never uncovers text: a two-letter span must not erase the town beside it.
     """
     ordered = sorted(
         ents,
@@ -448,8 +451,21 @@ def resolve_overlaps(ents: List[Entity]) -> List[Entity]:
     )
     kept: List[Entity] = []
     for e in ordered:
-        if not any(e.overlaps(k) for k in kept):
+        hits = sorted((k for k in kept if e.overlaps(k)), key=lambda k: k.start)
+        if not hits:
             kept.append(e)
+            continue
+        cursor = e.start
+        for lo, hi in [(k.start, k.end) for k in hits] + [(e.end, e.end)]:
+            s, t = cursor, min(lo, e.end)
+            cursor = max(cursor, hi)
+            while s < t and e.text[s - e.start].isspace():
+                s += 1
+            while t > s and e.text[t - 1 - e.start].isspace():
+                t -= 1
+            piece = e.text[s - e.start:t - e.start]
+            if any(ch.isalnum() for ch in piece):
+                kept.append(replace(e, text=piece, start=s, end=t))
     kept.sort(key=lambda e: e.start)
     return kept
 

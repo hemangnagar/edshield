@@ -134,10 +134,13 @@ def deidentify(
 ) -> DeidResult:
     """Detect then transform. `method=None` uses the policy's default method.
     `verify=True` raises if any acted-on value is still present verbatim.
-    With `o_threshold`, the policy's confidence floor applies to 1 - P(O)."""
+    With `o_threshold`, the policy's confidence floor is not applied to model
+    spans: the threshold has already decided them, and a floor on the span's
+    mean 1 - P(O) drops names that sit next to weak tokens."""
     res = analyze_text(text, model_name=model_name, device=device, o_threshold=o_threshold)
     out = apply_deidentification(
-        text, res.entities, method=method, policy=policy, date_shift_days=date_shift_days, seed=seed
+        text, res.entities, method=method, policy=policy, date_shift_days=date_shift_days, seed=seed,
+        floor_model_spans=o_threshold is None,
     )
     out.audit.update(
         detector=res.model_name or ner.resolve_model_id(None),
