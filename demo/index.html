@@ -322,7 +322,7 @@ const M = {method: "mask"};
 const INDIRECT = { SCHOOL: M, LOCATION: M, AGE: M, IP_ADDRESS: M, DEVICE_ID: M, GEO: M };
 const POLICY = {
   ferpa:    { min: 0.5,  labels: { NAME_STUDENT: {mask: "[STUDENT]", min: 0.4}, EMAIL: {}, USERNAME: {}, ID_NUM: {min: 0.6}, PHONE_NUM: {}, URL_PERSONAL: {}, STREET_ADDRESS: {}, SSN: M, DATE: {method: "shift"}, NAME_RELATED: {mask: "[PERSON]", min: 0.4}, ...INDIRECT } },
-  coppa:    { min: 0.35, labels: { NAME_STUDENT: {mask: "[CHILD]", min: 0.3}, EMAIL: M, USERNAME: {method: "mask", min: 0.3}, ID_NUM: {min: 0.5}, PHONE_NUM: M, URL_PERSONAL: M, STREET_ADDRESS: M, SSN: M, DATE: {method: "shift"}, NAME_RELATED: {mask: "[PERSON]", min: 0.3}, ...INDIRECT } },
+  coppa:    { min: 0.35, oThreshold: 0.99, labels: { NAME_STUDENT: {mask: "[CHILD]", min: 0.3}, EMAIL: M, USERNAME: {method: "mask", min: 0.3}, ID_NUM: {min: 0.5}, PHONE_NUM: M, URL_PERSONAL: M, STREET_ADDRESS: M, SSN: M, DATE: {method: "shift"}, NAME_RELATED: {mask: "[PERSON]", min: 0.3}, ...INDIRECT } },
   research: { min: 0.5,  method: "replace", labels: { NAME_STUDENT: {}, EMAIL: {}, USERNAME: {}, ID_NUM: {}, PHONE_NUM: {}, URL_PERSONAL: {}, STREET_ADDRESS: {}, SSN: M, DATE: {method: "shift"}, NAME_RELATED: {}, ...INDIRECT } },
 };
 const FIRST = ["Avery","Jordan","Riley","Sam","Taylor","Morgan","Casey","Quinn","Rowan","Elliot"], LAST = ["Nguyen","Patel","Garcia","Okoro","Kim","Rossi","Haddad","Lindqvist","Mensah","Sato"];
@@ -353,7 +353,9 @@ function shiftDate(s, days) {
 
 function deidentify(text, ents, policyName) {
   const pol = POLICY[policyName], memo = new Map(), shift = 137;
-  const acted = ents.filter(e => { const c = pol.labels[e.label]; return c && e.confidence >= (c.min ?? pol.min); });
+  // with recall-first decoding the threshold has already decided the model's spans; the floor is for rule spans
+  const floor = (e, c) => pol.oThreshold != null && e.source === "model" ? 0 : (c.min ?? pol.min);
+  const acted = ents.filter(e => { const c = pol.labels[e.label]; return c && e.confidence >= floor(e, c); });
   let out = "", cursor = 0; const html = [];
   for (const e of acted) {
     const c = pol.labels[e.label];
@@ -386,24 +388,28 @@ function alignTokens(text, pieces) {
       if (near >= 0 && near - start <= 12) start = near;   // the tokenizer dropped a few characters
       else { cursor += (text.slice(cursor).match(/^\S+/) || [""])[0].length; continue; }  // unknown token: skip what it stands for
     }
-    out.push({start, end: start + piece.length, label: (r.entity_group ?? r.entity).replace(/^[BI]-/, ""), score: r.score});
+    out.push({start, end: start + piece.length, label: (r.entity_group ?? r.entity).replace(/^[BI]-/, ""), score: r.score, po: r.po, alt: r.alt?.replace(/^[BI]-/, "")});
     cursor = start + piece.length;
   }
   return out;
 }
 const UNBROKEN = new Set(["URL_PERSONAL", "EMAIL"]), WRAPPERS = "()[]{}<>\"'“”‘’«»";
-function decodeTokens(text, tokens, threshold = 0.5) {
+// With oThreshold (recall-first) a token is an identifier whenever P(O) < oThreshold, labelled with its
+// most likely class other than O, and the span's confidence is 1 - P(O).
+function decodeTokens(text, tokens, threshold = 0.5, oThreshold = null) {
   const groups = [];
   for (const t of tokens) {
-    if (t.label === "O") continue;
+    let label = t.label, score = t.score;
+    if (oThreshold != null) { if (t.po >= oThreshold) continue; label = t.alt; score = 1 - t.po; }
+    else if (label === "O") continue;
     const g = groups[groups.length - 1];
-    if (g && g.label === t.label && /^[ \-.'’_]?$/.test(text.slice(g.end, t.start))) { g.end = Math.max(g.end, t.end); g.scores.push(t.score); }
-    else groups.push({start: t.start, end: t.end, label: t.label, scores: [t.score]});
+    if (g && g.label === label && /^[ \-.'’_]?$/.test(text.slice(g.end, t.start))) { g.end = Math.max(g.end, t.end); g.scores.push(score); }
+    else groups.push({start: t.start, end: t.end, label, scores: [score]});
   }
   const ents = [];
   for (const g of groups) {
     const conf = g.scores.reduce((a, b) => a + b, 0) / g.scores.length;
-    if (conf < threshold) continue;
+    if (oThreshold == null && conf < threshold) continue;
     // cover the whole word, or for a URL or an email the whole unbroken run
     let s = g.start, e = g.end; const unbroken = UNBROKEN.has(g.label);
     const inside = ch => unbroken ? !/\s/.test(ch) : /[\p{L}\p{N}]/u.test(ch);
@@ -439,10 +445,26 @@ async function loadModel() {
     modelSource = "the Hugging Face Hub";
   }
 }
-async function detectModel(text) {
+// Every token with its top class, P(O) and best class other than O. The pipeline itself reports only
+// the top class, which is not enough for recall-first decoding, so the model is called directly.
+async function modelTokens(text) {
+  const inputs = pipe.tokenizer([text], { padding: true, truncation: true });
+  const { logits } = await pipe.model(inputs);
+  const id2label = pipe.model.config.id2label, ids = inputs.input_ids[0], rows = logits[0], out = [];
+  const oId = +Object.keys(id2label).find(k => id2label[k] === "O");
+  for (let j = 0; j < rows.dims[0]; j++) {
+    const word = pipe.tokenizer.decode([ids[j].item()], { skip_special_tokens: true });
+    if (word === "") continue;
+    const z = rows[j].data, hi = Math.max(...z), p = Array.from(z, v => Math.exp(v - hi)), sum = p.reduce((a, b) => a + b, 0);
+    let top = 0, alt = -1;
+    p.forEach((v, i) => { p[i] = v / sum; if (p[i] > p[top]) top = i; if (i !== oId && (alt < 0 || p[i] > p[alt])) alt = i; });
+    out.push({ word, entity: id2label[top], score: p[top], po: p[oId], alt: id2label[alt] });
+  }
+  return out;
+}
+async function detectModel(text, oThreshold = null) {
   if (!pipe) await loadModel();
-  const res = await pipe(text, { ignore_labels: [] });   // every token, so each can be placed
-  return decodeTokens(text, alignTokens(text, res));
+  return decodeTokens(text, alignTokens(text, await modelTokens(text)), 0.5, oThreshold);
 }
 
 // ---------- UI ----------
@@ -455,7 +477,7 @@ $("run").addEventListener("click", async () => {
   const text = $("in").value, t0 = performance.now();
   let ents = detectRules(text);
   if ($("engine").value === "model") {
-    try { const found = await detectModel(text); ents = detectRules(text, MODEL_AUTHORITY).concat(found); }
+    try { const found = await detectModel(text, POLICY[$("policy").value].oThreshold ?? null); ents = detectRules(text, MODEL_AUTHORITY).concat(found); }
     catch (err) {
       status("The model could not be loaded from ./models or from the Hugging Face Hub. Check the connection, or switch to Rules only. Showing rules-only result.", true);
     }

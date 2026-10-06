@@ -206,3 +206,55 @@ console.log(JSON.stringify(resolve(ents.map(([label, start, end, confidence, sou
     got = json.loads(proc.stdout)
     assert ["LOCATION", "Brookfield", 12, 22] in got
     assert all(s < e and text[s:e] == t for _, t, s, e in got)
+
+
+# (text, [(token piece, {class: probability}), ...]): full distributions, for recall-first decoding
+RECALL_FIRST_CASES = [
+    # a name the model leans against, next to one it is sure of
+    ("thanks from Noor Haddad and Ines today",
+     [("▁thanks", {"O": .999}), ("▁from", {"O": .995}), ("▁Noor", {"O": .97, "B-NAME_STUDENT": .03}),
+      ("▁Had", {"O": .87, "I-NAME_STUDENT": .12}), ("dad", {"O": .40, "I-NAME_STUDENT": .55}), ("▁and", {"O": .999}),
+      ("▁Ines", {"O": .01, "B-NAME_STUDENT": .98}), ("▁today", {"O": .992})]),
+    # the best class other than O changes inside a word, and a weak tail joins a sure town
+    ("im in Brookfield tbh my user is kiwi_42",
+     [("▁im", {"O": .999}), ("▁in", {"O": .999}), ("▁Brook", {"O": .0, "B-LOCATION": 1.0}),
+      ("field", {"O": .0, "B-LOCATION": .99}), ("▁tb", {"O": .10, "I-LOCATION": .70, "I-STREET_ADDRESS": .16}),
+      ("h", {"O": .02, "I-STREET_ADDRESS": .44, "I-LOCATION": .34, "B-LOCATION": .18}), ("▁my", {"O": .999}),
+      ("▁user", {"O": .995}), ("▁is", {"O": .999}), ("▁kiwi", {"O": .985, "B-USERNAME": .01}),
+      ("_", {"O": .86, "B-USERNAME": .10}), ("42", {"O": .91, "B-USERNAME": .07, "B-ID_NUM": .02})]),
+    # nothing under the threshold; an initial alone is still not a name
+    ("By C. we read the rubric", [("▁By", {"O": .999}), ("▁C", {"O": .5, "B-NAME_STUDENT": .5}), (".", {"O": .999}),
+                                  ("▁we", {"O": .999}), ("▁read", {"O": .999}), ("▁the", {"O": .999}), ("▁rubric", {"O": .995})]),
+]
+
+
+def test_demo_recall_first_decoding_agrees_with_python():
+    from edshield import ner
+    harness = """
+const cases = JSON.parse(require("fs").readFileSync(0, "utf8"));
+console.log(JSON.stringify(cases.map(([text, pieces]) => {
+  const rows = pieces.map(([word, dist]) => {
+    const all = Object.entries(dist).sort((a, b) => b[1] - a[1]), nonO = all.filter(([l]) => l !== "O");
+    return {word, entity: all[0][0], score: all[0][1], po: dist.O, alt: nonO[0] ? nonO[0][0] : "B-NAME_STUDENT"};
+  });
+  return decodeTokens(text, alignTokens(text, rows), 0.5, 0.99).map(e => [e.label, e.text, e.start, e.end, +e.confidence.toFixed(6)]);
+})));
+"""
+    code = 'const NAME_LABELS = ["NAME_STUDENT","NAME_RELATED"];\n' + demo_section("Model decoding") + harness
+    proc = subprocess.run([NODE, "-e", code], input=json.dumps(RECALL_FIRST_CASES), capture_output=True,
+                          text=True, encoding="utf-8", timeout=60)
+    assert proc.returncode == 0, proc.stderr
+    got = json.loads(proc.stdout)
+    labels = ["O"] + sorted({l for _, pieces in RECALL_FIRST_CASES for _, dist in pieces for l in dist if l != "O"})
+    for (text, pieces), js in zip(RECALL_FIRST_CASES, got):
+        offsets, probs, cursor = [], [], 0
+        for piece, dist in pieces:
+            piece = piece.lstrip("▁")
+            start = text.index(piece, cursor)
+            cursor = start + len(piece)
+            offsets.append((start, cursor))
+            probs.append([dist.get(l, 0.0) for l in labels])
+        want = ner.decode(text, offsets, probs, dict(enumerate(labels)), o_threshold=0.99)
+        assert js == [[e.label, e.text, e.start, e.end, round(e.confidence, 6)] for e in want], f"disagree on: {text!r}"
+    assert [e[:2] for e in got[0]] == [["NAME_STUDENT", "Noor Haddad"], ["NAME_STUDENT", "Ines"]]
+    assert got[2] == []
