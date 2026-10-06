@@ -141,3 +141,11 @@ def test_resolving_an_overlap_never_uncovers_text():
     # a loser that is wholly covered still goes
     inner = Entity("USERNAME", "Brook", 12, 17, 0.5, "rules")
     assert [e.label for e in resolve_overlaps([town, inner])] == ["LOCATION"]
+    # ... also when it starts after the winner does, or hangs over the winner's right edge
+    full = Entity("NAME_STUDENT", "Ada Okoye-Lund", 31, 45, 0.99, "model")
+    last = Entity("NAME_STUDENT", "Okoye-Lund", 35, 45, 0.9, "propagated")
+    over = Entity("NAME_RELATED", "Lund came", 41, 50, 0.5, "model")
+    got = [(e.label, e.text, e.start, e.end) for e in resolve_overlaps([full, last, over])]
+    assert got == [("NAME_STUDENT", "Ada Okoye-Lund", 31, 45), ("NAME_RELATED", "came", 46, 50)]
+    for e in resolve_overlaps([town, slang, name, middle, inner, last, over]):
+        assert e.start < e.end and text[e.start:e.end] == e.text

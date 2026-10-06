@@ -459,6 +459,8 @@ def resolve_overlaps(ents: List[Entity]) -> List[Entity]:
         for lo, hi in [(k.start, k.end) for k in hits] + [(e.end, e.end)]:
             s, t = cursor, min(lo, e.end)
             cursor = max(cursor, hi)
+            if t <= s:
+                continue
             while s < t and e.text[s - e.start].isspace():
                 s += 1
             while t > s and e.text[t - 1 - e.start].isspace():

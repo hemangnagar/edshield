@@ -189,7 +189,9 @@ def test_demo_overlap_resolution_agrees_with_python():
     ents = [
         ("LOCATION", 12, 26, 0.95, "model"), ("STREET_ADDRESS", 23, 26, 0.98, "model"),
         ("NAME_RELATED", 31, 45, 0.6, "model"), ("NAME_STUDENT", 35, 40, 0.9, "model"),
-        ("USERNAME", 12, 17, 0.5, "rules"),
+        ("USERNAME", 12, 17, 0.5, "rules"), ("NAME_STUDENT", 41, 45, 0.55, "propagated"),
+        ("NAME_RELATED", 41, 50, 0.5, "model"), ("LOCATION", 20, 30, 0.4, "rules"),
+        ("NAME_RELATED", 33, 45, 0.3, "rules"),
     ]
     harness = """
 const [text, ents] = JSON.parse(require("fs").readFileSync(0, "utf8"));
@@ -201,4 +203,6 @@ console.log(JSON.stringify(resolve(ents.map(([label, start, end, confidence, sou
     assert proc.returncode == 0, proc.stderr
     want = resolve_overlaps([Entity(l, text[s:e], s, e, c, src) for l, s, e, c, src in ents])
     assert json.loads(proc.stdout) == [[e.label, e.text, e.start, e.end] for e in want]
-    assert ["LOCATION", "Brookfield", 12, 22] in json.loads(proc.stdout)
+    got = json.loads(proc.stdout)
+    assert ["LOCATION", "Brookfield", 12, 22] in got
+    assert all(s < e and text[s:e] == t for _, t, s, e in got)

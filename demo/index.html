@@ -307,6 +307,7 @@ function resolve(ents) {
     let cursor = e.start;
     for (const [lo, hi] of [...hits.map(k => [k.start, k.end]), [e.end, e.end]]) {
       let s = cursor, t = Math.min(lo, e.end); cursor = Math.max(cursor, hi);
+      if (t <= s) continue;
       while (s < t && /\s/.test(e.text[s - e.start])) s++;
       while (t > s && /\s/.test(e.text[t - 1 - e.start])) t--;
       const piece = e.text.slice(s - e.start, t - e.start);
