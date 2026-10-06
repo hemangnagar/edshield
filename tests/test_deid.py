@@ -180,5 +180,19 @@ def test_o_threshold_lifts_the_floor_in_deidentify(monkeypatch):
     weak = Entity("NAME_STUDENT", "Priya", 0, 5, 0.1, "model")
     monkeypatch.setattr(edshield.ner, "detect_model", lambda text, **kw: [weak])
     text = "Priya wrote this."
-    assert edshield.deidentify(text, policy="coppa", model_name="stub").deidentified_text == text
-    assert edshield.deidentify(text, policy="coppa", model_name="stub", o_threshold=0.99).deidentified_text == "[CHILD] wrote this."
+    assert edshield.deidentify(text, policy="ferpa", model_name="stub").deidentified_text == text
+    lifted = edshield.deidentify(text, policy="ferpa", model_name="stub", o_threshold=0.99)
+    assert lifted.deidentified_text == "[STUDENT] wrote this." and lifted.audit["o_threshold"] == 0.99
+
+
+def test_coppa_decodes_recall_first_by_default(monkeypatch):
+    seen = {}
+    weak = Entity("NAME_STUDENT", "Priya", 0, 5, 0.1, "model")
+    monkeypatch.setattr(edshield.ner, "detect_model", lambda text, **kw: seen.update(kw) or [weak])
+    r = edshield.deidentify("Priya wrote this.", policy="coppa", model_name="stub")
+    assert seen["o_threshold"] == 0.99 and r.audit["o_threshold"] == 0.99
+    assert r.deidentified_text == "[CHILD] wrote this."
+    edshield.deidentify("Priya wrote this.", policy="coppa", model_name="stub", o_threshold=0.5)
+    assert seen["o_threshold"] == 0.5
+    edshield.deidentify("Priya wrote this.", policy="ferpa", model_name="stub")
+    assert seen["o_threshold"] is None

@@ -8,6 +8,11 @@ name: coppa
 description: Recall-first removal of children's personal information from chat, transcripts and submissions before any model call.
 default_method: mask
 min_confidence: 0.35
+# Recall-first decoding: the model flags a token whenever P(O) < 0.99, and the
+# confidence floors above then apply to rule spans only. Measured on five
+# trained copies: default decoding left 0-3 of 165 held-out identifiers
+# depending on the copy; this leaves 0 on every copy.
+o_threshold: 0.99
 allow_method_override: true
 labels:
   NAME_STUDENT: {enabled: true, mask: "[CHILD]", min_confidence: 0.3}

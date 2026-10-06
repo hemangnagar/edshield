@@ -136,7 +136,10 @@ def deidentify(
     `verify=True` raises if any acted-on value is still present verbatim.
     With `o_threshold`, the policy's confidence floor is not applied to model
     spans: the threshold has already decided them, and a floor on the span's
-    mean 1 - P(O) drops names that sit next to weak tokens."""
+    mean 1 - P(O) drops names that sit next to weak tokens. A policy may set
+    `o_threshold` itself (coppa does); the argument, when given, wins."""
+    if o_threshold is None:
+        o_threshold = load_policy(policy).get("o_threshold")
     res = analyze_text(text, model_name=model_name, device=device, o_threshold=o_threshold)
     out = apply_deidentification(
         text, res.entities, method=method, policy=policy, date_shift_days=date_shift_days, seed=seed,

@@ -46,7 +46,7 @@ EDSHIELD_ALLOW_DOWNLOAD=1 edshield extract essay.txt     # PowerShell: $env:EDSH
 
 After that it loads from the Hugging Face cache with no network and the variable is not needed. Without the variable, models load from disk only: a directory you pass, the `local_path` in `edshield/models.jsonl`, or the cache. If you name a model (`model_name=...` or `EDSHIELD_MODEL`) and it cannot be loaded, edshield raises `ModelUnavailableError` rather than quietly doing less. If you name none and the default is not installed, the rules run alone and a `RuntimeWarning` says so; pass `model_name="rules"` to choose that on purpose.
 
-**Recall-first decoding.** `analyze_text(..., o_threshold=0.99)` marks a token as an entity whenever P(O) < 0.99 instead of taking the most likely class. It is off by default: on held-out PIILO essays it lowered precision from 0.69 to 0.57 with recall already at 1.00.
+**Recall-first decoding.** `analyze_text(..., o_threshold=0.99)` marks a token as an entity whenever P(O) < 0.99 instead of taking the most likely class. It is off by default: on held-out PIILO essays it lowered precision from 0.69 to 0.57 with recall already at 1.00. The `coppa` policy turns it on (`o_threshold: 0.99` in the policy file), and with it the policy's confidence floor applies to rule spans only.
 
 Label schema is the seven types of the [PIILO corpus](https://the-learning-agency-lab.com/learning-exchange/piilo-dataset/) (The Learning Agency Lab, CC BY 4.0), so models trained on it drop straight in.
 
